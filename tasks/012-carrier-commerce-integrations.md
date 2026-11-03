@@ -28,6 +28,14 @@ Connect Saleor, Shopify/WooCommerce and carrier/broker workflows with sandbox cr
 - Add operator-pinned overlapping signing keys and encrypted-state key rotation with backward-compatible reads. Keep minimal permissions, the existing manual endpoint and all non-payable boundaries.
 - Verify lifecycle behavior against the running isolated sandbox, including deactivate/reactivate and uninstall/reinstall, and record actual tests before changing this slice's status.
 
+## 2026-11-03 — Lifecycle and key-rotation evidence
+- [x] Signed self-lifecycle hooks retain the original MANAGE_CHECKOUTS-only scope. Recipient/App identity, timestamps, live-token checks and atomic binding checks protect reads/writes and reinstallation.
+- [x] Actual sandbox deactivate/reactivate/delete/reinstall passed after fixing missing API/worker shared media. App ID changed from QXBwOjE= to QXBwOjI=; four historical reviews survived and new checkout-created/updated reviews arrived automatically.
+- [x] Replacement App was verified inside Dashboard through real staff/AppBridge authentication; six review cards were visible. Financial collection remains disabled.
+- [x] Added bounded signing-key overlap/retirement and lazy encrypted-state rewrapping with previous keys; automated tests cover invalid signatures, retirement, tenant binding and tampered state. Sandbox keys were not actually rotated.
+- PASS: Release build (zero warnings/errors), 143 xUnit tests (19 new cases), 25 Python tests, container build, 10 HTTP smoke checks, npm audit (zero vulnerabilities), reproducible UI build, actionlint and repository checks.
+- [Lifecycle behavior, key-rotation runbook and limitations](../docs/SALEOR_APP_LIFECYCLE.md). Hosted CI, operational monitoring, distributed persistence and production recovery remain open; TASK-012 stays in-progress.
+
 ## Existing project references
 docs/ROADMAP.md; src/GlobalTradeTax.Api; tests/GlobalTradeTax.Api.Tests
 

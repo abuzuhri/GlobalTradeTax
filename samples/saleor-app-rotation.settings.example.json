@@ -1,0 +1,24 @@
+{
+  "SaleorApp": {
+    "Enabled": false,
+    "EncryptionKey": "<supply-current-64-hex-characters-via-secret-configuration>",
+    "PreviousEncryptionKeys": [
+      "<supply-previous-64-hex-characters-during-migration-only>"
+    ],
+    "Stores": [
+      {
+        "Id": "example",
+        "VerificationKeys": [
+          {
+            "KeyId": "<independently-verified-current-key-id>",
+            "PublicKeyPem": "<current-RSA-public-key-PEM>"
+          },
+          {
+            "KeyId": "<independently-verified-next-key-id>",
+            "PublicKeyPem": "<next-RSA-public-key-PEM>"
+          }
+        ]
+      }
+    ]
+  }
+}

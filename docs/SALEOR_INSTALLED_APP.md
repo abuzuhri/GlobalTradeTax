@@ -90,4 +90,6 @@ Dashboard 3.23.41 uses `/extensions/app/{encoded-app-id}`; the legacy `/apps/{id
 
 ## Remaining work
 
+Update 2026-11-03: [the lifecycle/key-rotation slice](SALEOR_APP_LIFECYCLE.md) adds signed self-events, revocation/reinstallation protection and bounded operator-controlled key overlap. The initial 0.1.0 installation results above are historical; existing installations need their webhook subscriptions updated to the new recipient-aware query. See that document for the latest boundaries and actual evidence.
+
 TASK-012 remains in progress: production HTTPS deployment, lifecycle revocation/reinstallation and key rotation, stronger provisioning UX, distributed persistence, volume/credential backup and retention policy, failure/retry monitoring, broader tenant-isolation review, carriers/Shopify/WooCommerce and verified line-level customs calculation are still open. The existing 005/007/008 calculation gates are unchanged. An installed review App does not authorize customs collection or a production release.

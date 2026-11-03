@@ -70,6 +70,7 @@ services:
       OTEL_METRICS_EXPORTER: none
       OTEL_LOGS_EXPORTER: none
     volumes:
+      - saleor-media:/app/media
       - ./signing-key.pem:/app/.jwt_key.pem:ro
     depends_on:
       - api

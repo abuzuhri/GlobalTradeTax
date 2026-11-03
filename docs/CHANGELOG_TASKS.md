@@ -87,6 +87,14 @@
 - Verified runtime schema (0 errors), staff login, rendered Dashboard, Saleor-generated signature/JWKS matching and controlled replay to the published .NET API. Signed contents remained synthetic; no automatic checkout webhook or payable tax flow was enabled.
 - Release build/publish and 111 xUnit / 25 Python tests passed. See [sandbox evidence](SALEOR_SANDBOX.md). App installation, review UI and real checkout-event delivery remain open.
 
+## 2026-11-03 — TASK-012 lifecycle and key rotation
+
+- Added signed self-lifecycle subscriptions, recipient-aware event binding, durable revocation, verified reinstallation and live-token gates without extra App permissions. Historical reviews survive; stale-installation events and writes are rejected.
+- Added bounded operator-pinned signing-key overlap and lazy AES-GCM rewrapping using previous encryption keys. Sandbox keys were not rotated; automated cryptographic tests verify overlap/retirement/migration/tamper rejection.
+- Fixed missing shared media between Saleor API and worker after real lifecycle delivery failed with a missing payload file. Retest passed deactivate/reactivate/delete/reinstall, preserved four historical references and delivered two new cart reviews; Dashboard rendered six cards.
+- PASS: Release build, 143 xUnit tests, 25 Python tests, container build, 10 HTTP smoke checks, npm audit (zero vulnerabilities), reproducible frontend output, actionlint and repository guards. No hosted CI run or production deployment.
+- [Evidence, configuration and remaining work](SALEOR_APP_LIFECYCLE.md). TASK-012 remains in-progress.
+
 ## 2026-11-03 — TASK-012 installed Saleor review App
 - Added manifest installation, token verification against preconfigured Saleor stores, AES-256-GCM state protection, signed asynchronous checkout-event ingestion and bounded persistent delivery deduplication.
 - Added a real product/cart test and Celery worker: checkout creation and quantity update automatically delivered signed reviews. Added an Arabic AppBridge-authenticated Dashboard screen and verified actual browser display.

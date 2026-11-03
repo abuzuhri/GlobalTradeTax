@@ -69,8 +69,13 @@ def main():
     historical = set()
     if args.lifecycle:
         if installed is None:
+            installed = next((edge['node'] for edge in apps if edge['node']['identifier'] == 'globaltradetax.checkout-review'), None)
+        if installed is None:
             raise RuntimeError('Lifecycle check requires the existing isolated review App')
         original_id = installed['id']
+        if not installed['isActive']:
+            mutate('appActivate', {'id': original_id}, 'app{id isActive}')
+            time.sleep(2)
         status, initial = request(18081, '/saleor/sandbox/reviews', token=token)
         if status != 200:
             raise RuntimeError('Initial review read failed before lifecycle check')
@@ -99,10 +104,13 @@ def main():
 
         mutate('appDeactivate', {'id': original_id}, 'app{id isActive}')
         wait_review_status(403)
+        print('PASS: real signed deactivation blocks review access', flush=True)
         mutate('appActivate', {'id': original_id}, 'app{id isActive}')
         wait_review_status(200)
+        print('PASS: real signed activation restores review access', flush=True)
         mutate('appDelete', {'id': original_id}, 'app{id}')
         wait_review_status(403)
+        print('PASS: real signed deletion revokes installation', flush=True)
         lifecycle = {'originalAppId': original_id, 'deactivationBlockedReads': True,
                      'reactivationRestoredReads': True, 'deletionBlockedReads': True}
         installed = None
@@ -130,6 +138,7 @@ def main():
             raise AssertionError('Historical reviews were lost during reinstallation')
         lifecycle.update({'newAppId': installed['id'], 'reinstallationVerified': True,
                           'historicalReviewsPreserved': len(historical)})
+        print('PASS: verified reinstallation preserves historical reviews', flush=True)
 
     channels = graphql('{channels{id slug}}')['channels']
     channel = next((value for value in channels if value['slug'] == 'gtt-uk-review'), None)
