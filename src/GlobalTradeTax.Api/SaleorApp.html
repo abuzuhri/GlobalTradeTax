@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GlobalTradeTax — مراجعات السلال</title>
+  <link rel="stylesheet" href="/saleor/app.css">
+  <script src="/saleor/app.js" defer></script>
+</head>
+<body data-api-url="{{API_URL}}">
+  <main>
+    <header><span class="eyebrow">GLOBAL TRADE TAX · SALEOR</span><h1>مراجعات السلال الجمركية</h1>
+      <p>أحداث موثّقة من المتجر، وبيانات واضحة لما يحتاج إلى مراجعة.</p></header>
+    <aside class="notice"><strong>للمراجعة فقط — التحصيل غير مفعّل</strong><span>الرسوم وVAT والتكلفة النهائية غير معتمدة. لا تمثل أسعار السلة عرضًا جمركيًا قابلًا للدفع.</span></aside>
+    <section class="toolbar"><h2>أحدث الأحداث</h2><button id="refresh" type="button">تحديث</button></section>
+    <p id="status" role="status">افتح التطبيق من داخل Saleor Dashboard لعرض المراجعات المصرح بها.</p>
+    <section id="reviews" aria-live="polite"></section>
+    <p class="footer"><a href="/saleor/notices.txt" target="_blank" rel="noopener">معلومات المكتبات المستخدمة</a></p>
+  </main>
+</body>
+</html>

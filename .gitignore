@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+.vs/
+.env
+*.user
+
+__pycache__/
+*.pyc
+/dev/saleor/.keepalive.json
+**/node_modules/
+/dev/saleor/app-settings.json
+/dev/saleor/signing-key.pem

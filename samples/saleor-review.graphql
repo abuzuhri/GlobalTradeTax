@@ -1,0 +1,64 @@
+subscription GlobalTradeTaxReviewPayload {
+  event {
+    __typename
+    issuedAt
+    version
+    ... on CalculateTaxes {
+      taxBase {
+        sourceObject {
+          __typename
+          ... on Checkout {
+            id
+          }
+          ... on Order {
+            id
+          }
+        }
+        channel {
+          slug
+        }
+        currency
+        pricesEnteredWithTax
+        shippingPrice {
+          amount
+        }
+        address {
+          country {
+            code
+          }
+        }
+        lines {
+          quantity
+          unitPrice {
+            amount
+          }
+          totalPrice {
+            amount
+          }
+          sourceLine {
+            ... on CheckoutLine {
+              id
+              checkoutProductVariant: variant {
+                sku
+                product {
+                  hsCode: metafield(key: "gtt.hsCode")
+                  countryOfOrigin: metafield(key: "gtt.countryOfOrigin")
+                }
+              }
+            }
+            ... on OrderLine {
+              id
+              orderProductVariant: variant {
+                sku
+                product {
+                  hsCode: metafield(key: "gtt.hsCode")
+                  countryOfOrigin: metafield(key: "gtt.countryOfOrigin")
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "__typename": "CalculateTaxes",
+  "issuedAt": "2026-11-02T12:00:00Z",
+  "version": "3.x",
+  "taxBase": {
+    "sourceObject": { "__typename": "Checkout", "id": "sandbox-checkout" },
+    "channel": { "slug": "uk" },
+    "currency": "GBP",
+    "pricesEnteredWithTax": false,
+    "shippingPrice": { "amount": 5.25 },
+    "address": { "country": { "code": "GB" } },
+    "lines": [
+      {
+        "sourceLine": {
+          "id": "sandbox-line-1",
+          "checkoutProductVariant": {
+            "sku": "sandbox-shirt",
+            "product": { "hsCode": "6109100000", "countryOfOrigin": "CN" }
+          }
+        },
+        "quantity": 2,
+        "unitPrice": { "amount": 12.5 },
+        "totalPrice": { "amount": 25 }
+      }
+    ]
+  }
+}

@@ -1,0 +1,140 @@
+name: .NET build, tests and package
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dotnet-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  saleor-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: src/GlobalTradeTax.Api
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Restore locked UI dependencies
+        run: npm ci --ignore-scripts
+      - name: Audit UI dependencies
+        run: npm audit --audit-level=low
+      - name: Verify committed UI bundle
+        run: |
+          npm run build:ui
+          git diff --exit-code -- SaleorApp.bundle.js SaleorApp.NOTICES.txt
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore tests/GlobalTradeTax.Api.Tests/GlobalTradeTax.Api.Tests.csproj
+      - name: Build (warnings as errors)
+        run: dotnet build tests/GlobalTradeTax.Api.Tests/GlobalTradeTax.Api.Tests.csproj --no-restore -c Release -warnaserror
+      - name: Unit and contract tests
+        run: dotnet test tests/GlobalTradeTax.Api.Tests/GlobalTradeTax.Api.Tests.csproj --no-build -c Release --logger 'trx;LogFileName=tests.trx' --results-directory TestResults
+      - name: Local HTTP smoke test (no credentials)
+        run: |
+          set -euo pipefail
+          ASPNETCORE_ENVIRONMENT=Development ASPNETCORE_URLS=http://127.0.0.1:5087 \
+            dotnet run --project src/GlobalTradeTax.Api/GlobalTradeTax.Api.csproj --no-build -c Release > api-smoke.log 2>&1 &
+          api_pid=$!
+          trap 'kill "$api_pid" 2>/dev/null || true' EXIT
+          if ! python3 scripts/smoke_api.py --base-url http://127.0.0.1:5087 --wait-seconds 35; then
+            tail -n 80 api-smoke.log
+            exit 1
+          fi
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-test-results
+          path: TestResults/*.trx
+          if-no-files-found: warn
+      - name: Publish application
+        run: dotnet publish src/GlobalTradeTax.Api/GlobalTradeTax.Api.csproj --no-restore -c Release -o publish
+      - name: Upload publish artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: globaltradetax-api
+          path: publish/
+          if-no-files-found: error
+
+  dependency-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore with NuGet security audit
+        run: dotnet restore tests/GlobalTradeTax.Api.Tests/GlobalTradeTax.Api.Tests.csproj -p:NuGetAudit=true -p:NuGetAuditMode=all -p:NuGetAuditLevel=low -warnaserror:NU1901,NU1902,NU1903,NU1904
+      - name: Audit vulnerable direct and transitive dependencies
+        run: |
+          set -euo pipefail
+          for project in src/GlobalTradeTax.Api/GlobalTradeTax.Api.csproj tests/GlobalTradeTax.Api.Tests/GlobalTradeTax.Api.Tests.csproj; do
+            report="nuget-audit-$(basename "$project" .csproj).json"
+            dotnet list "$project" package --vulnerable --include-transitive --format json --output-version 1 > "$report"
+            python3 scripts/check_nuget_audit.py "$report"
+          done
+      - name: Upload dependency audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-audit
+          path: nuget-audit-*.json
+          if-no-files-found: warn
+
+  repository-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate task links and financial safety conventions
+        run: |
+          python3 scripts/check_project_integrity.py
+          python3 scripts/check_secrets.py
+          python3 scripts/check_ci_workflow.py
+          python3 -m unittest discover -s scripts/tests -v
+
+  git-history-secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify repository history available
+        run: git log -1 --format=%H
+      - name: Scan committed Git history with Gitleaks
+        run: |
+          docker run --rm \
+            -v "$PWD:/repo:ro" \
+            -w /repo \
+            ghcr.io/gitleaks/gitleaks:v8.24.2 \
+            git --no-banner --redact --exit-code 1 --log-opts="--all"

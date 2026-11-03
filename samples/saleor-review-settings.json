@@ -1,0 +1,14 @@
+{
+  "Saleor": {
+    "ReviewEnabled": false,
+    "Stores": [
+      {
+        "Enabled": false,
+        "ApiUrl": "https://your-shop.saleor.cloud/graphql/",
+        "TenantId": "your-existing-globaltradetax-tenant",
+        "KeyId": "replace-with-verified-saleor-jwks-kid",
+        "PublicKeyPem": ""
+      }
+    ]
+  }
+}

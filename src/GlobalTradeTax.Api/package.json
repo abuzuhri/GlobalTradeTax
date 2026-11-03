@@ -1,0 +1,15 @@
+{
+  "name": "globaltradetax-saleor-review-ui",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build:ui": "node build-saleor-ui.cjs"
+  },
+  "dependencies": {
+    "@saleor/app-sdk": "1.16.0",
+    "react": "19.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

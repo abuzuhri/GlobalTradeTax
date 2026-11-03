@@ -1,0 +1,5 @@
+{
+  "shipFrom": "CN", "shipTo": "US", "currency": "USD", "incoterm": "DAP",
+  "lines": [{ "sku": "BAG-01", "hsCode": "420222", "countryOfOrigin": "CN", "quantity": 1, "unitPrice": 60.00 }],
+  "shippingCost": 12.00, "insuranceCost": 0
+}

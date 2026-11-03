@@ -1,0 +1,108 @@
+name: globaltradetax-saleor-sandbox
+
+services:
+  db:
+    image: postgres:15-alpine@sha256:54e0dd8e8cddcdbb9156c2486eed5a43eccb7214d7c6828097d41ce049fb3984
+    environment:
+      POSTGRES_DB: saleor_sandbox
+      POSTGRES_USER: saleor_sandbox
+      POSTGRES_PASSWORD: ${SANDBOX_DB_PASSWORD:?Run the sandbox setup first}
+    volumes:
+      - saleor-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U saleor_sandbox -d saleor_sandbox"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  cache:
+    image: valkey/valkey:8.1-alpine@sha256:2602ace2be6569bc2bbb06f873776516ab9089821525be34f4305c67eb9db02a
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  api:
+    image: ghcr.io/saleor/saleor:3.23.45@sha256:e2fa142c005ca8a859e0ed716229beb594f19a51712713df4e259afe15893f57
+    command: ["uvicorn", "saleor.asgi:application", "--host=0.0.0.0", "--port=8000", "--workers=1", "--no-access-log"]
+    ports:
+      - "127.0.0.1:18080:8000"
+    environment:
+      DEBUG: "True"
+      SECRET_KEY: ${SANDBOX_SECRET_KEY:?Run the sandbox setup first}
+      DATABASE_URL: postgres://saleor_sandbox:${SANDBOX_DB_PASSWORD}@db/saleor_sandbox
+      CACHE_URL: redis://cache:6379/0
+      CELERY_BROKER_URL: redis://cache:6379/1
+      CELERY_TASK_ALWAYS_EAGER: "True"
+      ALLOWED_HOSTS: localhost,127.0.0.1,api,saleor.sandbox.test
+      ALLOWED_CLIENT_HOSTS: localhost,127.0.0.1
+      DASHBOARD_URL: http://localhost:19090/
+      DEFAULT_FROM_EMAIL: sandbox@example.test
+      EMAIL_URL: console://
+      ENABLE_SSL: "False"
+      HTTP_IP_FILTER_ENABLED: "False"
+      OTEL_TRACES_EXPORTER: none
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    volumes:
+      - saleor-media:/app/media
+      - ./signing-key.pem:/app/.jwt_key.pem:ro
+
+  worker:
+    image: ghcr.io/saleor/saleor:3.23.45@sha256:e2fa142c005ca8a859e0ed716229beb594f19a51712713df4e259afe15893f57
+    command: ["celery", "--app=saleor.celeryconf:app", "worker", "--concurrency=1", "--loglevel=warning"]
+    environment:
+      DEBUG: "True"
+      SECRET_KEY: ${SANDBOX_SECRET_KEY}
+      DATABASE_URL: postgres://saleor_sandbox:${SANDBOX_DB_PASSWORD}@db/saleor_sandbox
+      CACHE_URL: redis://cache:6379/0
+      CELERY_BROKER_URL: redis://cache:6379/1
+      ENABLE_SSL: "False"
+      HTTP_IP_FILTER_ENABLED: "False"
+      EMAIL_URL: console://
+      OTEL_TRACES_EXPORTER: none
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+    volumes:
+      - ./signing-key.pem:/app/.jwt_key.pem:ro
+    depends_on:
+      - api
+      - cache
+
+  gtt:
+    build:
+      context: ../..
+    image: globaltradetax-saleor-review:local
+    networks:
+      default:
+        aliases:
+          - gtt.sandbox.test
+    ports:
+      - "127.0.0.1:18081:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      SaleorApp__EncryptionKey: ${SANDBOX_APP_ENCRYPTION_KEY:?Run the sandbox setup first}
+      Logging__LogLevel__Microsoft.AspNetCore: Warning
+    volumes:
+      - ./app-settings.json:/app/appsettings.saleor.json:ro
+      - saleor-app-state:/app/saleor-state
+
+  dashboard:
+    image: ghcr.io/saleor/saleor-dashboard:3.23.41@sha256:083f2a80a8e2f137353c2efcd5dca790ee2a79832661fd55019ab162f5d238cb
+    ports:
+      - "127.0.0.1:19090:80"
+    environment:
+      API_URL: http://localhost:18080/graphql/
+      APP_MOUNT_URI: /
+      STATIC_URL: /
+
+volumes:
+  saleor-db:
+  saleor-media:
+  saleor-app-state:

@@ -1,0 +1,65 @@
+namespace GlobalTradeTax.Api;
+
+// Combines two independent review gates. Never turns proposed VAT into payable VAT.
+public sealed record UkVatQuoteReviewRequest(
+    UkVatClassificationInput Classification,
+    UkVatInput Amounts,
+    string? AmountCurrency,
+    string? ShipmentId = null);
+
+public sealed record UkVatQuoteReviewResult(
+    string Status,
+    string? ShipmentId,
+    UkVatClassificationDecision Classification,
+    UkVatReadinessResult Amounts,
+    string[] UnresolvedChecks,
+    decimal? PayableVatGbp,
+    decimal? PayableLandedTotalGbp,
+    bool VerifiedForCalculation = false);
+
+public static class UkVatQuoteReview
+{
+    public static UkVatQuoteReviewResult Evaluate(UkVatQuoteReviewRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(request.Classification);
+        ArgumentNullException.ThrowIfNull(request.Amounts);
+        var classification = UkVatClassificationGate.Evaluate(request.Classification);
+        var amounts = UkVatReadiness.Evaluate(request.Amounts);
+        var checks = new List<string>();
+        checks.AddRange(classification.UnresolvedChecks);
+        checks.AddRange(amounts.UnresolvedChecks);
+        if (request.AmountCurrency != "GBP") checks.Add("amount_currency_must_be_GBP_no_fx_engine");
+        if (request.Classification.ProposedVatRatePercent != request.Amounts.VatRatePercent)
+            checks.Add("vat_rate_mismatch_between_classification_and_amounts");
+        if (request.Classification.DestinationTerritory != "GB")
+            checks.Add("only_great_britain_review_supported");
+        if (request.ShipmentId is { Length: > 128 }) checks.Add("shipment_id_too_long");
+        // Do not display GBP illustrative figures when the currency, rate, or
+        // territory is inconsistent. They would otherwise look like a valid GBP quote.
+        var canShowIllustration = request.AmountCurrency == "GBP"
+            && request.Classification.DestinationTerritory == "GB"
+            && request.Classification.ProposedVatRatePercent == request.Amounts.VatRatePercent
+            && classification.UnresolvedChecks.All(x => x is not (
+                "missing_or_invalid_commodity_code" or "missing_or_invalid_goods_origin_iso2"
+                or "missing_import_date" or "missing_vat_rate" or "invalid_vat_rate"
+                or "rate_not_yet_effective" or "rate_expired" or "invalid_rate_effective_window"
+                or "destination_territory_must_be_GB_or_XI"))
+            && amounts.Status == "illustrative_only";
+        if (!canShowIllustration)
+        {
+            amounts = amounts with
+            {
+                IllustrativeTaxableBaseGbp = null,
+                IllustrativeVatGbp = null
+            };
+            checks.Add("illustrative_amounts_suppressed_due_to_unresolved_input_consistency");
+        }
+        // An unverified proposal must never be promoted to a legal rate by this join.
+        checks.Add("authoritative_duty_and_vat_determination_required");
+        var status = amounts.Status == "invalid_input" || checks.Contains("shipment_id_too_long")
+            ? "invalid_input" : "requires_review";
+        return new(status, request.ShipmentId, classification, amounts,
+            checks.Distinct(StringComparer.Ordinal).ToArray(), null, null);
+    }
+}

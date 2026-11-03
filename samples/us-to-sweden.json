@@ -1,0 +1,5 @@
+{
+  "shipFrom": "US", "shipTo": "SE", "currency": "USD", "incoterm": "DDP",
+  "lines": [{ "sku": "TEE-01", "hsCode": "610910", "countryOfOrigin": "CN", "quantity": 2, "unitPrice": 35.00 }],
+  "shippingCost": 15.00, "insuranceCost": 0
+}
