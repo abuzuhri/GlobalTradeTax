@@ -28,7 +28,7 @@ Compile with .NET 8, run xUnit, integration tests, static analysis, dependency a
 - Coverage includes the real Dockerfile/root Compose configuration, fresh initialization, a frozen v0.4 upgrade, idempotent SQL reapplication, transaction rollback, merchant isolation/revocation, concurrent quote/staging deduplication, non-payable outputs, API/database recreation and isolated backup/restore with new writes.
 - Local Release build passed with zero warnings/errors; 219 xUnit cases passed with eight live cases skipped; 32 Python cases passed, including cleanup/isolation/redaction guard failures. Repository/static CI/limited secret/whitespace checks passed.
 - The final run against the frozen original schema also passed all 103 assertions and cleanup. Checksum-verified actionlint 1.7.12 passed with optional ShellCheck/Pyflakes disabled. All six existing Saleor containers remained running.
-- Added the `container-postgres` CI job and JSON artifact; hosted execution is tracked in the review PR. [Commands, sources, actual results and operational limits](../docs/POSTGRES_CONTAINER_VERIFICATION.md).
+- Added the `container-postgres` CI job and JSON artifact; hosted execution is tracked in [draft PR #2](https://github.com/abuzuhri/GlobalTradeTax/pull/2). [Commands, sources, actual results and operational limits](../docs/POSTGRES_CONTAINER_VERIFICATION.md).
 
 ## Existing project references
 tests/GlobalTradeTax.Api.Tests; .github/workflows

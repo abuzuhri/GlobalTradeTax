@@ -63,7 +63,7 @@ The six existing Saleor sandbox containers remained running alongside the isolat
 
 The `container-postgres` job runs the same script on every normal workflow run and uploads `postgres-integration-results` even when a check fails. The JSON records passed assertions, server version, timing, cleanup outcome and redacted failure diagnostics. A failure in building, initialization, HTTP behavior, upgrade, restore or cleanup fails the job.
 
-Hosted execution results are linked from the PR/task log after the new job runs. Local success alone is not a claim that the hosted job passed.
+Hosted execution and its uploaded evidence are tracked in [draft PR #2](https://github.com/abuzuhri/GlobalTradeTax/pull/2/checks), which builds on PR #1. The PR records the final hosted outcome separately from the local results above.
 
 ## Database upgrade and recovery procedure
 

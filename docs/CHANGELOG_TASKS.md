@@ -5,6 +5,7 @@
 - Real PostgreSQL integration exposed AuditStore sending text into a JSONB column (SQLSTATE 42804 / HTTP 500). Explicit Npgsql JSONB binding fixes the endpoint; tests verify persisted JSON and subsequent restored audit writes. Duty/tax/payable fields remain null.
 - Final frozen-fixture local run: 103 integration assertions passed with cleanup; zero-warning Release build; 219 xUnit cases passed/eight live skips; 32 Python cases, actionlint and repository guards passed. Added the historical schema fixture and a CI job with redacted evidence upload; hosted execution is tracked in the review PR.
 - [Verification and upgrade/recovery runbook](POSTGRES_CONTAINER_VERIFICATION.md). TASK-003/010 remain in-progress; migration ledger/release policy, required-check enforcement and production operational review remain open.
+- Review and hosted evidence: [draft PR #2](https://github.com/abuzuhri/GlobalTradeTax/pull/2), based on the UK-authentication PR #1.
 
 ## 2026-11-04 — TASK-005 managed access and TASK-010 hosted CI repair
 - Added opt-in managed GB authentication against the fixed official OAuth endpoint with encoded form credentials, memory-only tokens, expiry/rotation handling, concurrent refresh control, bounded bodies/timeouts and one retry after 401. Public requests receive no managed tokens and failures never fall back.
