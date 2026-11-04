@@ -8,6 +8,10 @@ builder.Services.AddSingleton<QuoteService>();
 builder.Services.AddMemoryCache(options => options.SizeLimit = 1000);
 builder.Services.AddHttpClient<IImportRateProvider, ExternalImportRateProvider>(client => client.Timeout = TimeSpan.FromSeconds(8));
 builder.Services.AddSingleton<LandedCostService>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddHttpClient(UkTariffAccessTokenProvider.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(8))
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
+builder.Services.AddSingleton<UkTariffAccessTokenProvider>();
 builder.Services.AddHttpClient<UkTariffReferenceClient>(client => { client.Timeout = TimeSpan.FromSeconds(8); client.DefaultRequestHeaders.Accept.ParseAdd("application/json"); })
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
 builder.Services.AddSingleton<QuoteStore>();

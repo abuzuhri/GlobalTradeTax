@@ -4,7 +4,12 @@
 - **Priority:** P0
 - **Owner:** Unassigned
 - **Dependencies:** Review related tasks in [master register](../TASKS.md) before starting.
-- **Last reviewed:** 2026-11-02
+- **Last reviewed:** 2026-11-04
+
+## 2026-11-04 — Hosted history-scan repair slice
+- Inspected hosted run 41683857783 for commit b8eb349: application, dependency, frontend and repository checks succeeded; Gitleaks failed with two findings.
+- Reproduced both findings locally using checksum-verified Gitleaks 8.24.2 with redacted reporting. Both are `curl-auth-header` matches in the initial commit's documentation examples (`README.md:41`, `docs/IMPLEMENTATION.md:16`). The README uses `your-secret-key`; the multi-line implementation example contains `replace-with-a-long-random-secret` in its API-key header.
+- Added only the two exact historical finding fingerprints to the scanner ignore file, with their rationale. All default rules and full-history coverage remain enabled. Local rescan with checksum-verified 8.24.2 passed with zero remaining findings; actionlint 1.7.12 and `git diff --check` passed. Hosted verification follows on the review branch.
 
 ## Objective
 Compile with .NET 8, run xUnit, integration tests, static analysis, dependency and secret scans in CI.

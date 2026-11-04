@@ -5,6 +5,17 @@ on:
     branches: [main, master]
   pull_request:
   workflow_dispatch:
+    inputs:
+      uk_live_contract:
+        description: 'Run read-only probes against the official legacy UK tariff API'
+        type: boolean
+        required: false
+        default: false
+      uk_managed_live_contract:
+        description: 'Probe the managed UK API using configured repository credentials'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -14,6 +25,62 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  uk-managed-live-contract:
+    if: github.event_name == 'workflow_dispatch' && inputs.uk_managed_live_contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build managed contract probes without credentials
+        run: dotnet build tests/GlobalTradeTax.Api.Tests/GlobalTradeTax.Api.Tests.csproj -c Release -warnaserror
+      - name: Probe managed UK API (read only)
+        env:
+          TRADE_RUN_UK_MANAGED_LIVE_CONTRACT: '1'
+          TRADE_UK_TARIFF_CLIENT_ID: ${{ secrets.TRADE_UK_TARIFF_CLIENT_ID }}
+          TRADE_UK_TARIFF_CLIENT_SECRET: ${{ secrets.TRADE_UK_TARIFF_CLIENT_SECRET }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$TRADE_UK_TARIFF_CLIENT_ID" || -z "$TRADE_UK_TARIFF_CLIENT_SECRET" ]]; then
+            echo 'Configure both TRADE_UK_TARIFF_CLIENT_ID and TRADE_UK_TARIFF_CLIENT_SECRET repository secrets.' >&2
+            exit 1
+          fi
+          dotnet test tests/GlobalTradeTax.Api.Tests/GlobalTradeTax.Api.Tests.csproj --no-build -c Release --filter 'Category=UkManagedLiveContract' --logger 'trx;LogFileName=uk-managed-live.trx' --results-directory UkManagedLiveResults
+      - name: Upload managed live contract report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uk-managed-live-contract-results
+          path: UkManagedLiveResults/*.trx
+          if-no-files-found: warn
+
+  uk-live-contract:
+    if: github.event_name == 'workflow_dispatch' && inputs.uk_live_contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Probe official UK API contract (read only)
+        env:
+          TRADE_RUN_UK_LIVE_CONTRACT: '1'
+        run: dotnet test tests/GlobalTradeTax.Api.Tests/GlobalTradeTax.Api.Tests.csproj -c Release --filter 'Category=UkLiveContract' --logger 'trx;LogFileName=uk-live.trx' --results-directory UkLiveResults
+      - name: Upload live contract report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uk-live-contract-results
+          path: UkLiveResults/*.trx
+          if-no-files-found: error
+
   saleor-ui:
     runs-on: ubuntu-latest
     timeout-minutes: 10

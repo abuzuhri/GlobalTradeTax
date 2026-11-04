@@ -1,5 +1,17 @@
 # Task register change log
 
+## 2026-11-04 — TASK-005 managed access and TASK-010 hosted CI repair
+- Added opt-in managed GB authentication against the fixed official OAuth endpoint with encoded form credentials, memory-only tokens, expiry/rotation handling, concurrent refresh control, bounded bodies/timeouts and one retry after 401. Public requests receive no managed tokens and failures never fall back.
+- Added 52 offline cases and four separately gated managed probes. PASS locally: zero-warning build, 219 offline xUnit cases (eight live probes skipped), separate four-case public live run, 25 Python tests, 20 general HTTP smoke assertions, six public authenticated UK checks and two missing-credential checks. Real managed credentials are absent; its live probes were not run.
+- Inspected old hosted run 41683857783: application/dependency/UI/repository checks passed; history scan failed on two initial documentation placeholders. Added only the exact two finding fingerprints to `.gitleaksignore`, retaining default rules/full-history coverage; updated scan/hosted verification is tracked in TASK-010.
+- [Managed API runbook and evidence](UK_MANAGED_API.md). TASK-005 and TASK-010 remain in progress.
+
+## 2026-11-04 — TASK-005 live UK contract correction
+- Probed the official legacy UK v2 point endpoints and found commodity `data.id` is an internal identifier, with its code in `attributes.goods_nomenclature_item_id`; resource types are singular. Fixed validation and added the documented v2 Accept header.
+- Added four exact public JSON fixtures with SHA-256/UTC provenance and OGL v3 attribution, 24 offline regression cases and four opt-in live probes. Added a manually enabled CI contract job; no scheduled monitor or hosted run.
+- PASS: Release build (zero warnings/errors), 167 offline xUnit tests with four live cases skipped, separate four-case live run, 25 Python tests, 10 general HTTP smoke assertions and six authenticated live UK route checks; repository/static CI/limited secret guards.
+- Current official docs describe a managed OAuth API on a different host. Legacy access worked during this check; migration, current service-terms review and broader coverage remain open. All payable calculation gates remain closed. [Evidence and reproduction](UK_LIVE_CONTRACT_VERIFICATION.md).
+
 ## 2026-11-02
 - Created master TASKS.md and 14 detailed task files.
 - Classified statuses conservatively; no new functionality claimed.

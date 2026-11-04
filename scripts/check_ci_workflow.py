@@ -7,6 +7,8 @@ REQUIRED = (
     'permissions:', 'contents: read', 'persist-credentials: false',
     'fetch-depth: 0', 'gitleaks/gitleaks:', 'git log',
     'dotnet test', 'scripts/smoke_api.py', 'dependency-audit:', 'repository-checks:',
+    'uk-live-contract:', 'TRADE_RUN_UK_LIVE_CONTRACT:', "--filter 'Category=UkLiveContract'",
+    'uk-managed-live-contract:', 'TRADE_RUN_UK_MANAGED_LIVE_CONTRACT:', "--filter 'Category=UkManagedLiveContract'",
 )
 
 def check(contents: str) -> list[str]:
