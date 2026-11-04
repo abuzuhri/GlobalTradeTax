@@ -3,6 +3,7 @@
 **/bin
 **/obj
 **/node_modules
+TestResults
 **/.env
 dev/saleor/app-settings.json
 dev/saleor/.keepalive.json

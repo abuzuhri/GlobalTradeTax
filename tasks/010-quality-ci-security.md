@@ -16,6 +16,20 @@
 ## Objective
 Compile with .NET 8, run xUnit, integration tests, static analysis, dependency and secret scans in CI.
 
+## 2026-11-04 — Container/PostgreSQL verification slice
+- Build the actual Dockerfile and run a unique, disposable Compose project with PostgreSQL 16; keep existing local databases and the Saleor sandbox separate.
+- Verify all four SQL scripts on a new volume, upgrade a seeded v0.4 database without deleting data, reapply the scripts, compare schemas and test transactional failure rollback.
+- Exercise database-backed merchant authentication, cross-merchant quote isolation, concurrent idempotency, key/tenant revocation, tariff staging and audit writes over the running API. Keep duty/tax/payable totals null.
+- Verify data after API/database recreation and an isolated pg_dump/pg_restore exercise. Clean up only the resources created by the test run and redact generated credentials from reports.
+- Add the repeatable integration runner to CI and document commands, actual results and remaining operational limits. Address concrete runtime defects found by these checks.
+
+## 2026-11-04 — Container/database local evidence
+- The first actual PostgreSQL-backed API run passed 53 assertions before exposing HTTP 500 on landed-cost audit writes (SQLSTATE 42804). Bind AuditStore's serialized details explicitly as JSONB; the corrected full run passed 103 assertions and cleanup succeeded.
+- Coverage includes the real Dockerfile/root Compose configuration, fresh initialization, a frozen v0.4 upgrade, idempotent SQL reapplication, transaction rollback, merchant isolation/revocation, concurrent quote/staging deduplication, non-payable outputs, API/database recreation and isolated backup/restore with new writes.
+- Local Release build passed with zero warnings/errors; 219 xUnit cases passed with eight live cases skipped; 32 Python cases passed, including cleanup/isolation/redaction guard failures. Repository/static CI/limited secret/whitespace checks passed.
+- The final run against the frozen original schema also passed all 103 assertions and cleanup. Checksum-verified actionlint 1.7.12 passed with optional ShellCheck/Pyflakes disabled. All six existing Saleor containers remained running.
+- Added the `container-postgres` CI job and JSON artifact; hosted execution is tracked in the review PR. [Commands, sources, actual results and operational limits](../docs/POSTGRES_CONTAINER_VERIFICATION.md).
+
 ## Existing project references
 tests/GlobalTradeTax.Api.Tests; .github/workflows
 
