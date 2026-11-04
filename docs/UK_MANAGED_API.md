@@ -65,8 +65,14 @@ In GitHub, configure Actions secrets named `TRADE_UK_TARIFF_CLIENT_ID` and `TRAD
 
 The previously uninspected [main-branch run](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/41683857783) for `b8eb349` actually passed the application, dependency, UI and repository jobs. Its failure was Gitleaks reporting two documentation placeholders in the initial `bcec3f9` commit: the README's `your-secret-key` and the implementation example's `replace-with-a-long-random-secret` header.
 
-`.gitleaksignore` now lists only those two exact historical finding fingerprints. No rule, path or whole commit is ignored, and the default rules/full-history scan remain enabled. This fixes the identified false positives without changing Git history. Updated hosted results are recorded in the PR and task log after the review-branch run completes.
+`.gitleaksignore` now lists only those two exact historical finding fingerprints. No rule, path or whole commit is ignored, and the default rules/full-history scan remain enabled. This fixes the identified false positives without changing Git history.
 
 The checksum-verified Gitleaks 8.24.2 local rescan of both existing commits passed with zero remaining findings. Checksum-verified actionlint 1.7.12 also passed (optional ShellCheck/Pyflakes disabled), as did `git diff --check`.
+
+Hosted verification for source commit [2673050](https://github.com/abuzuhri/GlobalTradeTax/commit/267305009a92ffbf94e8929c2ae95b2192118376):
+
+- [PR workflow run](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/41879751626): **success**, including application build/test/publish, dependency audit, UI, repository checks and full-history Gitleaks. Its test log confirms 219 passed, eight live probes skipped, zero build warnings/errors and ten HTTP smoke assertions.
+- [Manually enabled public live workflow](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/41879785451): **success**, including four public live probes with zero skips and a successful full-history scan. The managed live job was deliberately skipped because credentials have not been provisioned.
+- Both hosted Gitleaks logs confirm three commits scanned and no remaining findings with the two reviewed exact exceptions applied. [Draft PR #1](https://github.com/abuzuhri/GlobalTradeTax/pull/1) contains the changes; its latest checks show verification of any subsequent documentation-only update.
 
 TASK-005 remains in progress: live managed access/response verification, current service-terms review, broader contracts and operational drift monitoring remain open. Hosted CI cannot prove legal applicability or authorize payable customs amounts.
