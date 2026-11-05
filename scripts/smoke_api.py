@@ -18,6 +18,7 @@ PROTECTED_ENDPOINTS = (
     ('/v1/references/uk/assessments/0101210000?origin=US&importDate=2026-11-02', 'GET', None),
     ('/v1/references/uk/assessments/0101210000/evidence-package?origin=US&importDate=2026-11-02', 'GET', None),
     ('/v1/references/uk/vat/review', 'POST', {}),
+    ('/v1/references/uk/shipments/review', 'POST', {}),
 )
 
 

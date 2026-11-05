@@ -78,6 +78,22 @@ public sealed class UkManagedApiTests
         Json(JsonSerializer.Serialize(new { access_token = value, token_type = "Bearer", expires_in = seconds }));
 
     [Fact]
+    public async Task Managed_GB_and_XI_share_fixed_OAuth_but_keep_territory_bound_requests()
+    {
+        var paths = new List<string>();
+        using var harness = new Harness(api: (request, _) => {
+            Assert.Equal("example-access-token",request.Headers.Authorization!.Parameter);
+            paths.Add(request.RequestUri!.AbsolutePath);
+            return Task.FromResult(Json("{\"data\":{\"id\":\"1011\",\"type\":\"geographical_area\"}}"));
+        });
+        harness.Configuration["TRADE_UK_TARIFF_XI_API_BASE_URL"] = UkTariffReferenceClient.ManagedXiApiBaseUrl;
+        await harness.Client.GetGeographicalAreaAsync("1011",new DateOnly(2026,11,5),"GB",default);
+        await harness.Client.GetGeographicalAreaAsync("1011",new DateOnly(2026,11,5),"XI",default);
+        Assert.Equal(new[] { "/uk/api/geographical_areas/1011", "/xi/api/geographical_areas/1011" },paths);
+        Assert.Equal(1,harness.TokenHandler.Calls);
+    }
+
+    [Fact]
     public async Task Dated_managed_requests_preserve_authentication_and_partition_area_cache()
     {
         using var harness = new Harness(api: (request, _) =>

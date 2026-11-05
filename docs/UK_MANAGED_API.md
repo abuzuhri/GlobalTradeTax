@@ -7,6 +7,7 @@ Implemented and locally verified on 2026-11-04. This is an opt-in, read-only aut
 | Setting | Purpose |
 |---|---|
 | `TRADE_UK_TARIFF_API_BASE_URL` | Set to `https://api.trade-tariff.service.gov.uk/uk/api/` for managed GB access. |
+| `TRADE_UK_TARIFF_XI_API_BASE_URL` | Optional distinct NI prefix: `https://api.trade-tariff.service.gov.uk/xi/api/`. Uses the same credentials and fixed OAuth endpoint; no GB fallback. |
 | `TRADE_UK_TARIFF_CLIENT_ID` | Client ID provisioned through the official developer portal. |
 | `TRADE_UK_TARIFF_CLIENT_SECRET` | Corresponding secret, supplied through the operator's secret provider or process environment. |
 
@@ -18,7 +19,7 @@ Keep real values out of tracked files, command-line arguments, support messages 
 
 ## Token and transport behavior
 
-- Client credentials are submitted only to the fixed official HTTPS token URL. No configurable token/discovery endpoint or request-controlled authentication host exists. HTTP, alternate ports, user information, queries/fragments, Northern Ireland paths and unsupported host/path combinations are rejected before credential exchange.
+- Client credentials are submitted only to the fixed official HTTPS token URL. No configurable token/discovery endpoint or request-controlled authentication host exists. HTTP, alternate ports, user information, queries/fragments and unsupported host/path combinations are rejected before credential exchange. As of 2026-11-05, the separate XI setting accepts only the official XI prefix. A GB setting cannot accept XI, or vice versa.
 - Public lookups never invoke the token provider or attach its token. Managed lookups fail with `not_configured` before network activity if either credential is absent. Existing merchant authentication still protects the local HTTP routes.
 - The process shares one memory-only token provider. Successful refreshes are serialized so concurrent requests reuse one token; failed refreshes have a five-second cooldown per credential configuration. Tokens and credential response bodies are not returned in API results or written to storage.
 - Responses must contain a nonempty Bearer token and a numeric `expires_in` between 1 and 86,400 seconds. The parser rejects invalid token characters, tokens over 16 KiB, duplicate fields, OAuth error documents and token bodies over 64 KiB, including responses with unknown length. Unsupported/missing expiry metadata fails closed rather than assuming a one-day lifetime. This response contract has been tested with simulated responses; actual managed credentials remain needed to confirm the live service response.

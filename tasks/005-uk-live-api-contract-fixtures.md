@@ -4,7 +4,7 @@
 - **Priority:** P0
 - **Owner:** Unassigned
 - **Dependencies:** Review related tasks in [master register](../TASKS.md) before starting.
-- **Last reviewed:** 2026-11-04
+- **Last reviewed:** 2026-11-05
 
 ## Objective
 Verify official UK endpoints, API version, JSON:API relationships, pagination, status codes and real fixtures.
@@ -65,3 +65,11 @@ Recorded permitted fixtures; live smoke test; version drift alarm; documented re
 - Inspected historical hosted run 41683857783: four jobs passed, history scan failed on two documentation placeholders. TASK-010 tracks the exact-fingerprint repair and new hosted verification.
 - [Managed configuration, contract and actual local evidence](../docs/UK_MANAGED_API.md). Status remains in-progress.
 - Hosted verification for source commit 2673050 passed: [PR workflow](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/41879751626) (219 xUnit passes, eight live skips, build/publish/audits/history scan) and [manual public-live workflow](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/41879785451) (four live passes). Managed live probes remain unrun without credentials. Changes are in [draft PR #1](https://github.com/abuzuhri/GlobalTradeTax/pull/1).
+
+## 2026-11-05 — Full UK engineering completion pass
+- Requested scope: finish the remaining UK engineering across GB and XI. Implement territory-bound reference access/evidence, structured measure/components/conditions and document/quota/preference review, bounded duty arithmetic, line/shipment VAT cost reconciliation and UK compliance gates. Preserve null payable results whenever authority, eligibility or data is unverified. Add recorded official contracts, arithmetic regressions, authenticated integration checks and a final per-criterion readiness report. Managed-live credentials and independent rule/rights approval are external prerequisites, not assumed complete.
+
+## 2026-11-05 — Expanded UK verification evidence
+- Separate GB/XI public and managed prefixes, territory-bound caches/evidence, exact response hashes and both documented FX contracts are implemented. Seven attributed exact responses and ten opt-in public probes cover the expanded contracts. A weekly public drift workflow is included and starts after merge; six managed probes remain unrun without credentials.
+- PASS locally: warnings-as-errors Release test build; 378 offline xUnit cases, 16 optional live skips; separate ten-case public live run; 32 Python tests; 112 PostgreSQL/container assertions with cleanup=true; repository/task/CI guards and whitespace check. Hosted verification is recorded in the review PR after execution.
+- [Current API, compatibility, source attribution and per-criterion completion gates](../docs/UK_SHIPMENT_REVIEW.md). Status remains in-progress where those acceptance criteria are unmet; no deployment or collection is enabled.

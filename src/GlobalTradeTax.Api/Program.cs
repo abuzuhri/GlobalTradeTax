@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using System.Text.Json;
 using GlobalTradeTax.Api;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,7 +7,8 @@ builder.Configuration.AddJsonFile("appsettings.saleor.json", optional: true).Add
 builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddSingleton<QuoteService>();
 builder.Services.AddMemoryCache(options => options.SizeLimit = 1000);
-builder.Services.AddHttpClient<IImportRateProvider, ExternalImportRateProvider>(client => client.Timeout = TimeSpan.FromSeconds(8));
+builder.Services.AddHttpClient<IImportRateProvider, ExternalImportRateProvider>(client => client.Timeout = TimeSpan.FromSeconds(8))
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
 builder.Services.AddSingleton<LandedCostService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddHttpClient(UkTariffAccessTokenProvider.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(8))
@@ -20,6 +22,7 @@ builder.Services.AddSingleton<SaleorApp>();
 builder.Services.AddHttpClient("SaleorApp", client => client.Timeout = TimeSpan.FromSeconds(8))
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
 builder.Services.AddScoped<UkImportAssessment>();
+builder.Services.AddScoped<UkShipmentReview>();
 var pgConnection = builder.Configuration.GetConnectionString("Postgres") ?? Environment.GetEnvironmentVariable("TRADE_POSTGRES_CONNECTION");
 if (!string.IsNullOrWhiteSpace(pgConnection))
 {
@@ -129,14 +132,14 @@ app.MapGet("/v1/admin/tariff-datasets/{id:guid}", async (Guid id, HttpRequest ht
     return batch is null ? Results.NotFound() : Results.Ok(batch);
 });
 // Read-only UK commodity lookup. Requires merchant authentication; never returns payable amounts.
-app.MapGet("/v1/references/uk/commodities/{code}", async (string code, HttpRequest http,
+app.MapGet("/v1/references/uk/commodities/{code}", async (string code, string? territory, HttpRequest http,
     UkTariffReferenceClient uk, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
-    var result = await uk.GetCommodityAsync(code, ct);
+    var result = await uk.GetCommodityAsync(code, null, territory ?? "GB", ct);
     return result.Status switch
     {
-        "invalid_code" => Results.BadRequest(result),
+        "invalid_code" or "invalid_territory" => Results.BadRequest(result),
         "not_found" => Results.NotFound(result),
         "not_configured" => Results.Problem(result.Warning, statusCode: 503),
         "upstream_error" => Results.Problem(result.Warning, statusCode: 502),
@@ -144,15 +147,15 @@ app.MapGet("/v1/references/uk/commodities/{code}", async (string code, HttpReque
     };
 });
 // Normalized, read-only UK reference; never feeds duty/VAT calculations.
-app.MapGet("/v1/references/uk/commodities/{code}/normalized", async (string code, HttpRequest http,
+app.MapGet("/v1/references/uk/commodities/{code}/normalized", async (string code, string? territory, HttpRequest http,
     UkTariffReferenceClient uk, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
-    var result = await uk.GetCommodityAsync(code, ct);
+    var result = await uk.GetCommodityAsync(code, null, territory ?? "GB", ct);
     var normalized = UkTariffNormalizer.Normalize(code, result);
     return result.Status switch
     {
-        "invalid_code" => Results.BadRequest(normalized),
+        "invalid_code" or "invalid_territory" => Results.BadRequest(normalized),
         "not_found" => Results.NotFound(normalized),
         "not_configured" => Results.Problem(result.Warning, statusCode: 503),
         "upstream_error" => Results.Problem(result.Warning, statusCode: 502),
@@ -161,14 +164,14 @@ app.MapGet("/v1/references/uk/commodities/{code}/normalized", async (string code
 });
 // Conservative UK measure screening: reference only, never a payable duty quote.
 app.MapGet("/v1/references/uk/commodities/{code}/screen", async (string code, string origin,
-    DateOnly importDate, HttpRequest http, UkTariffReferenceClient uk,
+    DateOnly importDate, string? territory, HttpRequest http, UkTariffReferenceClient uk,
     IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
     if (origin is null || origin.Length != 2 || !origin.All(c => c is >= 'A' and <= 'Z'))
         return Results.BadRequest(new { error = "origin must be uppercase ISO alpha-2" });
-    var result = await uk.GetCommodityAsync(code, importDate, ct);
-    if (result.Status is "invalid_code" or "invalid_import_date") return Results.BadRequest(result);
+    var result = await uk.GetCommodityAsync(code, importDate, territory ?? "GB", ct);
+    if (result.Status is "invalid_code" or "invalid_import_date" or "invalid_territory") return Results.BadRequest(result);
     if (result.Status == "not_found") return Results.NotFound(result);
     if (result.Status == "not_configured") return Results.Problem(result.Warning, statusCode: 503);
     if (result.Status == "upstream_error") return Results.Problem(result.Warning, statusCode: 502);
@@ -176,14 +179,14 @@ app.MapGet("/v1/references/uk/commodities/{code}/screen", async (string code, st
 });
 // Detailed evidence-only measure inspection; never computes payable amounts.
 app.MapGet("/v1/references/uk/commodities/{code}/evidence", async (string code, string origin,
-    DateOnly importDate, HttpRequest http, UkTariffReferenceClient uk,
+    DateOnly importDate, string? territory, HttpRequest http, UkTariffReferenceClient uk,
     IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
     if (origin is null || origin.Length != 2 || !origin.All(c => c is >= 'A' and <= 'Z'))
         return Results.BadRequest(new { error = "origin must be uppercase ISO alpha-2" });
-    var result = await uk.GetCommodityAsync(code, importDate, ct);
-    if (result.Status is "invalid_code" or "invalid_import_date") return Results.BadRequest(result);
+    var result = await uk.GetCommodityAsync(code, importDate, territory ?? "GB", ct);
+    if (result.Status is "invalid_code" or "invalid_import_date" or "invalid_territory") return Results.BadRequest(result);
     if (result.Status == "not_found") return Results.NotFound(result);
     if (result.Status == "not_configured") return Results.Problem(result.Warning, statusCode: 503);
     if (result.Status == "upstream_error") return Results.Problem(result.Warning, statusCode: 502);
@@ -191,28 +194,28 @@ app.MapGet("/v1/references/uk/commodities/{code}/evidence", async (string code, 
 });
 // Geographical evidence analysis: deliberately non-payable and fail-closed.
 app.MapGet("/v1/references/uk/commodities/{code}/geography", async (string code, string origin,
-    DateOnly importDate, HttpRequest http, UkTariffReferenceClient uk,
+    DateOnly importDate, string? territory, HttpRequest http, UkTariffReferenceClient uk,
     IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
     if (origin is null || origin.Length != 2 || !origin.All(c => c is >= 'A' and <= 'Z'))
         return Results.BadRequest(new { error = "origin must be uppercase ISO alpha-2" });
-    var result = await uk.GetCommodityAsync(code, importDate, ct);
-    if (result.Status is "invalid_code" or "invalid_import_date") return Results.BadRequest(result);
+    var result = await uk.GetCommodityAsync(code, importDate, territory ?? "GB", ct);
+    if (result.Status is "invalid_code" or "invalid_import_date" or "invalid_territory") return Results.BadRequest(result);
     if (result.Status == "not_found") return Results.NotFound(result);
     if (result.Status == "not_configured") return Results.Problem(result.Warning, statusCode: 503);
     if (result.Status == "upstream_error") return Results.Problem(result.Warning, statusCode: 502);
     return Results.Ok(UkGeographyResolver.Analyze(result, code, origin, importDate));
 });
 // UK geography reference endpoint; read-only and deliberately non-payable.
-app.MapGet("/v1/references/uk/geographical-areas/{id}", async (string id, HttpRequest http,
+app.MapGet("/v1/references/uk/geographical-areas/{id}", async (string id, string? territory, HttpRequest http,
     UkTariffReferenceClient uk, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
-    var result = await uk.GetGeographicalAreaAsync(id, ct);
+    var result = await uk.GetGeographicalAreaAsync(id, null, territory ?? "GB", ct);
     return result.Status switch
     {
-        "invalid_code" => Results.BadRequest(result),
+        "invalid_code" or "invalid_territory" => Results.BadRequest(result),
         "not_found" => Results.NotFound(result),
         "not_configured" => Results.Problem(result.Warning, statusCode: 503),
         "upstream_error" => Results.Problem(result.Warning, statusCode: 502),
@@ -221,14 +224,14 @@ app.MapGet("/v1/references/uk/geographical-areas/{id}", async (string id, HttpRe
 });
 // Dated area-membership evidence, never a legal tariff determination.
 app.MapGet("/v1/references/uk/geographical-areas/{id}/membership", async (string id, string origin,
-    DateOnly importDate, HttpRequest http, UkTariffReferenceClient uk,
+    DateOnly importDate, string? territory, HttpRequest http, UkTariffReferenceClient uk,
     IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
     if (origin is null || origin.Length != 2 || !origin.All(c => c is >= 'A' and <= 'Z'))
         return Results.BadRequest(new { error = "origin must be uppercase ISO alpha-2" });
-    var result = await uk.GetGeographicalAreaAsync(id, importDate, ct);
-    if (result.Status is "invalid_code" or "invalid_import_date") return Results.BadRequest(result);
+    var result = await uk.GetGeographicalAreaAsync(id, importDate, territory ?? "GB", ct);
+    if (result.Status is "invalid_code" or "invalid_import_date" or "invalid_territory") return Results.BadRequest(result);
     if (result.Status == "not_found") return Results.NotFound(result);
     if (result.Status == "not_configured") return Results.Problem(result.Warning, statusCode: 503);
     if (result.Status == "upstream_error") return Results.Problem(result.Warning, statusCode: 502);
@@ -236,14 +239,14 @@ app.MapGet("/v1/references/uk/geographical-areas/{id}/membership", async (string
 });
 // Orchestrated UK assessment: evidence-only, not a payable customs quote.
 app.MapGet("/v1/references/uk/assessments/{code}", async (string code, string origin,
-    DateOnly importDate, HttpRequest http, UkImportAssessment assessment,
+    DateOnly importDate, string? territory, HttpRequest http, UkImportAssessment assessment,
     IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
-    var result = await assessment.AssessAsync(code, origin, importDate, ct);
+    var result = await assessment.AssessAsync(code, origin, importDate, territory ?? "GB", ct);
     return result.Status switch
     {
-        "invalid_origin" or "invalid_code" or "invalid_import_date" => Results.BadRequest(result),
+        "invalid_origin" or "invalid_code" or "invalid_import_date" or "invalid_territory" => Results.BadRequest(result),
         "not_found" => Results.NotFound(result),
         "not_configured" => Results.Problem("UK tariff API is not configured", statusCode: 503),
         "upstream_error" => Results.Problem("UK tariff API lookup failed", statusCode: 502),
@@ -252,14 +255,14 @@ app.MapGet("/v1/references/uk/assessments/{code}", async (string code, string or
 });
 // Reproducible, hash-addressed evidence for downstream audit systems. Not a payable quote.
 app.MapGet("/v1/references/uk/assessments/{code}/evidence-package", async (string code, string origin,
-    DateOnly importDate, HttpRequest http, UkImportAssessment assessment,
+    DateOnly importDate, string? territory, HttpRequest http, UkImportAssessment assessment,
     IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
-    var result = await assessment.AssessAsync(code, origin, importDate, ct);
+    var result = await assessment.AssessAsync(code, origin, importDate, territory ?? "GB", ct);
     return result.Status switch
     {
-        "invalid_origin" or "invalid_code" or "invalid_import_date" => Results.BadRequest(result),
+        "invalid_origin" or "invalid_code" or "invalid_import_date" or "invalid_territory" => Results.BadRequest(result),
         "not_found" => Results.NotFound(result),
         "not_configured" => Results.Problem("UK tariff API is not configured", statusCode: 503),
         "upstream_error" => Results.Problem("UK tariff API lookup failed", statusCode: 502),
@@ -267,6 +270,26 @@ app.MapGet("/v1/references/uk/assessments/{code}/evidence-package", async (strin
     };
 });
 // UK VAT review joins classification and amount readiness without legal rate inference.
+app.MapPost("/v1/references/uk/shipments/review", async (HttpRequest http, UkShipmentReview review,
+    IServiceProvider services, IConfiguration config, CancellationToken ct) =>
+{
+    var tenant = await AuthenticateAsync(http, services, config, ct);
+    if (tenant is null) return Results.Unauthorized();
+    if (http.ContentLength is > 262_144) return Results.StatusCode(413);
+    using var body = new StreamContent(http.Body);
+    var bytes = await UkTariffHttp.ReadReferenceBytesAsync(body, 262_144, ct);
+    if (bytes is null) return Results.StatusCode(413);
+    UkShipmentReviewRequest? request;
+    try { request = ExactJsonInput.Deserialize<UkShipmentReviewRequest>(bytes); }
+    catch (JsonException) { return Results.BadRequest(new { error = "invalid_or_inexact_review_json" }); }
+    if (request is null) return Results.BadRequest(new { error = "shipment_review_required" });
+    var result = await review.ReviewAsync(request, ct);
+    if (services.GetService<AuditStore>() is { } audit)
+        await audit.WriteAsync(tenant, "uk_shipment_review", result.Status,
+            new { evidenceSha256 = result.EvidenceSha256, destinationTerritory = result.DestinationTerritory,
+                importDate = result.ImportDate, approvedForPayment = result.ApprovedForPayment }, ct);
+    return result.Status == "invalid_input" ? Results.BadRequest(result) : Results.Ok(result);
+});
 app.MapPost("/v1/references/uk/vat/review", async (HttpRequest http,
     UkVatQuoteReviewRequest request, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {

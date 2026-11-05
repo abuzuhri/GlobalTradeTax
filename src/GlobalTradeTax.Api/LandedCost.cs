@@ -38,11 +38,16 @@ public sealed class LandedCostService(IImportRateProvider provider)
             !string.IsNullOrWhiteSpace(result.Evidence.Provider) &&
             !string.IsNullOrWhiteSpace(result.Evidence.Reference) &&
             result.Evidence.EffectiveAt <= DateTimeOffset.UtcNow &&
-            string.Equals(result.Evidence.OriginCountry, request.ShipFrom, StringComparison.OrdinalIgnoreCase) &&
             request.Lines.Count == 1 &&
+            string.Equals(result.Evidence.OriginCountry, request.Lines[0].CountryOfOrigin, StringComparison.OrdinalIgnoreCase) &&
             string.Equals(result.Evidence.HsCode, request.Lines[0].HsCode, StringComparison.OrdinalIgnoreCase);
-        var total = verified ? merchandise + request.ShippingCost + request.InsuranceCost +
-            result.Duty!.Value + result.Tax!.Value + result.ClearanceFee!.Value : (decimal?)null;
+        decimal? total = null;
+        try
+        {
+            if (verified) total = checked(merchandise + request.ShippingCost + request.InsuranceCost +
+                result.Duty!.Value + result.Tax!.Value + result.ClearanceFee!.Value);
+        }
+        catch (OverflowException) { verified = false; }
         return new(merchandise, request.ShippingCost, request.InsuranceCost,
             verified ? result.Duty : null, verified ? result.Tax : null,
             verified ? result.ClearanceFee : null, total,

@@ -6,6 +6,9 @@ namespace GlobalTradeTax.Api;
 public static class UkMeasureEvidence
 {
     public static UkEvidenceReport Analyze(UkReferenceResult upstream, string code, string origin, DateOnly date)
+        => AnalyzeCore(upstream, code, origin, date) with { DestinationTerritory = upstream.DestinationTerritory, ResponseSha256 = upstream.ResponseSha256 };
+
+    private static UkEvidenceReport AnalyzeCore(UkReferenceResult upstream, string code, string origin, DateOnly date)
     {
         var screened = UkMeasureScreening.Screen(upstream, code, origin, date);
         if (upstream.Status != "reference_only" || upstream.Data is not { } root ||
@@ -92,4 +95,8 @@ public sealed record UkMeasureEvidenceItem(string MeasureId, string GeographyEvi
     int AdditionalCodeReferences, int QuotaReferences, string? RawDutyExpression,
     string[] UnresolvedChecks, string Status);
 public sealed record UkEvidenceReport(string Status, string CommodityCode, string Origin,
-    DateOnly ImportDate, UkMeasureEvidenceItem[] Measures, bool VerifiedForCalculation, string Warning);
+    DateOnly ImportDate, UkMeasureEvidenceItem[] Measures, bool VerifiedForCalculation, string Warning)
+{
+    public string DestinationTerritory { get; init; } = "GB";
+    public string? ResponseSha256 { get; init; }
+}

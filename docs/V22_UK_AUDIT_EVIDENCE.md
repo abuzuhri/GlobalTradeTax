@@ -1,6 +1,6 @@
 # v2.2 UK evidence package
 
-**2026-11-05 compatibility update:** envelopes now use `uk-reference-evidence/v2` to cover candidate evidence, requested dates, membership paths and invariant-calendar formatting. Preserve the schema version with stored hashes; v1/v2 canonical digests are not interchangeable. See [current evidence contract](UK_APPLICABILITY_EVIDENCE.md).
+**2026-11-05 compatibility update:** current envelopes use `uk-reference-evidence/v3` to bind territory, exact response digests and structured rules as well as dated applicability and membership. Preserve the version with stored hashes; v1/v2/v3 canonical digests are not interchangeable. See [current UK review contract](UK_SHIPMENT_REVIEW.md). The v2 slice is retained in [historical applicability evidence](UK_APPLICABILITY_EVIDENCE.md).
 
 Adds `GET /v1/references/uk/assessments/{code}/evidence-package?origin=US&importDate=2026-11-02`.
 

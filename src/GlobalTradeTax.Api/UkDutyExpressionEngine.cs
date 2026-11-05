@@ -20,6 +20,7 @@ public static class UkDutyExpressionEngine
         var original = expression ?? string.Empty;
         UkDutyExpressionResult Unknown(string reason) => new(null, "requires_review", [reason], original);
         if (string.IsNullOrWhiteSpace(expression)) return Unknown("missing_duty_expression");
+        if (expression.Length > 512) return Unknown("unsupported_duty_expression");
         if (customsValueGbp is < 0 || netMassKg is < 0 || itemCount is < 0)
             return Unknown("negative_input");
         try
@@ -28,7 +29,7 @@ public static class UkDutyExpressionEngine
             if (match.Success)
             {
                 if (customsValueGbp is null) return Unknown("missing_verified_customs_value_gbp");
-                return Result(checked(decimal.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture) * customsValueGbp.Value / 100m));
+                return Result(checked(Rate(match.Groups[1].Value) * customsValueGbp.Value / 100m));
             }
             match = Specific.Match(expression);
             if (match.Success)
@@ -39,7 +40,7 @@ public static class UkDutyExpressionEngine
                 if (customsValueGbp is null) return Unknown("missing_verified_customs_value_gbp");
                 var unit = UnitAmount(match.Groups[2].Value, match.Groups[3].Value);
                 if (unit.IllustrativeAmount is null) return unit;
-                var percent = decimal.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+                var percent = Rate(match.Groups[1].Value);
                 return Result(checked(percent * customsValueGbp.Value / 100m + unit.IllustrativeAmount.Value));
             }
             return Unknown("unsupported_duty_expression");
@@ -51,17 +52,23 @@ public static class UkDutyExpressionEngine
 
         UkDutyExpressionResult UnitAmount(string rateText, string unitText)
         {
-            var unit = unitText.Trim().ToLowerInvariant();
+            var unit = Regex.Replace(unitText.Trim().ToLowerInvariant(), @"\s+", "");
             decimal? quantity = unit switch
             {
                 "kg" => netMassKg,
-                "100 kg" => netMassKg / 100m,
+                "100kg" => netMassKg / 100m,
                 "tonne" => netMassKg / 1000m,
-                "item" => itemCount,
+                "item" => itemCount is { } count && count == decimal.Truncate(count) ? count : null,
                 _ => null
             };
             if (quantity is null) return Unknown("missing_quantity_for_" + unit.Replace(' ', '_'));
-            return Result(checked(decimal.Parse(rateText, CultureInfo.InvariantCulture) * quantity.Value));
+            return Result(checked(Rate(rateText) * quantity.Value));
+        }
+        static decimal Rate(string text)
+        {
+            if (text.Count(char.IsAsciiDigit) > 28 || text.Contains('.') && text.Split('.')[1].Length > 28)
+                throw new FormatException("Unsupported duty precision.");
+            return decimal.Parse(text, CultureInfo.InvariantCulture);
         }
         UkDutyExpressionResult Result(decimal amount) => new(amount, "illustrative_only",
             ["legal_measure_applicability_not_verified", "quota_preference_and_exclusion_checks_required", "customs_valuation_and_currency_evidence_required"], original);
