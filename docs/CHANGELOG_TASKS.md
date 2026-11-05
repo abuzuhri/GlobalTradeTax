@@ -1,5 +1,12 @@
 # Task register change log
 
+## 2026-11-04 — TASK-003/010 PostgreSQL and container lifecycle
+- Added a disposable, labelled Compose test project derived from the root configuration and real Dockerfile. Verify fresh schema, original v0.4 upgrade/reapplication/rollback, authenticated merchant isolation/revocation, concurrent idempotency/staging, container recreation and isolated backup/restore.
+- Real PostgreSQL integration exposed AuditStore sending text into a JSONB column (SQLSTATE 42804 / HTTP 500). Explicit Npgsql JSONB binding fixes the endpoint; tests verify persisted JSON and subsequent restored audit writes. Duty/tax/payable fields remain null.
+- Final frozen-fixture local run: 103 integration assertions passed with cleanup; zero-warning Release build; 219 xUnit cases passed/eight live skips; 32 Python cases, actionlint and repository guards passed. Added the historical schema fixture and a CI job with redacted evidence upload; hosted execution is tracked in the review PR.
+- [Verification and upgrade/recovery runbook](POSTGRES_CONTAINER_VERIFICATION.md). TASK-003/010 remain in-progress; migration ledger/release policy, required-check enforcement and production operational review remain open.
+- Review and hosted evidence: [draft PR #2](https://github.com/abuzuhri/GlobalTradeTax/pull/2), based on the UK-authentication PR #1.
+
 ## 2026-11-04 — TASK-005 managed access and TASK-010 hosted CI repair
 - Added opt-in managed GB authentication against the fixed official OAuth endpoint with encoded form credentials, memory-only tokens, expiry/rotation handling, concurrent refresh control, bounded bodies/timeouts and one retry after 401. Public requests receive no managed tokens and failures never fall back.
 - Added 52 offline cases and four separately gated managed probes. PASS locally: zero-warning build, 219 offline xUnit cases (eight live probes skipped), separate four-case public live run, 25 Python tests, 20 general HTTP smoke assertions, six public authenticated UK checks and two missing-credential checks. Real managed credentials are absent; its live probes were not run.

@@ -45,6 +45,10 @@ curl http://localhost:5080/v1/destinations/SE -H 'X-API-Key: your-secret-key'
 
 See [docs/V04_POSTGRES.md](docs/V04_POSTGRES.md). Docker Compose provisions PostgreSQL and the API. The old in-memory store is used only when no connection string is supplied. Customs duties and taxes remain unavailable until an authoritative provider is connected.
 
+### PostgreSQL/container verification — 2026-11-04
+
+Run `python3 scripts/check_postgres_integration.py` on a Linux/WSL Docker host to verify fresh databases, a frozen v0.4 upgrade, merchant isolation, concurrent idempotency, container recreation and backup restoration. The first real database run exposed and fixed an audit JSONB parameter error that caused HTTP 500. The corrected suite passed 103 assertions locally; the new CI job uploads redacted JSON evidence. See [commands, upgrade/recovery procedure and scope](docs/POSTGRES_CONTAINER_VERIFICATION.md).
+
 
 ## v0.5 Multi-tenant authentication
 PostgreSQL-backed SHA-256 hashed per-merchant API keys are now supported. See `docs/V05_MULTI_TENANT.md` for migrations and merchant provisioning. The API still does not calculate authoritative customs duties or taxes.

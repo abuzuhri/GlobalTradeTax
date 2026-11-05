@@ -25,6 +25,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  container-postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify Docker and PostgreSQL lifecycle
+        run: python3 scripts/check_postgres_integration.py --report TestResults/postgres-integration.json
+      - name: Upload database integration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: postgres-integration-results
+          path: TestResults/postgres-integration.json
+          if-no-files-found: error
+
   uk-managed-live-contract:
     if: github.event_name == 'workflow_dispatch' && inputs.uk_managed_live_contract
     runs-on: ubuntu-latest
