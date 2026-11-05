@@ -1,5 +1,7 @@
 # v1.2 — PostgreSQL tariff reference staging
 
+**2026-11-05 update:** migration 005 adds exact-byte archives and append-only operator review evidence. Existing volumes must apply it after 001–004. Matching original uploads can backfill older staged batches; no archive or licence approval is invented. See [current API, migration and verification](TARIFF_PROVENANCE_REVIEW.md).
+
 ## Scope
 Validated CSV rows are written transactionally to PostgreSQL, with SHA-256 deduplication. This is **reference-only staging**. No imported row is activated for IImportRateProvider, no VAT is calculated, and no payable customs amount is derived.
 

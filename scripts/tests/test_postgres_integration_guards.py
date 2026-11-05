@@ -1,10 +1,11 @@
 import json
+import io
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from check_postgres_integration import Integration, MARKER, VerificationError, validate_spec
@@ -71,6 +72,25 @@ class PostgresIntegrationGuardTests(unittest.TestCase):
             self.assertIn('[REDACTED]', redacted)
             for secret in runner.hidden:
                 self.assertNotIn(secret, redacted)
+
+    def test_chunked_request_keeps_original_bytes_until_the_http_client_reads_them(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            runner = Integration(temporary, Path(temporary) / 'report.json')
+            runner.base = 'http://127.0.0.1:12345'
+            payload = b'\xef\xbb\xbf' + b'test-record\r\n' * 2000
+
+            def receive(request, timeout):
+                self.assertEqual(payload, b''.join(request.data))
+                self.assertEqual('POST', request.method)
+                response = io.BytesIO(b'{"status":"accepted"}')
+                response.status = 200
+                return response
+
+            opener = Mock()
+            opener.open.side_effect = receive
+            with patch('check_postgres_integration.build_opener', return_value=opener):
+                result = runner.request('POST', '/upload', payload=payload, chunked=True)
+            self.assertEqual('accepted', result['status'])
 
 
 if __name__ == '__main__':

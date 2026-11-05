@@ -6,6 +6,7 @@ Requires Docker Compose v2 and Python's standard library. No existing database i
 import argparse
 import concurrent.futures
 import copy
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import os
@@ -252,7 +253,7 @@ class Integration:
             time.sleep(.25)
         raise VerificationError('Container API did not become reachable')
 
-    def request(self, method, path, *, key=None, operator=False, payload=None, idempotency=None, expected=200):
+    def request(self, method, path, *, key=None, operator=False, payload=None, idempotency=None, expected=200, chunked=False):
         headers = {}
         if key is not None:
             headers['X-API-Key'] = key
@@ -260,14 +261,17 @@ class Integration:
             headers['X-Operator-Key'] = self.env['GTT_TEST_OPERATOR_KEY']
         if idempotency:
             headers['Idempotency-Key'] = idempotency
-        if isinstance(payload, str):
+        if isinstance(payload, (str, bytes)):
             headers['Content-Type'] = 'text/csv'
-            body = payload.encode()
+            body = payload.encode() if isinstance(payload, str) else payload
         elif payload is not None:
             headers['Content-Type'] = 'application/json'
             body = json.dumps(payload).encode()
         else:
             body = None
+        if chunked and body is not None:
+            raw_body = body
+            body = (raw_body[i:i + 8192] for i in range(0, len(raw_body), 8192))
         request = Request(self.base + path, data=body, headers=headers, method=method)
         try:
             response = build_opener(NoRedirects()).open(request, timeout=12)
@@ -276,7 +280,8 @@ class Integration:
         with response:
             status = response.status
             raw = response.read(1_048_576)
-        self.check(f'{method} {path} expects HTTP {expected} (received {status})', status == expected)
+        self.check(f'{method} {path} expects HTTP {expected} (received {status})',
+                   status in expected if isinstance(expected, tuple) else status == expected)
         try:
             return json.loads(raw) if raw else None
         except ValueError:
@@ -290,8 +295,8 @@ class Integration:
     def fresh_api(self):
         self.phase('Checking fresh schema, merchant isolation and concurrent idempotency')
         self.fresh_schema = self.sql(SCHEMA_SQL)
-        self.check('All six schema tables initialized', len(json.loads(self.fresh_schema)['indexes']) > 0 and
-                   self.sql("SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';") == '6')
+        self.check('All eight schema tables initialized', len(json.loads(self.fresh_schema)['indexes']) > 0 and
+                   self.sql("SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE';") == '8')
         self.provision('merchant-a', self.keys['a'])
         self.provision('merchant-b', self.keys['b'])
         self.start_api()
@@ -335,6 +340,8 @@ class Integration:
         csv = ('destination,origin,hs_code,ad_valorem_percent,valid_from,valid_to,source_url,source_version\n'
                'GB,US,0101210000,9.5,2026-01-01,2026-12-31,https://example.test/test-only,integration-only\n'
                'GB,US,0101299000,12.3,2026-01-01,2026-12-31,https://example.test/test-only,integration-only\n')
+        csv = '\ufeff' + csv.replace('\n', '\r\n')
+        self.staged_csv = csv
         path = '/v1/admin/tariff-datasets/stage'
         self.request('POST', path, key=self.keys['rotated'], payload=csv, expected=401)
         with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
@@ -348,8 +355,20 @@ class Integration:
         self.request('GET', '/v1/admin/tariff-datasets/' + self.batch_id, key=self.keys['rotated'], expected=401)
         batch = self.request('GET', '/v1/admin/tariff-datasets/' + self.batch_id, operator=True)
         self.check('Staged provenance is preserved', batch['sha256'] == hashlib.sha256(csv.encode()).hexdigest() and batch['rows'] == 2)
+        self.check('Exact BOM/CRLF upload archived with database-checked digest', batch['documentArchived'] and batch['review'] is None and
+                   self.sql("SELECT encode(document_bytes,'hex') LIKE 'efbbbf%' AND dataset_sha256=encode(sha256(document_bytes),'hex') FROM tariff_import_documents;") == 't')
         self.request('POST', path, operator=True, payload=csv.replace('2026-12-31', '2025-12-31'), expected=400)
+        duplicate = csv + csv.split('\r\n')[1] + '\r\n'
+        for rejected in (duplicate, csv.replace('9.5,', '9.51234,'), b'\xc3\x28'):
+            self.request('POST', path, operator=True, payload=rejected, expected=400)
+        oversized = b' ' * (1_048_576 + 1)
+        self.request('POST', path, operator=True, payload=oversized, expected=413)
+        self.request('POST', path, operator=True, payload=oversized, chunked=True, expected=413)
+        self.request('POST', '/v1/tariff-datasets/validate', key=self.keys['rotated'], payload=oversized, chunked=True, expected=413)
+        validated = self.request('POST', '/v1/tariff-datasets/validate', key=self.keys['rotated'], payload=csv, chunked=True)
+        self.check('Merchant validation preserves exact upload digest without enabling rates', validated['sha256'] == batch['sha256'])
         self.check('Rejected CSV leaves no partial batch', self.sql('SELECT count(*) FROM tariff_import_batches;') == '1')
+        self.tariff_reviews(batch)
         probe = copy.deepcopy(self.payload)
         probe['shipTo'] = 'GB'
         probe['lines'][0].update(hsCode='0101210000', countryOfOrigin='US')
@@ -359,6 +378,82 @@ class Integration:
         self.check('Landed-cost estimate remains non-payable', estimate['total'] is None and estimate['importDuty'] is None and estimate['importTax'] is None)
         self.check('Audit JSON is stored as an object for the authenticated merchant',
                    self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='merchant-a' AND action='landed_cost_estimate' AND jsonb_typeof(details_json)='object';") == '1')
+
+    def tariff_reviews(self, batch):
+        self.phase('Checking reference reviews, expiry, revision preconditions and immutable history')
+        path = '/v1/admin/tariff-datasets/' + self.batch_id + '/reviews'
+        future = (datetime.now(timezone.utc) + timedelta(seconds=15)).isoformat()
+        review = dict(expectedDatasetSha256=batch['sha256'], disposition='reviewed_reference_only',
+                      reviewedBy='integration-operator', licenceUrl='https://example.test/test-only-licence',
+                      expiresAt=future, note='Synthetic operator attestation only; not official tariff data.')
+        self.request('POST', path, payload=review, expected=401)
+        self.request('POST', path, key=self.keys['rotated'], payload=review, expected=401)
+        self.request('GET', path, key=self.keys['rotated'], expected=401)
+        self.request('POST', path, operator=True, payload={**review, 'expectedDatasetSha256': '0' * 64}, expected=409)
+        self.request('POST', path, operator=True, payload={**review, 'licenceUrl': None}, expected=400)
+        self.request('POST', path, operator=True, payload={**review, 'note': 'x' * 40000}, expected=413)
+        self.request('POST', path, operator=True, payload={**review, 'note': 'x' * 40000}, chunked=True, expected=413)
+        self.request('POST', path, operator=True, payload=b'{', expected=400)
+        self.sql("UPDATE tariff_reference_rows SET ad_valorem_percent=99 WHERE batch_id=" + self.literal(self.batch_id) + ' AND row_number=1;')
+        self.request('POST', path, operator=True, payload=review, expected=409)
+        self.sql("UPDATE tariff_reference_rows SET ad_valorem_percent=9.5 WHERE batch_id=" + self.literal(self.batch_id) + ' AND row_number=1;')
+        self.sql("UPDATE tariff_import_documents SET document_bytes='not the upload'::bytea;", error_state='23514')
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            results = list(pool.map(lambda _: self.request('POST', path, operator=True, payload=review), range(4)))
+        first = results[0]['review']
+        self.check('Concurrent identical reviews record one immutable revision',
+                   len({item['review']['reviewId'] for item in results}) == 1 and
+                   sum(item['status'] == 'recorded' for item in results) == 1 and first['revision'] == 1 and
+                   self.sql('SELECT count(*) FROM tariff_reference_reviews;') == '1')
+        self.check('Review snapshots digest/source and makes no calculation or licensing claim',
+                   first['datasetSha256'] == batch['sha256'] and first['sourceUrl'] == batch['sourceUrl'] and
+                   not first['approvedForCalculation'] and first['licenceVerification'] == 'operator_attestation_only')
+        self.request('POST', path, operator=True, payload={**review, 'note': 'Changed without previous review'}, expected=409)
+        deadline = time.monotonic() + 25
+        while True:
+            # Poll directly to avoid counting timing-dependent attempts as integration assertions.
+            req = Request(self.base + '/v1/admin/tariff-datasets/' + self.batch_id,
+                          headers={'X-Operator-Key': self.env['GTT_TEST_OPERATOR_KEY']})
+            with build_opener(NoRedirects()).open(req, timeout=12) as response:
+                expired = json.load(response)
+            if expired['review']['evidenceStatus'] == 'expired_reference_review':
+                break
+            if time.monotonic() >= deadline:
+                raise VerificationError('Reference review did not expire at its declared timestamp')
+            time.sleep(.25)
+        self.check('Expiry is recomputed at read time without modifying review history',
+                   expired['review']['reviewId'] == first['reviewId'] and not expired['approvedForCalculation'] and
+                   self.sql('SELECT count(*) FROM tariff_reference_reviews;') == '1')
+        replay = self.request('POST', path, operator=True, payload=review)
+        self.check('Identical review replay remains idempotent after expiry', replay['status'] == 'already_recorded' and
+                   replay['review']['reviewId'] == first['reviewId'] and replay['review']['evidenceStatus'] == 'expired_reference_review')
+        renewal = {**review, 'previousReviewId': first['reviewId'], 'expiresAt': (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()}
+        renewed = self.request('POST', path, operator=True, payload=renewal)['review']
+        self.check('Renewal appends a revision and retains the expired decision', renewed['revision'] == 2 and
+                   renewed['previousReviewId'] == first['reviewId'] and self.sql('SELECT count(*) FROM tariff_reference_reviews;') == '2')
+        rejection = {**review, 'previousReviewId': renewed['reviewId'], 'disposition': 'rejected', 'expiresAt': None,
+                     'licenceUrl': None, 'note': 'Synthetic rejection: rights evidence withdrawn.'}
+        rejected = self.request('POST', path, operator=True, payload=rejection)['review']
+        self.check('Rejection appends evidence without deleting or activating data', rejected['revision'] == 3 and rejected['evidenceStatus'] == 'rejected')
+        choices = [{**renewal, 'previousReviewId': rejected['reviewId'], 'note': 'Concurrent renewed attestation'},
+                   {**rejection, 'previousReviewId': rejected['reviewId'], 'note': 'Concurrent rejection attestation'}]
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            raced = list(pool.map(lambda value: self.request('POST', path, operator=True, payload=value, expected=(200, 409)), choices))
+        self.check('Competing reviews with the same predecessor have one winner', sorted(r['status'] for r in raced) == ['conflict', 'recorded'])
+        self.review_id = next(r['review']['reviewId'] for r in raced if r['status'] == 'recorded')
+        history = self.request('GET', path + '?limit=2', operator=True)
+        later = self.request('GET', path + '?limit=2&afterRevision=' + str(history['nextAfterRevision']), operator=True)
+        self.check('Bounded history pagination preserves all four decisions',
+                   [r['revision'] for r in history['reviews'] + later['reviews']] == [1, 2, 3, 4] and history['hasMore'] and not later['hasMore'])
+        self.check('First review snapshot survives subsequent decisions', history['reviews'][0]['reviewId'] == first['reviewId'] and
+                   history['reviews'][0]['note'] == first['note'])
+        self.request('GET', path + '?limit=0', operator=True, expected=400)
+        self.request('GET', '/v1/admin/tariff-datasets/' + str(uuid.uuid4()) + '/reviews', operator=True, expected=404)
+        self.request('POST', '/v1/admin/tariff-datasets/' + str(uuid.uuid4()) + '/reviews', operator=True, payload=renewal, expected=404)
+        self.request('POST', path, operator=True, payload={**renewal, 'previousReviewId': self.review_id,
+                     'expiresAt': (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()}, expected=400)
+        self.sql("INSERT INTO tariff_import_documents(batch_id,dataset_sha256,document_bytes) SELECT " + self.literal(str(uuid.uuid4())) +
+                 '::uuid,dataset_sha256,document_bytes FROM tariff_import_documents LIMIT 1;', error_state='23503')
 
     def verify_saved_data(self, database='trade'):
         quote = self.request('GET', '/v1/quotes/' + self.quote_a['quoteId'], key=self.keys['rotated'])
@@ -370,6 +465,10 @@ class Integration:
         batch = self.request('GET', '/v1/admin/tariff-datasets/' + self.batch_id, operator=True)
         self.check('Staging survives recreation/restore', batch['rows'] == 2 and
                    self.sql('SELECT count(*) FROM tariff_reference_rows;', database=database) == '2')
+        self.check('Exact archive and latest review survive recreation/restore', batch['documentArchived'] and
+                   batch['review']['reviewId'] == self.review_id and not batch['approvedForCalculation'] and
+                   self.sql('SELECT count(*) FROM tariff_reference_reviews;', database=database) == '4' and
+                   self.sql("SELECT dataset_sha256=encode(sha256(document_bytes),'hex') FROM tariff_import_documents;", database=database) == 't')
         self.check('Audit survives recreation/restore', self.sql('SELECT count(*) FROM audit_events;', database=database) == '1')
 
     def persistence_and_restore(self):
@@ -420,9 +519,18 @@ class Integration:
         self.sql('INSERT INTO quotes(quote_id,tenant_id,idempotency_key,fingerprint,response_json) VALUES (' +
                  ','.join(self.literal(value) for value in (legacy_id, 'legacy-merchant', 'legacy-key', 'legacy-fingerprint', json.dumps(legacy))) + ');', service=service)
         scripts = sorted((self.repo / 'db').glob('*.sql'))
-        self.check('Exactly the four reviewed migration scripts are used', [path.name for path in scripts] ==
-                   ['001_init.sql', '002_tenants.sql', '003_audit.sql', '004_tariff_staging.sql'])
-        self.sql('\n'.join(path.read_text() for path in scripts[1:]), service=service)
+        self.check('Exactly the five reviewed migration scripts are used', [path.name for path in scripts] ==
+                   ['001_init.sql', '002_tenants.sql', '003_audit.sql', '004_tariff_staging.sql', '005_tariff_provenance.sql'])
+        self.sql('\n'.join(path.read_text() for path in scripts[1:3]) + '\n' +
+                 (self.repo / 'tests/fixtures/postgres/v12-tariff-schema.sql').read_text(), service=service)
+        old_batch_id = str(uuid.uuid4())
+        old_sha = hashlib.sha256(self.staged_csv.encode()).hexdigest()
+        self.sql("INSERT INTO tariff_import_batches(batch_id,dataset_sha256,source_version,source_url,record_count) VALUES (" +
+                 ','.join(self.literal(v) for v in (old_batch_id, old_sha, 'integration-only', 'https://example.test/test-only')) + ",2);" +
+                 "INSERT INTO tariff_reference_rows VALUES (" + self.literal(old_batch_id) +
+                 ",1,'GB','US','0101210000',9.5,'2026-01-01','2026-12-31','https://example.test/test-only','integration-only'),(" +
+                 self.literal(old_batch_id) + ",2,'GB','US','0101299000',12.3,'2026-01-01','2026-12-31','https://example.test/test-only','integration-only');", service=service)
+        self.sql(scripts[4].read_text(), service=service)
         self.check('Upgraded schema matches fresh initialization', self.sql(SCHEMA_SQL, service=service) == self.fresh_schema)
         self.sql('\n'.join(path.read_text() for path in scripts), service=service)
         self.check('Reapplying schema scripts preserves legacy data',
@@ -431,6 +539,21 @@ class Integration:
         self.check('Failed migration transaction leaves no schema changes', self.sql(SCHEMA_SQL, service=service) == self.fresh_schema)
         self.provision('legacy-merchant', self.keys['legacy'], service=service)
         self.start_api(host=service)
+        old_batch = self.request('GET', '/v1/admin/tariff-datasets/' + old_batch_id, operator=True)
+        self.check('Pre-provenance staging survives migration without invented archive or review',
+                   old_batch['rows'] == 2 and not old_batch['documentArchived'] and old_batch['review'] is None)
+        old_review = dict(expectedDatasetSha256=old_sha, disposition='reviewed_reference_only', reviewedBy='upgrade-test',
+                          licenceUrl='https://example.test/licence', expiresAt=(datetime.now(timezone.utc) + timedelta(days=1)).isoformat(),
+                          note='Synthetic historical migration test only.')
+        self.request('POST', '/v1/admin/tariff-datasets/' + old_batch_id + '/reviews', operator=True, payload=old_review, expected=409)
+        self.sql("UPDATE tariff_reference_rows SET ad_valorem_percent=99 WHERE batch_id=" + self.literal(old_batch_id) + ' AND row_number=1;', service=service)
+        self.request('POST', '/v1/admin/tariff-datasets/stage', operator=True, payload=self.staged_csv, expected=409)
+        self.check('Mismatching legacy rows cannot acquire an archive', self.sql('SELECT count(*) FROM tariff_import_documents;', service=service) == '0')
+        self.sql("UPDATE tariff_reference_rows SET ad_valorem_percent=9.5 WHERE batch_id=" + self.literal(old_batch_id) + ' AND row_number=1;', service=service)
+        backfill = self.request('POST', '/v1/admin/tariff-datasets/stage', operator=True, payload=self.staged_csv)
+        self.check('Exact matching legacy upload backfills the archive without duplicate rows', backfill['alreadyExists'] and
+                   backfill['batchId'] == old_batch_id and self.sql('SELECT count(*) FROM tariff_reference_rows;', service=service) == '2')
+        self.request('POST', '/v1/admin/tariff-datasets/' + old_batch_id + '/reviews', operator=True, payload=old_review)
         restored = self.request('GET', '/v1/quotes/' + legacy_id, key=self.keys['legacy'])
         self.check('API reads pre-upgrade quote after migration', restored['quoteId'] == legacy_id and restored['merchandiseValue'] == 70)
         self.incomplete_quote(restored)
