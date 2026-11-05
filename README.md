@@ -109,7 +109,15 @@ See `docs/V22_UK_AUDIT_EVIDENCE.md`. It is not a payable quote.
 See [docs/V23_UK_CONTRACT_TESTS.md](docs/V23_UK_CONTRACT_TESTS.md). Offline mocked HTTP tests; no live tariff calculation.
 
 ## v2.4 UK API contract guard
-See [UK contract guard](docs/V24_UK_CONTRACT_GUARD.md) and [task 005](tasks/005-uk-live-api-contract-fixtures.md). CI added but build and live UK verification remain pending.
+See [UK contract guard](docs/V24_UK_CONTRACT_GUARD.md) and [task 005](tasks/005-uk-live-api-contract-fixtures.md). Initial CI/guard work was followed by the live verification below.
+
+### UK live contract correction — 2026-11-04
+
+The live UK commodity API uses an internal resource ID and a separate commodity-code attribute. The reference validator now checks the actual singular resource types and code attribute, with four recorded official responses and opt-in live CI probes. Local verification passed 167 offline xUnit tests, four separate live probes, 25 Python tests and authenticated HTTP checks. See [sources, reproduction and remaining managed-API migration work](docs/UK_LIVE_CONTRACT_VERIFICATION.md). TASK-005 remains in progress; this does not enable payable customs calculations.
+
+### Managed UK API authentication — 2026-11-04
+
+The UK reference adapter now supports the official managed GB API with operator-provisioned client credentials, shared token renewal and one retry after HTTP 401. Public access remains available. See [configuration, opt-in managed probes and verification](docs/UK_MANAGED_API.md). Local verification passed 219 offline xUnit cases, four public live probes and both running-app configurations; real managed credentials are still required for live managed verification. The two historical Gitleaks findings were confirmed as documentation placeholders and scoped to exact finding fingerprints.
 
 ### v2.5 — UK lookup coverage
 UK assessment exposes omitted area IDs when the 20-lookup safety cap is exceeded. See `docs/V25_UK_LOOKUP_COVERAGE.md` and TASK-006. Not a payable quote.

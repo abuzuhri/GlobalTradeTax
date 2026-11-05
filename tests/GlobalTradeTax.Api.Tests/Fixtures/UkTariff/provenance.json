@@ -1,0 +1,50 @@
+{
+  "captured_at_utc": "2026-11-04T17:08:01.168361+00:00",
+  "territory": "GB (legacy UK endpoint); not Northern Ireland",
+  "accept": "application/vnd.hmrc.2.0+json",
+  "licence": "Open Government Licence v3.0",
+  "licence_url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+  "licence_source": "https://www.api.gov.uk/hmrc/gov-uk-trade-tariff-api/",
+  "attribution": "Contains public sector information licensed under the Open Government Licence v3.0.",
+  "purpose": "Offline structural regression fixtures only; not validated rates or payable calculations.",
+  "transformations": "None. Files preserve the response bytes; no credentials or user data were sent.",
+  "upstream_source_commit": "64c30b8d35a9c2b2508e0669a6af57892f14bdeb",
+  "responses": [
+    {
+      "file": "commodity-0101210000.json",
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/commodities/0101210000",
+      "retrieved_at_utc": "2026-11-04T17:08:01.483840+00:00",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "bytes": 269763,
+      "sha256": "0897ddd0fec210aa6d58fca696505799decb0ae71d176a4a55ff7a20841d83d9"
+    },
+    {
+      "file": "geographical-area-1011.json",
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/geographical_areas/1011",
+      "retrieved_at_utc": "2026-11-04T17:08:01.690643+00:00",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "bytes": 60943,
+      "sha256": "504fbca83f24a745f3bee0c3a774210eaa3591db89c742c90fef7403589865ce"
+    },
+    {
+      "file": "commodity-not-found.json",
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/commodities/0000000000",
+      "retrieved_at_utc": "2026-11-04T17:08:01.899029+00:00",
+      "status": 404,
+      "content_type": "application/json; charset=utf-8",
+      "bytes": 35,
+      "sha256": "7f6fdcb0d55eeffaf73f5f082f1e18d05206d6785d198b21191d3addcd403a83"
+    },
+    {
+      "file": "geographical-area-not-found.json",
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/geographical_areas/ZZZZZZZZZZZZ",
+      "retrieved_at_utc": "2026-11-04T17:08:02.043589+00:00",
+      "status": 404,
+      "content_type": "application/json; charset=utf-8",
+      "bytes": 35,
+      "sha256": "7f6fdcb0d55eeffaf73f5f082f1e18d05206d6785d198b21191d3addcd403a83"
+    }
+  ]
+}

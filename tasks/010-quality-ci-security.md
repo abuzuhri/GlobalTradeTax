@@ -4,7 +4,14 @@
 - **Priority:** P0
 - **Owner:** Unassigned
 - **Dependencies:** Review related tasks in [master register](../TASKS.md) before starting.
-- **Last reviewed:** 2026-11-02
+- **Last reviewed:** 2026-11-04
+
+## 2026-11-04 — Hosted history-scan repair slice
+- Inspected hosted run 41683857783 for commit b8eb349: application, dependency, frontend and repository checks succeeded; Gitleaks failed with two findings.
+- Reproduced both findings locally using checksum-verified Gitleaks 8.24.2 with redacted reporting. Both are `curl-auth-header` matches in the initial commit's documentation examples (`README.md:41`, `docs/IMPLEMENTATION.md:16`). The README uses `your-secret-key`; the multi-line implementation example contains `replace-with-a-long-random-secret` in its API-key header.
+- Added only the two exact historical finding fingerprints to the scanner ignore file, with their rationale. All default rules and full-history coverage remain enabled. Local rescan with checksum-verified 8.24.2 passed with zero remaining findings; actionlint 1.7.12 and `git diff --check` passed.
+- Hosted [PR run](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/41879751626) and [manual public-live run](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/41879785451) both passed for source commit 2673050. Hosted logs confirm three commits scanned with no remaining findings, 219 xUnit passes/eight live skips, zero build warnings/errors, and ten HTTP smoke assertions; the manual job separately passed four public live probes. Changes are in [draft PR #1](https://github.com/abuzuhri/GlobalTradeTax/pull/1).
+- Status remains in-progress: required PR-check enforcement, current container/PostgreSQL validation and broader production security/recovery work remain open. No history rewrite, merge or production deployment was performed.
 
 ## Objective
 Compile with .NET 8, run xUnit, integration tests, static analysis, dependency and secret scans in CI.

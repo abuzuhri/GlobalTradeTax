@@ -1,0 +1,5 @@
+# Exact historical documentation-example findings, reviewed under TASK-010 on 2026-11-04.
+# README example: literal "your-secret-key"; implementation example: replace-with-random-secret placeholder.
+# Do not ignore an entire rule, path, commit, or future API key. All default rules remain enabled.
+bcec3f994af5ac04cb7dc5f1fa15f41bc6452f02:README.md:curl-auth-header:41
+bcec3f994af5ac04cb7dc5f1fa15f41bc6452f02:docs/IMPLEMENTATION.md:curl-auth-header:16
