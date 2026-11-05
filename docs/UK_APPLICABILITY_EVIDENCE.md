@@ -1,6 +1,6 @@
 # UK dated membership and measure candidate evidence
 
-Verified locally on 2026-11-05 for TASK-006. This slice resolves reference evidence; it does not calculate or authorize customs duty or import VAT. Conditions, certificates, preferences, quotas and legal eligibility remain open, so TASK-006 stays in progress.
+Verified locally on 2026-11-05 for TASK-006; [implementation PR #4](https://github.com/abuzuhri/GlobalTradeTax/pull/4) records the hosted checks and review. This slice resolves reference evidence; it does not calculate or authorize customs duty or import VAT. Conditions, certificates, preferences, quotas and legal eligibility remain open, so TASK-006 stays in progress.
 
 ## What changed
 
