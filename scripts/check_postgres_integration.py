@@ -370,7 +370,8 @@ class Integration:
                        review['status'] == 'requires_review' and review['destinationTerritory'] == territory and
                        review['approvedForPayment'] is False and review['verifiedForCalculation'] is False and
                        all(review[name] is None for name in ('payableDutyGbp', 'payableVatGbp', 'payableLandedTotalGbp', 'illustrativeTotals')))
-        for malformed in ('{"currency":"GBP","Currency":"USD"}', '{"intrinsicValueGbp":1e-100}'):
+        for malformed in ('{"currency":"GBP","Currency":"USD"}', '{"intrinsicValueGbp":1e-100}',
+                          '{"intrinsicValueGbp":"1e-100"}'):
             self.request('POST', path, key=self.keys['rotated'], payload=malformed, expected=400)
         self.request('POST', path, key=self.keys['rotated'], payload=' ' * 262145, expected=413)
         self.check('UK evidence audit is tenant-bound, contains a digest and omits shipment details',

@@ -13,7 +13,7 @@ Implemented 2026-11-05 for TASK-005–009. This completes a broad reference and 
 
 ## Authenticated shipment endpoint
 
-`POST /v1/references/uk/shipments/review` uses existing merchant authentication (`X-API-Key`). Authentication happens before reading the body. JSON is bounded to 256 KiB, with 1–20 lines and at most 100 costs. Duplicate JSON fields, exponent numbers and decimal values that cannot be represented exactly are rejected. HTTP 400 means invalid input; 413 means oversized input. A valid review with missing upstream access returns HTTP 200 with explicit gaps and null amounts.
+`POST /v1/references/uk/shipments/review` uses existing merchant authentication (`X-API-Key`). Authentication happens before reading the body. JSON is bounded to 256 KiB, with 1–20 lines and at most 100 costs. Duplicate JSON fields, quoted numbers, exponent numbers and decimal values that cannot be represented exactly are rejected. HTTP 400 means invalid input; 413 means oversized input. A valid review with missing upstream access returns HTTP 200 with explicit gaps and null amounts.
 
 Example JSON (the IDs are explicit measures from the recorded GB response, not recommendations to use those measures):
 
@@ -61,7 +61,7 @@ Responses contain:
 - `evidenceSha256`: deterministic `uk-shipment-review/v1` digest binding request, context, source assessments, rates and results. Reordering lines/costs does not change it. This is an integrity aid, not a signature.
 - Unconditional false verification/payment flags and null payable amounts.
 
-With PostgreSQL, the existing audit store records tenant, review status, digest, territory, date and false approval. It does not store the line inputs or retrieved reference bodies. Capture the full review securely if replay is required. No database migration is needed for this endpoint.
+With PostgreSQL, the existing audit store records tenant, review status, digest, territory, date and false approval. It does not store the line inputs or retrieved reference bodies. Capture the original request, full review and raw referenced responses securely if independent replay or source-digest verification is required. No database migration is needed for this endpoint.
 
 ## Supported arithmetic and explicit limits
 
@@ -112,4 +112,4 @@ python scripts/check_secrets.py --include-untracked
 
 Public live probes require `TRADE_RUN_UK_LIVE_CONTRACT=1` and filter `Category=UkLiveContract`; managed probes use the separate opt-in and secrets described in the managed runbook. [The weekly public workflow](../.github/workflows/uk-public-contract.yml) produces a failed check and TRX on contract drift or outage. The regular CI container job exercises real merchant authentication, malformed/oversized review bodies, GB/XI missing-source results, audit persistence, recreation and backup/restore using private labelled resources. Existing Saleor volumes are not selected.
 
-Local verification passed: warnings-as-errors Release build/test (378 offline cases; 16 optional live skips), ten separately enabled public live probes, 32 Python cases and 112 PostgreSQL/container assertions with cleanup=true. Release publish, actionlint 1.7.12 (optional ShellCheck/Pyflakes disabled), task/CI/secret-pattern guards and whitespace checks passed. The database run verified private resource cleanup; the existing stopped Saleor containers and data were retained. Hosted results are recorded in the review PR after execution.
+Local verification passed: warnings-as-errors Release build/test (380 offline cases; 16 optional live skips), ten separately enabled public live probes, 32 Python cases and 112 PostgreSQL/container assertions with cleanup=true. Release publish, actionlint 1.7.12 (optional ShellCheck/Pyflakes disabled), task/CI/secret-pattern guards and whitespace checks passed. The database run verified private resource cleanup; the existing stopped Saleor containers and data were retained. Hosted results are recorded in the review PR after execution.

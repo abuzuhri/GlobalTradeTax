@@ -38,6 +38,8 @@ public sealed class UkProviderAndComplianceTests
     [InlineData("{\"status\":\"verified\",\"warnings\":null}")]
     [InlineData("{\"status\":\"verified\",\"warnings\":[null]}")]
     [InlineData("{\"status\":\"verified\",\"warnings\":[],\"duty\":1e-100}")]
+    [InlineData("{\"status\":\"verified\",\"warnings\":[],\"duty\":\"1e-100\"}")]
+    [InlineData("{\"status\":\"verified\",\"warnings\":[],\"duty\":\"100\"}")]
     [InlineData("{\"status\":\"verified\",\"warnings\":[],\"duty\":0.00000000000000000000000000001}")]
     [InlineData("{\"status\":\"verified\",\"Status\":\"unavailable\",\"warnings\":[]}")]
     public async Task Invalid_provider_financial_JSON_cannot_reach_the_payable_gate(string json)

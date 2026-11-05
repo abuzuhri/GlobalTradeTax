@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace GlobalTradeTax.Api;
 
@@ -35,6 +36,7 @@ internal static class ExactJsonInput
             }
         }
         Validate(document.RootElement);
-        return document.RootElement.Deserialize<T>(new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        return document.RootElement.Deserialize<T>(new JsonSerializerOptions(JsonSerializerDefaults.Web)
+            { NumberHandling = JsonNumberHandling.Strict });
     }
 }
