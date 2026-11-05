@@ -10,6 +10,8 @@ This C# assessment implementation is original code, inspired by the separation o
 
 ## New endpoint
 `GET /v1/references/uk/assessments/{code}?origin=US&importDate=2026-11-02`
+
+**2026-11-05 update:** import dates now reach both upstream lookups and cache keys. Each measure adds explicit candidate evidence, including typed memberships, effective windows and exclusions; overlapping measures remain separate. [Current contract, evidence v2 and verified results](UK_APPLICABILITY_EVIDENCE.md) supersede the original reference-parser assumptions below. All payable gates remain closed.
 Header: `X-API-Key: ...`
 
 The endpoint fetches a commodity, extracts measure evidence, screens geography, performs bounded (max 20, concurrency 4) geography lookups and returns an audit-friendly list of unresolved checks. It never claims an applicable rate or calculates payable customs duty or VAT. The UK reference client caches geographical lookups for ten minutes.

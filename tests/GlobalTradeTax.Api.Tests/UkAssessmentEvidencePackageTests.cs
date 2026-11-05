@@ -1,4 +1,5 @@
 using GlobalTradeTax.Api;
+using System.Globalization;
 using Xunit;
 
 public class UkAssessmentEvidencePackageTests
@@ -24,5 +25,42 @@ public class UkAssessmentEvidencePackageTests
             new DateOnly(2026, 11, 2), [], [], null, null, null, [warning], false);
         Assert.NotEqual(UkAssessmentEvidencePackage.Build(Make("A"), DateTimeOffset.UtcNow).ContentHash,
             UkAssessmentEvidencePackage.Build(Make("B"), DateTimeOffset.UtcNow).ContentHash);
+    }
+
+    [Fact]
+    public void Version_2_hash_covers_classification_date_and_membership_path()
+    {
+        var applicability = new UkMeasureApplicabilityEvidence("candidate_for_review", "import", "within_window",
+            "candidate_group_membership", "empty_exclusion_list", ["legal_review_required"], false);
+        var measure = new UkMeasureDecision("m1", "requires_review", null, ["1011"], []) { Applicability = applicability };
+        var area = new UkAreaEvidence("1011", "reference_only", "candidate_membership_evidence", null, false)
+            { AsOfDate = new DateOnly(2026, 11, 5), MembershipPath = ["1011", "US"] };
+        var report = new UkAssessmentReport("requires_review", "0101210000", "US", new DateOnly(2026, 11, 5),
+            [measure], [area], null, null, null, [], false);
+        var original = UkAssessmentEvidencePackage.Build(report, DateTimeOffset.UtcNow);
+        Assert.Equal("uk-reference-evidence/v2", original.SchemaVersion);
+        Assert.NotEqual(original.ContentHash, UkAssessmentEvidencePackage.Build(report with
+            { Measures = [measure with { Applicability = applicability with { Status = "indeterminate" } }] }, DateTimeOffset.UtcNow).ContentHash);
+        Assert.NotEqual(original.ContentHash, UkAssessmentEvidencePackage.Build(report with
+            { Areas = [area with { MembershipPath = ["1011", "1000", "US"] }] }, DateTimeOffset.UtcNow).ContentHash);
+        Assert.NotEqual(original.ContentHash, UkAssessmentEvidencePackage.Build(report with
+            { Areas = [area with { AsOfDate = new DateOnly(2026, 11, 4) }] }, DateTimeOffset.UtcNow).ContentHash);
+        Assert.False(original.ApprovedForPayment);
+    }
+
+    [Fact]
+    public void Evidence_hash_is_independent_of_host_calendar()
+    {
+        var report = new UkAssessmentReport("requires_review", "0101210000", "US", new DateOnly(2026, 11, 5),
+            [], [], null, null, null, [], false);
+        var previous = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+            var first = UkAssessmentEvidencePackage.Build(report, DateTimeOffset.UtcNow).ContentHash;
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("ar-SA");
+            Assert.Equal(first, UkAssessmentEvidencePackage.Build(report, DateTimeOffset.UtcNow).ContentHash);
+        }
+        finally { CultureInfo.CurrentCulture = previous; }
     }
 }

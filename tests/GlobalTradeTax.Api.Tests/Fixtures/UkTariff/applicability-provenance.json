@@ -1,0 +1,53 @@
+{
+  "territory": "GB legacy UK endpoint; not Northern Ireland",
+  "accept": "application/vnd.hmrc.2.0+json",
+  "licence": "Open Government Licence v3.0",
+  "licence_url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+  "licence_source": "https://www.api.gov.uk/hmrc/gov-uk-trade-tariff-api/",
+  "attribution": "Contains public sector information licensed under the Open Government Licence v3.0.",
+  "purpose": "Offline date-scoped membership/import/exclusion contract tests; not verified payable rates.",
+  "transformations": "None. Response bytes preserved. No credentials or user data sent.",
+  "upstream_source_commit": "e5cab2b0fea383c2b5cc80dc6d25469fc3ede323",
+  "responses": [
+    {
+      "file": "dated-commodity-0101210000.json",
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/commodities/0101210000?as_of=2026-11-05",
+      "as_of_date": "2026-11-05",
+      "retrieved_at_utc": "2026-11-05T09:21:31.204465+00:00",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "bytes": 269763,
+      "sha256": "0897ddd0fec210aa6d58fca696505799decb0ae71d176a4a55ff7a20841d83d9"
+    },
+    {
+      "file": "dated-area-1011.json",
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/geographical_areas/1011?as_of=2026-11-05",
+      "as_of_date": "2026-11-05",
+      "retrieved_at_utc": "2026-11-05T09:21:31.368543+00:00",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "bytes": 60943,
+      "sha256": "504fbca83f24a745f3bee0c3a774210eaa3591db89c742c90fef7403589865ce"
+    },
+    {
+      "file": "dated-area-1060.json",
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/geographical_areas/1060?as_of=2026-11-05",
+      "as_of_date": "2026-11-05",
+      "retrieved_at_utc": "2026-11-05T09:21:31.500465+00:00",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "bytes": 732,
+      "sha256": "08ccdfd805217e704c38bbd896b54557dfd48aa61356598a4548caa2387fae91"
+    },
+    {
+      "file": "dated-area-1060-before-start.json",
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/geographical_areas/1060?as_of=2022-01-01",
+      "as_of_date": "2022-01-01",
+      "retrieved_at_utc": "2026-11-05T09:21:31.611395+00:00",
+      "status": 404,
+      "content_type": "application/json; charset=utf-8",
+      "bytes": 35,
+      "sha256": "7f6fdcb0d55eeffaf73f5f082f1e18d05206d6785d198b21191d3addcd403a83"
+    }
+  ]
+}

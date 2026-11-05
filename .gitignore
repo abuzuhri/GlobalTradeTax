@@ -7,6 +7,7 @@
 
 __pycache__/
 *.pyc
+/TestResults/
 /dev/saleor/.keepalive.json
 **/node_modules/
 /dev/saleor/app-settings.json

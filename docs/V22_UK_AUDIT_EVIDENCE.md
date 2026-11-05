@@ -1,5 +1,7 @@
 # v2.2 UK evidence package
 
+**2026-11-05 compatibility update:** envelopes now use `uk-reference-evidence/v2` to cover candidate evidence, requested dates, membership paths and invariant-calendar formatting. Preserve the schema version with stored hashes; v1/v2 canonical digests are not interchangeable. See [current evidence contract](UK_APPLICABILITY_EVIDENCE.md).
+
 Adds `GET /v1/references/uk/assessments/{code}/evidence-package?origin=US&importDate=2026-11-02`.
 
 The endpoint calls the existing UK reference assessment and wraps the result in a versioned, SHA-256-addressed evidence package. Its hash is computed from a canonical projection of the assessment, with measures, areas and warnings sorted, excluding capture timestamp. This makes it possible to detect changes to evidence independently of retrieval time. The hash is **not** a digital signature or proof that upstream data is accurate.

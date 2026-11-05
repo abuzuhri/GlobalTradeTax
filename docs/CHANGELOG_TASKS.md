@@ -1,11 +1,19 @@
 # Task register change log
 
+
 ## 2026-11-04 — TASK-003/010 PostgreSQL and container lifecycle
 - Added a disposable, labelled Compose test project derived from the root configuration and real Dockerfile. Verify fresh schema, original v0.4 upgrade/reapplication/rollback, authenticated merchant isolation/revocation, concurrent idempotency/staging, container recreation and isolated backup/restore.
 - Real PostgreSQL integration exposed AuditStore sending text into a JSONB column (SQLSTATE 42804 / HTTP 500). Explicit Npgsql JSONB binding fixes the endpoint; tests verify persisted JSON and subsequent restored audit writes. Duty/tax/payable fields remain null.
 - Final frozen-fixture local run: 103 integration assertions passed with cleanup; zero-warning Release build; 219 xUnit cases passed/eight live skips; 32 Python cases, actionlint and repository guards passed. Added the historical schema fixture and a CI job with redacted evidence upload; hosted execution is tracked in the review PR.
 - [Verification and upgrade/recovery runbook](POSTGRES_CONTAINER_VERIFICATION.md). TASK-003/010 remain in-progress; migration ledger/release policy, required-check enforcement and production operational review remain open.
 - Review and hosted evidence: [draft PR #2](https://github.com/abuzuhri/GlobalTradeTax/pull/2), based on the UK-authentication PR #1.
+
+## 2026-11-05 — TASK-006 dated membership and measure candidates
+- Pass import dates to upstream commodity/area requests and partition the cache by date. Reject dates the upstream would silently replace. Interpret the recorded typed child tree, preserve membership paths and handle both official exclusion fields with unknown evidence kept explicit.
+- Add per-measure reference candidate evidence for commodity import linkage, shared import/export measures, inclusive effective windows and direct/group exclusions; preserve overlaps without selecting rates. Introduce canonical evidence v2 covering new fields with invariant-calendar dates.
+- Captured four unmodified, attributed dated responses with hashes, including current/historical group 200/404 cases. PASS locally: 292 offline xUnit cases (73 new; ten live skips), six separate public live probes, 35 dated HTTP plus ten general smoke assertions, 25 Python cases, Release build/publish and repository guards.
+- [Scope, source contracts, compatibility and evidence](UK_APPLICABILITY_EVIDENCE.md); [PR #4](https://github.com/abuzuhri/GlobalTradeTax/pull/4) records hosted checks and review. TASK-006 remains in progress for legal conditions, certificates, quotas, preferences and reviewed applicability. No production deployment or payable outputs.
+
 
 ## 2026-11-04 — TASK-005 managed access and TASK-010 hosted CI repair
 - Added opt-in managed GB authentication against the fixed official OAuth endpoint with encoded form credentials, memory-only tokens, expiry/rotation handling, concurrent refresh control, bounded bodies/timeouts and one retry after 401. Public requests receive no managed tokens and failures never fall back.

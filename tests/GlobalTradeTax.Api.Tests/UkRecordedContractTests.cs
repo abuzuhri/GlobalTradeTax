@@ -86,7 +86,7 @@ public sealed class UkRecordedContractTests
         Assert.Equal(1, handler.Calls);
         var membership = UkAreaMembership.Inspect(result, "1011", "US", new DateOnly(2026, 11, 4));
         Assert.Equal("unknown", membership.EvidenceStatus);
-        Assert.Contains("no_explicit_dated_membership_proof", membership.UnresolvedChecks);
+        Assert.Contains("membership_as_of_date_unverified", membership.UnresolvedChecks);
         Assert.False(membership.VerifiedForCalculation);
     }
 
