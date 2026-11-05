@@ -48,6 +48,31 @@ public sealed class UkLiveContractTests : IDisposable
 
     [UkLiveFact]
     [Trait("Category", "UkLiveContract")]
+    public async Task Official_dated_commodity_preserves_the_requested_context()
+    {
+        var date = new DateOnly(2026, 11, 5);
+        var result = await Client().GetCommodityAsync("0101210000", date, default);
+        Assert.Equal("reference_only", result.Status);
+        Assert.Equal(date, result.AsOfDate);
+        Assert.EndsWith("?as_of=2026-11-05", result.SourceUrl);
+        Assert.NotEmpty(UkMeasureEvidence.Analyze(result, "0101210000", "US", date).Measures);
+    }
+
+    [UkLiveFact]
+    [Trait("Category", "UkLiveContract")]
+    public async Task Official_dated_world_group_provides_only_candidate_membership()
+    {
+        var date = new DateOnly(2026, 11, 5);
+        var result = await Client().GetGeographicalAreaAsync("1011", date, default);
+        Assert.Equal("reference_only", result.Status);
+        var membership = UkAreaMembership.Inspect(result, "1011", "US", date);
+        Assert.Equal("candidate_membership_evidence", membership.EvidenceStatus);
+        Assert.Equal(new[] { "1011", "US" }, membership.MembershipPath);
+        Assert.False(membership.VerifiedForCalculation);
+    }
+
+    [UkLiveFact]
+    [Trait("Category", "UkLiveContract")]
     public async Task Official_missing_commodity_is_not_a_zero_rate()
     {
         var result = await Client().GetCommodityAsync("0000000000", default);

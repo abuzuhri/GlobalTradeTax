@@ -1,5 +1,11 @@
 # Task register change log
 
+## 2026-11-05 — TASK-006 dated membership and measure candidates
+- Pass import dates to upstream commodity/area requests and partition the cache by date. Reject dates the upstream would silently replace. Interpret the recorded typed child tree, preserve membership paths and handle both official exclusion fields with unknown evidence kept explicit.
+- Add per-measure reference candidate evidence for commodity import linkage, shared import/export measures, inclusive effective windows and direct/group exclusions; preserve overlaps without selecting rates. Introduce canonical evidence v2 covering new fields with invariant-calendar dates.
+- Captured four unmodified, attributed dated responses with hashes, including current/historical group 200/404 cases. PASS locally: 292 offline xUnit cases (73 new; ten live skips), six separate public live probes, 35 dated HTTP plus ten general smoke assertions, 25 Python cases, Release build/publish and repository guards.
+- [Scope, source contracts, compatibility and evidence](UK_APPLICABILITY_EVIDENCE.md). TASK-006 remains in progress for legal conditions, certificates, quotas, preferences and reviewed applicability. Hosted results are recorded in the implementation PR; no production deployment or payable outputs.
+
 ## 2026-11-04 — TASK-005 managed access and TASK-010 hosted CI repair
 - Added opt-in managed GB authentication against the fixed official OAuth endpoint with encoded form credentials, memory-only tokens, expiry/rotation handling, concurrent refresh control, bounded bodies/timeouts and one retry after 401. Public requests receive no managed tokens and failures never fall back.
 - Added 52 offline cases and four separately gated managed probes. PASS locally: zero-warning build, 219 offline xUnit cases (eight live probes skipped), separate four-case public live run, 25 Python tests, 20 general HTTP smoke assertions, six public authenticated UK checks and two missing-credential checks. Real managed credentials are absent; its live probes were not run.

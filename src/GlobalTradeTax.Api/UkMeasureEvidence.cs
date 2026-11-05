@@ -28,7 +28,7 @@ public static class UkMeasureEvidence
             var relations = Obj(raw, "relationships");
             var geoRefs = Refs(relations, "geographical_area");
             var conditions = Refs(relations, "measure_conditions");
-            var exclusions = Refs(relations, "excluded_geographical_areas");
+            var exclusions = UkMeasureApplicability.ReadExclusions(raw, out var exclusionsComplete);
             var additional = Refs(relations, "additional_code");
             var quota = Refs(relations, "order_number");
             var rate = Get(attrs, "duty_expression") ?? Get(attrs, "duty_expression_description");
@@ -52,14 +52,15 @@ public static class UkMeasureEvidence
                 }
                 else evidence.Add("geographical_group_membership_unresolved");
             }
-            if (exclusions.Count > 0) evidence.Add("geographical_exclusions_unresolved");
+            if (exclusions.Length > 0) evidence.Add("geographical_exclusions_unresolved");
+            if (!exclusionsComplete) evidence.Add("exclusion_relationship_unverified");
             if (conditions.Count > 0) evidence.Add("measure_conditions_unresolved");
             if (additional.Count > 0) evidence.Add("additional_codes_unresolved");
             if (quota.Count > 0) evidence.Add("quota_balance_and_eligibility_unresolved");
             if (rate is not null) evidence.Add("duty_expression_unverified_and_not_calculated");
             evidence.AddRange(measure.ReviewReasons);
             details.Add(new(measure.MeasureId, geo, geoRefs.Select(x => x.Id).ToArray(),
-                conditions.Count, exclusions.Count, additional.Count, quota.Count,
+                conditions.Count, exclusions.Length, additional.Count, quota.Count,
                 rate, evidence.Distinct().ToArray(), "requires_review"));
         }
         return new(screened.Status, code, origin, date, details.ToArray(), false,

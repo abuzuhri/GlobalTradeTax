@@ -13,6 +13,8 @@ public static class UkMeasureScreening
         if (upstream.Status != "reference_only" || upstream.Data is not { } doc)
             return new(upstream.Status, code, origin, date, [], false, upstream.Warning);
         var root = doc;
+        if (root.ValueKind != JsonValueKind.Object)
+            return new("insufficient_data", code, origin, date, [], false, "Invalid reference document; no applicability conclusion.");
         if (!root.TryGetProperty("included", out var included) || included.ValueKind != JsonValueKind.Array)
             return new("insufficient_data", code, origin, date, [], false,
                 "Upstream response does not contain included measures; applicability cannot be established.");
@@ -27,9 +29,10 @@ public static class UkMeasureScreening
             var start = Read(attrs, "effective_start_date") ?? Read(attrs, "validity_start_date");
             var end = Read(attrs, "effective_end_date") ?? Read(attrs, "validity_end_date");
             var reasons = new List<string>();
-            if (!DateOnly.TryParse(start, out var from)) reasons.Add("start_date_not_verified");
+            if (!UkEvidenceJson.TryDate(start, out var from)) reasons.Add("start_date_not_verified");
             else if (date < from) reasons.Add("not_yet_effective");
-            if (end is not null && (!DateOnly.TryParse(end, out var to) || date > to)) reasons.Add("end_date_unknown_or_expired");
+            if (end is not null && (!UkEvidenceJson.TryDate(end, out var to, allowEndOfDay: true) || date > to)) reasons.Add("end_date_unknown_or_expired");
+            if (UkEvidenceJson.EffectiveWindow(attrs, date) == "unknown") reasons.Add("effective_window_unverified");
             // Geographical area relationships can include groups and exclusions. Do not
             // assume a measure applies just because the country matches a label.
             reasons.Add("geographical_area_and_exclusions_not_resolved");
@@ -37,9 +40,11 @@ public static class UkMeasureScreening
             items.Add(new(id, Read(attrs, "measure_type_id"), start, end,
                 reasons.ToArray(), "requires_review"));
         }
+        var warnings = included.EnumerateArray().Count(item => item.ValueKind == JsonValueKind.Object && Read(item, "type") == "measure") > 200
+            ? new[] { "measure_screening_limit_exceeded_incomplete_evidence" } : [];
         return new(items.Count == 0 ? "no_embedded_measures" : "reference_screened", code, origin, date,
             items.ToArray(), false,
-            "No duty rate, VAT, legal eligibility, or payable amount is inferred from this response.");
+            "No duty rate, VAT, legal eligibility, or payable amount is inferred from this response.") { Warnings = warnings };
     }
 
     private static JsonElement Object(JsonElement obj, string key) =>
@@ -55,4 +60,7 @@ public static class UkMeasureScreening
 public sealed record UkScreenedMeasure(string MeasureId, string? MeasureTypeId, string? EffectiveFrom,
     string? EffectiveTo, string[] ReviewReasons, string Status);
 public sealed record UkScreeningResult(string Status, string CommodityCode, string Origin, DateOnly ImportDate,
-    UkScreenedMeasure[] Measures, bool VerifiedForCalculation, string Warning);
+    UkScreenedMeasure[] Measures, bool VerifiedForCalculation, string Warning)
+{
+    public string[] Warnings { get; init; } = [];
+}

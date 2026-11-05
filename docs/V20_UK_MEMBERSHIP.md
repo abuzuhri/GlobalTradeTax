@@ -1,5 +1,7 @@
 # v2.0 — UK geographical-area membership evidence
 
+**2026-11-05 update:** the original assumed membership-resource parser below has been replaced by the recorded date-scoped `children_geographical_areas` tree contract. See [current behavior and compatibility](UK_APPLICABILITY_EVIDENCE.md). Undated/unverified structures stay unknown; positive paths remain candidate reference evidence only.
+
 Reference: https://github.com/trade-tariff/trade-tariff-backend
 Documentation: https://docs.trade-tariff.service.gov.uk/
 

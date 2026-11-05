@@ -77,6 +77,23 @@ public sealed class UkManagedApiTests
     private static HttpResponseMessage Token(string value = "example-access-token", int seconds = 3600) =>
         Json(JsonSerializer.Serialize(new { access_token = value, token_type = "Bearer", expires_in = seconds }));
 
+    [Fact]
+    public async Task Dated_managed_requests_preserve_authentication_and_partition_area_cache()
+    {
+        using var harness = new Harness(api: (request, _) =>
+        {
+            Assert.Equal("example-access-token", request.Headers.Authorization!.Parameter);
+            Assert.StartsWith("?as_of=2026-11-0", request.RequestUri!.Query);
+            return Task.FromResult(Json("{\"data\":{\"id\":\"1011\",\"type\":\"geographical_area\"}}"));
+        });
+        var date = new DateOnly(2026, 11, 5);
+        Assert.Equal(date, (await harness.Client.GetGeographicalAreaAsync("1011", date, default)).AsOfDate);
+        Assert.Equal(date.AddDays(-1), (await harness.Client.GetGeographicalAreaAsync("1011", date.AddDays(-1), default)).AsOfDate);
+        await harness.Client.GetGeographicalAreaAsync("1011", date, default);
+        Assert.Equal(2, harness.ApiHandler.Calls);
+        Assert.Equal(1, harness.TokenHandler.Calls);
+    }
+
     private sealed class UnknownLengthContent(string body) : HttpContent
     {
         private readonly byte[] bytes = Encoding.UTF8.GetBytes(body);

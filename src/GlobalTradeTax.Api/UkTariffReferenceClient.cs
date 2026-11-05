@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
+using System.Globalization;
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -12,14 +13,20 @@ public sealed class UkTariffReferenceClient(HttpClient client, IConfiguration co
     public const string ManagedApiBaseUrl = "https://api.trade-tariff.service.gov.uk/uk/api/";
 
     public Task<UkReferenceResult> GetGeographicalAreaAsync(string areaId, CancellationToken ct) =>
+        GetGeographicalAreaAsync(areaId, null, ct);
+
+    public Task<UkReferenceResult> GetGeographicalAreaAsync(string areaId, DateOnly? asOfDate, CancellationToken ct) =>
         !IsSafeAreaId(areaId)
             ? Task.FromResult(new UkReferenceResult("invalid_code", null, null, "Area ID must contain 2-12 ASCII letters, digits, hyphens or underscores."))
-            : GetReferenceAsync("geographical_areas/", areaId, cacheable: true, ct);
+            : GetReferenceAsync("geographical_areas/", areaId, cacheable: true, asOfDate, ct);
 
     public Task<UkReferenceResult> GetCommodityAsync(string commodityCode, CancellationToken ct) =>
+        GetCommodityAsync(commodityCode, null, ct);
+
+    public Task<UkReferenceResult> GetCommodityAsync(string commodityCode, DateOnly? asOfDate, CancellationToken ct) =>
         commodityCode.Length is < 8 or > 10 || !commodityCode.All(char.IsAsciiDigit)
             ? Task.FromResult(new UkReferenceResult("invalid_code", null, null, "Commodity code must be 8-10 digits."))
-            : GetReferenceAsync("commodities/", commodityCode, cacheable: false, ct);
+            : GetReferenceAsync("commodities/", commodityCode, cacheable: false, asOfDate, ct);
 
     public static bool IsApprovedApiPath(string path) =>
         string.Equals(path.TrimEnd('/'), "/uk/api/v2", StringComparison.OrdinalIgnoreCase);
@@ -40,15 +47,20 @@ public sealed class UkTariffReferenceClient(HttpClient client, IConfiguration co
 
     private static bool IsManaged(Uri uri) => uri.Host == "api.trade-tariff.service.gov.uk";
 
-    private async Task<UkReferenceResult> GetReferenceAsync(string resourcePath, string id, bool cacheable, CancellationToken ct)
+    private async Task<UkReferenceResult> GetReferenceAsync(string resourcePath, string id, bool cacheable,
+        DateOnly? asOfDate, CancellationToken ct)
     {
+        // The upstream silently substitutes today for unsupported dates. Refuse them locally.
+        if (asOfDate > DateOnly.FromDateTime(DateTime.UtcNow).AddYears(20))
+            return new("invalid_import_date", null, null, "UK reference dates cannot be more than 20 years in the future.");
         if (!TryGetBaseUri(out var baseUri))
             return new("not_configured", null, null, "Configure an approved UK Trade Tariff HTTPS API prefix.");
         var managed = IsManaged(baseUri!);
         var fingerprint = managed ? tokens?.ConfigurationFingerprint : "public";
         if (fingerprint is null)
             return new("not_configured", null, null, "Managed UK API access requires configured client credentials.");
-        var uri = new Uri(baseUri!.GetLeftPart(UriPartial.Authority) + baseUri.AbsolutePath.TrimEnd('/') + "/" + resourcePath + id);
+        var query = asOfDate is { } date ? "?as_of=" + date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : "";
+        var uri = new Uri(baseUri!.GetLeftPart(UriPartial.Authority) + baseUri.AbsolutePath.TrimEnd('/') + "/" + resourcePath + id + query);
         var cacheKey = "uk-ref:" + uri.AbsoluteUri + ":" + fingerprint;
         if (cacheable && cache.TryGetValue(cacheKey, out UkReferenceResult? cached) && cached is not null) return cached;
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
@@ -70,7 +82,7 @@ public sealed class UkTariffReferenceClient(HttpClient client, IConfiguration co
             if (!valid)
                 return new("invalid_upstream_contract", null, uri.ToString(), "UK API response failed structural contract validation.");
             var result = new UkReferenceResult("reference_only", document.RootElement.Clone(), uri.ToString(),
-                "Read-only reference; geographical membership and duty applicability are not verified.");
+                "Read-only reference; geographical membership and duty applicability are not verified.", asOfDate);
             if (cacheable)
                 cache.Set(cacheKey, result, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)).SetSize(1));
             return result;
@@ -105,4 +117,6 @@ public sealed class UkTariffReferenceClient(HttpClient client, IConfiguration co
     }
 }
 
-public sealed record UkReferenceResult(string Status, JsonElement? Data, string? SourceUrl, string Warning);
+// AsOfDate records the requested upstream date, not independent legal verification of its response.
+public sealed record UkReferenceResult(string Status, JsonElement? Data, string? SourceUrl, string Warning,
+    DateOnly? AsOfDate = null);

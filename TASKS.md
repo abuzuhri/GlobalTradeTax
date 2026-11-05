@@ -2,6 +2,8 @@
 
 **Single source of truth for planned work.** Detailed task files live in `tasks/`. This tracker describes implementation status, not regulatory approval or production readiness.
 
+**Latest TASK-006 evidence (2026-11-05):** date-scoped UK requests/cache, typed membership paths, import/export linkage, effective windows and explicit exclusions now have 292 passing offline xUnit cases, six separately enabled public live probes and 35 dated HTTP assertions. [Scope, compatibility and verification](docs/UK_APPLICABILITY_EVIDENCE.md). TASK-006 remains in progress; legal conditions, certificates, quotas and preferences are still unresolved. The dated baseline below records the preceding slice.
+
 ## Status vocabulary
 - `not-started`: not implemented.
 - `in-progress`: partial code exists; acceptance criteria unmet.

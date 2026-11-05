@@ -1,5 +1,7 @@
 > **Project planning:** [Master task register](TASKS.md) · [Task details](tasks/) · [Task change log](docs/CHANGELOG_TASKS.md)
 
+Latest UK reference work: [dated membership and measure candidate evidence](docs/UK_APPLICABILITY_EVIDENCE.md) covers historical requests, import/export linkage, inclusive dates and explicit exclusions. Assessments remain for review, with null duty/VAT; evidence envelopes use `uk-reference-evidence/v2`.
+
 # GlobalTradeTax — Cross-border Customs & Tax SaaS (C#)
 
 Initial working source scaffold for **US -> Worldwide**, designed to expand to **China/Worldwide -> US**.

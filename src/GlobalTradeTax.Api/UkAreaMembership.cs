@@ -2,76 +2,63 @@ using System.Text.Json;
 
 namespace GlobalTradeTax.Api;
 
-// Evidence-only interpretation of geographical-area relationships.
-// A positive membership is NOT evidence of tariff eligibility or a payable rate.
+// A dated upstream tree is candidate reference evidence, never tariff eligibility.
 public static class UkAreaMembership
 {
     public static UkAreaMembershipReport Inspect(UkReferenceResult response, string areaId, string origin, DateOnly date)
     {
-        if (response.Status != "reference_only" || response.Data is not { } root || root.ValueKind != JsonValueKind.Object)
-            return new(areaId, origin, date, "unknown", [], response.SourceUrl, false,
-                "Reference data unavailable; no membership conclusion.");
+        UkAreaMembershipReport Unknown(string reason) => new(areaId, origin, date, "unknown", [reason],
+            response.SourceUrl, false, "Membership is indeterminate; no payable tariff conclusion.");
 
-        var notes = new List<string>();
-        var matches = new List<string>();
-        var candidates = new List<JsonElement>();
-        if (root.TryGetProperty("included", out var included) && included.ValueKind == JsonValueKind.Array)
-            candidates.AddRange(included.EnumerateArray());
-        if (root.TryGetProperty("data", out var data))
+        if (origin.Length != 2 || !origin.All(c => c is >= 'A' and <= 'Z')) return Unknown("invalid_origin");
+        if (response.Status != "reference_only" || response.Data is not { } root ||
+            !UkJsonApiContract.IsValidGeographicalArea(root, areaId)) return Unknown("area_contract_unverified");
+        if (response.AsOfDate != date) return Unknown("membership_as_of_date_unverified");
+
+        var resources = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
+        var data = root.GetProperty("data");
+        resources.Add(areaId, data);
+        if (root.TryGetProperty("included", out var included))
         {
-            if (data.ValueKind == JsonValueKind.Array) candidates.AddRange(data.EnumerateArray());
-            else if (data.ValueKind == JsonValueKind.Object) candidates.Add(data);
+            if (included.GetArrayLength() > 1024) return Unknown("membership_resource_limit_exceeded");
+            foreach (var item in included.EnumerateArray())
+            {
+                if (UkEvidenceJson.String(item, "type") != "geographical_area") continue;
+                var id = UkEvidenceJson.String(item, "id")!;
+                if (!resources.TryAdd(id, item)) return Unknown("duplicate_geographical_area_resource");
+            }
         }
 
-        foreach (var item in candidates)
+        var visited = new HashSet<string>(StringComparer.Ordinal);
+        var active = new HashSet<string>(StringComparer.Ordinal);
+        string[]? membershipPath = null;
+        string? failure = null;
+        void Walk(string id, string[] path)
         {
-            if (item.ValueKind != JsonValueKind.Object || Read(item, "type") != "geographical_area_membership") continue;
-            if (!item.TryGetProperty("attributes", out var attrs) || attrs.ValueKind != JsonValueKind.Object)
-            {
-                notes.Add("membership_attributes_missing"); continue;
-            }
-            var start = Read(attrs, "validity_start_date");
-            var end = Read(attrs, "validity_end_date");
-            if (start is null || !DateOnly.TryParseExact(start, "yyyy-MM-dd", out var startDate))
-            {
-                notes.Add("membership_start_date_unverified"); continue;
-            }
-            if (date < startDate) continue;
-            if (end is not null)
-            {
-                if (!DateOnly.TryParseExact(end, "yyyy-MM-dd", out var endDate))
-                { notes.Add("membership_end_date_unverified"); continue; }
-                if (date > endDate) continue;
-            }
-            if (!item.TryGetProperty("relationships", out var rel) || rel.ValueKind != JsonValueKind.Object)
-            { notes.Add("membership_relationships_missing"); continue; }
-            var member = RelationId(rel, "geographical_area");
-            var parent = RelationId(rel, "geographical_area_group");
-            // API representations differ. Never infer which side is country/group from IDs alone.
-            if (string.Equals(member, origin, StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(parent, areaId, StringComparison.OrdinalIgnoreCase))
-                matches.Add(Read(item, "id") ?? "unidentified");
-            else notes.Add("membership_relationship_not_confirmed_for_origin_and_group");
+            if (failure is not null) return;
+            if (path.Length > 16) { failure = "membership_depth_limit_exceeded"; return; }
+            if (active.Contains(id)) { failure = "cyclic_geographical_area_relationship"; return; }
+            if (!visited.Add(id)) return;
+            if (!resources.TryGetValue(id, out var resource)) { failure = "membership_child_resource_missing:" + id; return; }
+            if (!UkEvidenceJson.TryReferences(resource, "children_geographical_areas", "geographical_area", true, out var children))
+            { failure = "membership_children_contract_unverified:" + id; return; }
+            if (id == origin) membershipPath ??= path;
+            active.Add(id);
+            foreach (var child in children) Walk(child, [.. path, child]);
+            active.Remove(id);
         }
-        if (matches.Count == 0) notes.Add("no_explicit_dated_membership_proof");
-        // Even a matching relationship is not sufficient for legal applicability.
-        return new(areaId, origin, date, matches.Count > 0 ? "candidate_membership_evidence" : "unknown",
-            notes.Distinct().ToArray(), response.SourceUrl, false,
-            "Reference-only. Verify upstream schema, exclusions, conditions, quotas and legal applicability before calculating duty.");
+        Walk(areaId, [areaId]);
+        if (failure is not null) return Unknown(failure);
+        if (membershipPath is null) return Unknown("no_explicit_dated_membership_proof");
+        return new(areaId, origin, date, "candidate_membership_evidence", ["legal_eligibility_not_verified"],
+            response.SourceUrl, false, "Dated reference membership only; exclusions, conditions and legal eligibility still require review.")
+            { MembershipPath = membershipPath };
     }
-
-    private static string? RelationId(JsonElement rel, string name)
-    {
-        if (!rel.TryGetProperty(name, out var relationship) || relationship.ValueKind != JsonValueKind.Object ||
-            !relationship.TryGetProperty("data", out var data) || data.ValueKind != JsonValueKind.Object)
-            return null;
-        return Read(data, "id");
-    }
-    private static string? Read(JsonElement obj, string name) =>
-        obj.ValueKind == JsonValueKind.Object && obj.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String
-            ? v.GetString() : null;
 }
 
 public sealed record UkAreaMembershipReport(string AreaId, string Origin, DateOnly ImportDate,
     string EvidenceStatus, string[] UnresolvedChecks, string? SourceUrl,
-    bool VerifiedForCalculation, string Warning);
+    bool VerifiedForCalculation, string Warning)
+{
+    public string[] MembershipPath { get; init; } = [];
+}

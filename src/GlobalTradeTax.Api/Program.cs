@@ -167,8 +167,8 @@ app.MapGet("/v1/references/uk/commodities/{code}/screen", async (string code, st
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
     if (origin is null || origin.Length != 2 || !origin.All(c => c is >= 'A' and <= 'Z'))
         return Results.BadRequest(new { error = "origin must be uppercase ISO alpha-2" });
-    var result = await uk.GetCommodityAsync(code, ct);
-    if (result.Status == "invalid_code") return Results.BadRequest(result);
+    var result = await uk.GetCommodityAsync(code, importDate, ct);
+    if (result.Status is "invalid_code" or "invalid_import_date") return Results.BadRequest(result);
     if (result.Status == "not_found") return Results.NotFound(result);
     if (result.Status == "not_configured") return Results.Problem(result.Warning, statusCode: 503);
     if (result.Status == "upstream_error") return Results.Problem(result.Warning, statusCode: 502);
@@ -182,8 +182,8 @@ app.MapGet("/v1/references/uk/commodities/{code}/evidence", async (string code, 
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
     if (origin is null || origin.Length != 2 || !origin.All(c => c is >= 'A' and <= 'Z'))
         return Results.BadRequest(new { error = "origin must be uppercase ISO alpha-2" });
-    var result = await uk.GetCommodityAsync(code, ct);
-    if (result.Status == "invalid_code") return Results.BadRequest(result);
+    var result = await uk.GetCommodityAsync(code, importDate, ct);
+    if (result.Status is "invalid_code" or "invalid_import_date") return Results.BadRequest(result);
     if (result.Status == "not_found") return Results.NotFound(result);
     if (result.Status == "not_configured") return Results.Problem(result.Warning, statusCode: 503);
     if (result.Status == "upstream_error") return Results.Problem(result.Warning, statusCode: 502);
@@ -197,8 +197,8 @@ app.MapGet("/v1/references/uk/commodities/{code}/geography", async (string code,
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
     if (origin is null || origin.Length != 2 || !origin.All(c => c is >= 'A' and <= 'Z'))
         return Results.BadRequest(new { error = "origin must be uppercase ISO alpha-2" });
-    var result = await uk.GetCommodityAsync(code, ct);
-    if (result.Status == "invalid_code") return Results.BadRequest(result);
+    var result = await uk.GetCommodityAsync(code, importDate, ct);
+    if (result.Status is "invalid_code" or "invalid_import_date") return Results.BadRequest(result);
     if (result.Status == "not_found") return Results.NotFound(result);
     if (result.Status == "not_configured") return Results.Problem(result.Warning, statusCode: 503);
     if (result.Status == "upstream_error") return Results.Problem(result.Warning, statusCode: 502);
@@ -227,8 +227,8 @@ app.MapGet("/v1/references/uk/geographical-areas/{id}/membership", async (string
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
     if (origin is null || origin.Length != 2 || !origin.All(c => c is >= 'A' and <= 'Z'))
         return Results.BadRequest(new { error = "origin must be uppercase ISO alpha-2" });
-    var result = await uk.GetGeographicalAreaAsync(id, ct);
-    if (result.Status == "invalid_code") return Results.BadRequest(result);
+    var result = await uk.GetGeographicalAreaAsync(id, importDate, ct);
+    if (result.Status is "invalid_code" or "invalid_import_date") return Results.BadRequest(result);
     if (result.Status == "not_found") return Results.NotFound(result);
     if (result.Status == "not_configured") return Results.Problem(result.Warning, statusCode: 503);
     if (result.Status == "upstream_error") return Results.Problem(result.Warning, statusCode: 502);
@@ -243,7 +243,7 @@ app.MapGet("/v1/references/uk/assessments/{code}", async (string code, string or
     var result = await assessment.AssessAsync(code, origin, importDate, ct);
     return result.Status switch
     {
-        "invalid_origin" or "invalid_code" => Results.BadRequest(result),
+        "invalid_origin" or "invalid_code" or "invalid_import_date" => Results.BadRequest(result),
         "not_found" => Results.NotFound(result),
         "not_configured" => Results.Problem("UK tariff API is not configured", statusCode: 503),
         "upstream_error" => Results.Problem("UK tariff API lookup failed", statusCode: 502),
@@ -259,7 +259,7 @@ app.MapGet("/v1/references/uk/assessments/{code}/evidence-package", async (strin
     var result = await assessment.AssessAsync(code, origin, importDate, ct);
     return result.Status switch
     {
-        "invalid_origin" or "invalid_code" => Results.BadRequest(result),
+        "invalid_origin" or "invalid_code" or "invalid_import_date" => Results.BadRequest(result),
         "not_found" => Results.NotFound(result),
         "not_configured" => Results.Problem("UK tariff API is not configured", statusCode: 503),
         "upstream_error" => Results.Problem("UK tariff API lookup failed", statusCode: 502),
