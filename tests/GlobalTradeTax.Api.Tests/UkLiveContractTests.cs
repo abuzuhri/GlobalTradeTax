@@ -22,7 +22,8 @@ public sealed class UkLiveContractTests : IDisposable
     private UkTariffReferenceClient Client() => new(http,
         new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["TRADE_UK_TARIFF_API_BASE_URL"] = "https://www.trade-tariff.service.gov.uk/uk/api/v2/"
+            ["TRADE_UK_TARIFF_API_BASE_URL"] = "https://www.trade-tariff.service.gov.uk/uk/api/v2/",
+            ["TRADE_UK_TARIFF_XI_API_BASE_URL"] = "https://www.trade-tariff.service.gov.uk/xi/api/v2/"
         }).Build(), cache);
 
     [UkLiveFact]
@@ -87,6 +88,48 @@ public sealed class UkLiveContractTests : IDisposable
         var result = await Client().GetGeographicalAreaAsync("ZZZZZZZZZZZZ", default);
         Assert.Equal("not_found", result.Status);
         Assert.Null(result.Data);
+    }
+
+    [UkLiveFact]
+    [Trait("Category", "UkLiveContract")]
+    public async Task Official_XI_commodity_preserves_territory_and_structured_components()
+    {
+        var date = DateOnly.FromDateTime(DateTime.UtcNow);
+        var result = await Client().GetCommodityAsync("0201300090", date, "XI", default);
+        Assert.Equal("reference_only", result.Status); Assert.Equal("XI", result.DestinationTerritory);
+        Assert.NotNull(result.ResponseSha256);
+        Assert.Contains(UkMeasureRules.Read(result,"0201300090").Measures, r => r.ImportLinked && r.Components.Length > 0);
+    }
+
+    [UkLiveFact]
+    [Trait("Category", "UkLiveContract")]
+    public async Task Official_XI_area_preserves_territory()
+    {
+        var date = DateOnly.FromDateTime(DateTime.UtcNow);
+        var result = await Client().GetGeographicalAreaAsync("1011",date,"XI",default);
+        Assert.Equal("reference_only",result.Status); Assert.Equal("XI",result.DestinationTerritory);
+        var membership = UkAreaMembership.Inspect(result,"1011","US",date);
+        Assert.Equal("XI",membership.DestinationTerritory); Assert.False(membership.VerifiedForCalculation);
+    }
+
+    [UkLiveFact]
+    [Trait("Category", "UkLiveContract")]
+    public async Task Official_monthly_invoice_FX_has_a_dated_USD_conversion()
+    {
+        var date = DateOnly.FromDateTime(DateTime.UtcNow);
+        var result = await Client().GetMonthlyExchangeRatesAsync(date,default);
+        Assert.Equal("reference_only",result.Status);
+        Assert.Contains(UkExchangeRates.Monthly(result,date).Rates, r => r.Currency == "USD" && r.Purpose == "invoice_customs_value" && r.GbpPerUnit > 0);
+    }
+
+    [UkLiveFact]
+    [Trait("Category", "UkLiveContract")]
+    public async Task Official_XI_tariff_FX_has_its_separate_monthly_EUR_conversion()
+    {
+        var date = DateOnly.FromDateTime(DateTime.UtcNow);
+        var result = await Client().GetTariffExchangeRatesAsync(date,default);
+        Assert.Equal("reference_only",result.Status);
+        Assert.Equal("tariff_duty",Assert.Single(UkExchangeRates.Tariff(result,date).Rates).Purpose);
     }
 
     public void Dispose()

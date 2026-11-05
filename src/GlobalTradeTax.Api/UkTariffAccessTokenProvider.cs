@@ -134,6 +134,22 @@ public sealed class UkTariffAccessTokenProvider(
 
 internal static class UkTariffHttp
 {
+    // Reference documents need an exact response digest; token bodies never use this evidence path.
+    public static async Task<byte[]?> ReadReferenceBytesAsync(HttpContent content, int byteLimit, CancellationToken ct)
+    {
+        if (content.Headers.ContentLength > byteLimit) return null;
+        await using var stream = await content.ReadAsStreamAsync(ct);
+        using var memory = new MemoryStream();
+        var buffer = new byte[8192];
+        while (true)
+        {
+            var count = await stream.ReadAsync(buffer.AsMemory(0, Math.Min(buffer.Length, byteLimit + 1 - (int)memory.Length)), ct);
+            if (count == 0) return memory.ToArray();
+            memory.Write(buffer, 0, count);
+            if (memory.Length > byteLimit) return null;
+        }
+    }
+
     public static async Task<JsonDocument?> ReadDocumentAsync(HttpContent content, int byteLimit, CancellationToken ct)
     {
         if (content.Headers.ContentLength > byteLimit) return null;

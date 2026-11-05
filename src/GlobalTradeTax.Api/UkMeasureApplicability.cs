@@ -45,7 +45,8 @@ public static class UkMeasureApplicability
         if (window == "outside_window") checks.Add("outside_effective_window");
 
         bool HasMembership(string id) => areas.TryGetValue(id, out var area) && area.AreaId == id &&
-            area.Origin == origin && area.ImportDate == date && area.EvidenceStatus == "candidate_membership_evidence";
+            area.Origin == origin && area.ImportDate == date && area.DestinationTerritory == upstream.DestinationTerritory &&
+            area.EvidenceStatus == "candidate_membership_evidence";
 
         var geography = "unknown";
         if (UkEvidenceJson.TryReferences(raw, "geographical_area", "geographical_area", false, out var references))

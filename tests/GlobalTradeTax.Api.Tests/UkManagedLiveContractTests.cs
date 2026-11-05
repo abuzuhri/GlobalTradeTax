@@ -19,7 +19,8 @@ public sealed class UkManagedLiveContractTests : IDisposable
     public UkManagedLiveContractTests()
     {
         var configuration = new ConfigurationBuilder().AddEnvironmentVariables().AddInMemoryCollection(new Dictionary<string, string?>
-        { ["TRADE_UK_TARIFF_API_BASE_URL"] = UkTariffReferenceClient.ManagedApiBaseUrl }).Build();
+        { ["TRADE_UK_TARIFF_API_BASE_URL"] = UkTariffReferenceClient.ManagedApiBaseUrl,
+          ["TRADE_UK_TARIFF_XI_API_BASE_URL"] = UkTariffReferenceClient.ManagedXiApiBaseUrl }).Build();
         var collection = new ServiceCollection();
         collection.AddSingleton<IConfiguration>(configuration);
         collection.AddSingleton(TimeProvider.System);
@@ -67,6 +68,25 @@ public sealed class UkManagedLiveContractTests : IDisposable
         var result = await services.GetRequiredService<UkTariffReferenceClient>().GetGeographicalAreaAsync("ZZZZZZZZZZZZ", default);
         Assert.Equal("not_found", result.Status);
         Assert.Null(result.Data);
+    }
+
+    [UkManagedLiveFact]
+    [Trait("Category", "UkManagedLiveContract")]
+    public async Task Managed_XI_commodity_preserves_territory()
+    {
+        var result = await services.GetRequiredService<UkTariffReferenceClient>()
+            .GetCommodityAsync("0201300090", DateOnly.FromDateTime(DateTime.UtcNow), "XI", default);
+        Assert.Equal("reference_only",result.Status); Assert.Equal("XI",result.DestinationTerritory);
+    }
+
+    [UkManagedLiveFact]
+    [Trait("Category", "UkManagedLiveContract")]
+    public async Task Managed_FX_feeds_preserve_their_distinct_contracts()
+    {
+        var date = DateOnly.FromDateTime(DateTime.UtcNow);
+        var client = services.GetRequiredService<UkTariffReferenceClient>();
+        Assert.NotEmpty(UkExchangeRates.Monthly(await client.GetMonthlyExchangeRatesAsync(date,default),date).Rates);
+        Assert.Single(UkExchangeRates.Tariff(await client.GetTariffExchangeRatesAsync(date,default),date).Rates);
     }
 
     public void Dispose() => services.Dispose();

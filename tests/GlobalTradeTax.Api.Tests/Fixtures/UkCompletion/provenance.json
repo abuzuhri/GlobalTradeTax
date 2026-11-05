@@ -1,0 +1,81 @@
+{
+  "attribution": "Contains public sector information licensed under the Open Government Licence v3.0.",
+  "licence": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+  "licence_source": "https://www.api.gov.uk/hmrc/gov-uk-trade-tariff-api/",
+  "purpose": "Exact public dated GB/XI contract and reference arithmetic fixtures; no entitlement, legal approval or payable rate inferred.",
+  "transformations": "None; response bytes preserved. No credentials or customer data sent.",
+  "responses": [
+    {
+      "file": "gb-ad-valorem.json",
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/commodities/0101299000?as_of=2026-11-05",
+      "territory": "GB",
+      "as_of_date": "2026-11-05",
+      "status": 200,
+      "bytes": 271900,
+      "sha256": "8b7c5a715e5706cdb252d7dea8e3c19976bab9ffe77736dd101e23bd7977c320",
+      "retrieved_at_utc": "2026-11-05T10:48:25.724757+00:00"
+    },
+    {
+      "file": "gb-compound.json",
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/commodities/0201300090?as_of=2026-11-05",
+      "territory": "GB",
+      "as_of_date": "2026-11-05",
+      "status": 200,
+      "bytes": 373084,
+      "sha256": "a08e4b698aa1af418cd4ba638717e52ddb9f90fe50a3c4d850f48cb3dce9a1d5",
+      "retrieved_at_utc": "2026-11-05T10:48:26.908713+00:00"
+    },
+    {
+      "file": "xi-compound.json",
+      "url": "https://www.trade-tariff.service.gov.uk/xi/api/v2/commodities/0201300090?as_of=2026-11-05",
+      "territory": "XI",
+      "as_of_date": "2026-11-05",
+      "status": 200,
+      "bytes": 368674,
+      "sha256": "94656b1a1efe8410f4c7a8dc6bbd446a00c4b0efa03646fd58b60e6a990b2382",
+      "retrieved_at_utc": "2026-11-05T10:48:28.427419+00:00"
+    },
+    {
+      "file": "xi-area-1011.json",
+      "url": "https://www.trade-tariff.service.gov.uk/xi/api/v2/geographical_areas/1011?as_of=2026-11-05",
+      "territory": "XI",
+      "as_of_date": "2026-11-05",
+      "status": 200,
+      "bytes": 50997,
+      "sha256": "2456eaf6b4727a8e528f09d118be04c4063b7a1e59221d6616d2b39238c27e1b",
+      "retrieved_at_utc": "2026-11-05T10:48:29.039879+00:00"
+    },
+    {
+      "file": "xi-area-1400.json",
+      "url": "https://www.trade-tariff.service.gov.uk/xi/api/v2/geographical_areas/1400?as_of=2026-11-05",
+      "territory": "XI",
+      "as_of_date": "2026-11-05",
+      "status": 404,
+      "bytes": 35,
+      "sha256": "7f6fdcb0d55eeffaf73f5f082f1e18d05206d6785d198b21191d3addcd403a83",
+      "retrieved_at_utc": "2026-11-05T10:48:29.199766+00:00"
+    },
+    {
+      "file": "gb-monthly-fx.json",
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/exchange_rates/2026-11?as_of=2026-11-05&filter%5Btype%5D=monthly",
+      "territory": "GB",
+      "as_of_date": "2026-11-05",
+      "status": 200,
+      "bytes": 54141,
+      "sha256": "9da033ba46179c7eecf52d897a8b4db77c0778f5010bde25d3692a6456f5abbb",
+      "retrieved_at_utc": "2026-11-05T11:46:25.022673+00:00"
+    },
+    {
+      "file": "xi-tariff-fx.json",
+      "url": "https://www.trade-tariff.service.gov.uk/xi/api/v2/monetary_exchange_rates?as_of=2026-11-05",
+      "territory": "XI",
+      "as_of_date": "2026-11-05",
+      "status": 200,
+      "bytes": 14047,
+      "sha256": "70d8a2a8b398bfa0e7c8e0b9e921aacc6acbefea8443cd24286fcc34e94652c4",
+      "retrieved_at_utc": "2026-11-05T11:19:29.726798+00:00"
+    }
+  ],
+  "reviewed_backend_revision": "e5cab2b0fea383c2b5cc80dc6d25469fc3ede323",
+  "revision_note": "Reviewed public source contract; not an attestation of deployed revision."
+}

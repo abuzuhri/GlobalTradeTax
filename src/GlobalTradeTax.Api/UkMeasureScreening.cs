@@ -7,6 +7,9 @@ namespace GlobalTradeTax.Api;
 public static class UkMeasureScreening
 {
     public static UkScreeningResult Screen(UkReferenceResult upstream, string code, string origin, DateOnly date)
+        => ScreenCore(upstream, code, origin, date) with { DestinationTerritory = upstream.DestinationTerritory, ResponseSha256 = upstream.ResponseSha256 };
+
+    private static UkScreeningResult ScreenCore(UkReferenceResult upstream, string code, string origin, DateOnly date)
     {
         if (origin.Length != 2 || !origin.All(c => c is >= 'A' and <= 'Z'))
             return new("invalid_origin", code, origin, date, [], false, "Use uppercase ISO 3166-1 alpha-2 origin code.");
@@ -63,4 +66,6 @@ public sealed record UkScreeningResult(string Status, string CommodityCode, stri
     UkScreenedMeasure[] Measures, bool VerifiedForCalculation, string Warning)
 {
     public string[] Warnings { get; init; } = [];
+    public string DestinationTerritory { get; init; } = "GB";
+    public string? ResponseSha256 { get; init; }
 }

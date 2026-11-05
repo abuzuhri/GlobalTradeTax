@@ -28,7 +28,7 @@ public class UkAssessmentEvidencePackageTests
     }
 
     [Fact]
-    public void Version_2_hash_covers_classification_date_and_membership_path()
+    public void Version_3_hash_covers_classification_date_and_membership_path()
     {
         var applicability = new UkMeasureApplicabilityEvidence("candidate_for_review", "import", "within_window",
             "candidate_group_membership", "empty_exclusion_list", ["legal_review_required"], false);
@@ -38,7 +38,7 @@ public class UkAssessmentEvidencePackageTests
         var report = new UkAssessmentReport("requires_review", "0101210000", "US", new DateOnly(2026, 11, 5),
             [measure], [area], null, null, null, [], false);
         var original = UkAssessmentEvidencePackage.Build(report, DateTimeOffset.UtcNow);
-        Assert.Equal("uk-reference-evidence/v2", original.SchemaVersion);
+        Assert.Equal("uk-reference-evidence/v3", original.SchemaVersion);
         Assert.NotEqual(original.ContentHash, UkAssessmentEvidencePackage.Build(report with
             { Measures = [measure with { Applicability = applicability with { Status = "indeterminate" } }] }, DateTimeOffset.UtcNow).ContentHash);
         Assert.NotEqual(original.ContentHash, UkAssessmentEvidencePackage.Build(report with
@@ -62,5 +62,17 @@ public class UkAssessmentEvidencePackageTests
             Assert.Equal(first, UkAssessmentEvidencePackage.Build(report, DateTimeOffset.UtcNow).ContentHash);
         }
         finally { CultureInfo.CurrentCulture = previous; }
+    }
+
+    [Fact]
+    public void Version_3_hash_binds_territory_response_bytes_and_structured_rules()
+    {
+        var report = UkCompletionTestData.Assessment();
+        string Hash(UkAssessmentReport r) => UkAssessmentEvidencePackage.Build(r,DateTimeOffset.UtcNow).ContentHash;
+        var original = Hash(report);
+        Assert.NotEqual(original,Hash(report with { DestinationTerritory = "XI" }));
+        Assert.NotEqual(original,Hash(report with { ResponseSha256 = new string('b',64) }));
+        var changed = report.Measures[0] with { Rule = report.Measures[0].Rule! with { Components = [UkCompletionTestData.Percent(9)] } };
+        Assert.NotEqual(original,Hash(report with { Measures = [changed,report.Measures[1]] }));
     }
 }

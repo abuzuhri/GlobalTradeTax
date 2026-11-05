@@ -40,11 +40,7 @@ public static class UkVatQuoteReview
         var canShowIllustration = request.AmountCurrency == "GBP"
             && request.Classification.DestinationTerritory == "GB"
             && request.Classification.ProposedVatRatePercent == request.Amounts.VatRatePercent
-            && classification.UnresolvedChecks.All(x => x is not (
-                "missing_or_invalid_commodity_code" or "missing_or_invalid_goods_origin_iso2"
-                or "missing_import_date" or "missing_vat_rate" or "invalid_vat_rate"
-                or "rate_not_yet_effective" or "rate_expired" or "invalid_rate_effective_window"
-                or "destination_territory_must_be_GB_or_XI"))
+            && classification.UnresolvedChecks.All(x => x == "independent_authoritative_vat_determination_not_implemented")
             && amounts.Status == "illustrative_only";
         if (!canShowIllustration)
         {
