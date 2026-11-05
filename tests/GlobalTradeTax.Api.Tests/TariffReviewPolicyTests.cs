@@ -57,6 +57,18 @@ public sealed class TariffReviewPolicyTests
     }
 
     [Fact]
+    public void URL_limits_cover_the_encoded_value_written_to_storage()
+    {
+        var url = "https://example.test/" + new string('é', 1000);
+        Assert.True(url.Length < 2048);
+        Assert.True(new Uri(url).IsWellFormedOriginalString());
+        Assert.True(new Uri(url).AbsoluteUri.Length > 2048);
+        Assert.False(TariffDataset.TryProvenanceUrl(url, out var canonical));
+        Assert.Null(canonical);
+        Assert.NotNull(TariffReviewPolicy.Normalize(Request() with { LicenceUrl = url }).Error);
+    }
+
+    [Fact]
     public void Expiry_is_exclusive_and_unknown_evidence_stays_unverified()
     {
         Assert.Equal("reviewed_reference_only", TariffReviewPolicy.EvidenceStatus("reviewed_reference_only", Now.AddTicks(10), Now));

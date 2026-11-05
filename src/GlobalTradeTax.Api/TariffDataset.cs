@@ -111,6 +111,7 @@ public static class TariffDataset
         if (value is null || value.Length > 2048 || value.Any(char.IsControl) ||
             !Uri.TryCreate(value, UriKind.Absolute, out var uri) || !uri.IsWellFormedOriginalString() ||
             uri.Scheme != Uri.UriSchemeHttps || uri.Port != 443 || uri.UserInfo.Length != 0 || uri.Fragment.Length != 0) return false;
+        if (uri.AbsoluteUri.Length > 2048) return false;
         canonical = uri.AbsoluteUri;
         return true;
     }

@@ -2,7 +2,7 @@
 
 **Single source of truth for planned work.** Detailed task files live in `tasks/`. This tracker describes implementation status, not regulatory approval or production readiness.
 
-**Latest TASK-004 slice (2026-11-05):** strict byte-preserving uploads, duplicate/overlap checks, archived provenance and append-only operator review/expiry are implemented. Local suites: 343 offline xUnit and 33 Python cases passed; [full container/upgrade/restore evidence and limits](docs/TARIFF_PROVENANCE_REVIEW.md) track final verification. TASK-004 remains in progress for authoritative source agreements, independent rights review and controlled publication; no reviewed/staged record is a payable rate.
+**Latest TASK-004 slice (2026-11-05):** strict byte-preserving uploads, duplicate/overlap checks, archived provenance and append-only operator review/expiry are implemented. Local suites: 344 offline xUnit and 33 Python cases passed; [full container/upgrade/restore evidence and limits](docs/TARIFF_PROVENANCE_REVIEW.md) track final verification. TASK-004 remains in progress for authoritative source agreements, independent rights review and controlled publication; no reviewed/staged record is a payable rate.
 
 **Latest TASK-006 evidence (2026-11-05):** date-scoped UK requests/cache, typed membership paths, import/export linkage, effective windows and explicit exclusions now have 292 passing offline xUnit cases, six separately enabled public live probes and 35 dated HTTP assertions. [Scope, compatibility and verification](docs/UK_APPLICABILITY_EVIDENCE.md). TASK-006 remains in progress; legal conditions, certificates, quotas and preferences are still unresolved. The dated baseline below records the preceding slice.
 

@@ -61,7 +61,7 @@ Official database references: [binary SHA-256/byte-length functions](https://www
 
 ## Verification
 
-- Local .NET Release build/publish passed; **343 offline xUnit cases** (51 new) passed, with ten optional live probes skipped. No new external tariff API calls are needed for this slice.
+- Local .NET Release build/publish passed; **344 offline xUnit cases** (52 new) passed, with ten optional live probes skipped. No new external tariff API calls are needed for this slice.
 - **33 Python cases** passed, including the streamed-request regression. Task integrity, static CI guard, limited source secret scan and whitespace checks passed.
 - The corrected local Docker/PostgreSQL run passed **154 assertions with cleanup=true**, including legacy upgrade/backfill and backup restoration. Its report is ignored `TestResults/postgres-provenance-integration.json`; the hosted artifact records the final checked runner separately.
 - The isolated Docker/PostgreSQL runner covers exact BOM/CRLF archives, database checksum/foreign-key constraints, streamed body limits, duplicate/precision rejection, operator/merchant separation, concurrent first reviews, real-clock expiry, post-expiry replay, renewal/rejection history and competing revision preconditions. Container recreation and backup restoration retain the archive, four review revisions, quotes and merchant revocations; staged/reviewed rates still produce null monetary outputs.

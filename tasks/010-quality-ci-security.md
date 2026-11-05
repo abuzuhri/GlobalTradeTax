@@ -47,7 +47,7 @@ tests/GlobalTradeTax.Api.Tests; .github/workflows
 dotnet restore/build/test pass; CI required on PR; container smoke test passes.
 
 ## Evidence / decision log
-- 2026-11-05 / TASK-004: extended the existing isolated container job for byte archives, streamed limits, review concurrency/expiry/history and frozen v1.2 upgrade/backfill. Local corrected run passed 154 assertions and cleanup; suites passed 343 offline xUnit/33 Python cases. Added a regression after the chunked-upload helper failed its first local run. Hosted evidence remains attached to the implementation PR; [details](../docs/TARIFF_PROVENANCE_REVIEW.md). No broader security/production completion claimed.
+- 2026-11-05 / TASK-004: extended the existing isolated container job for byte archives, streamed limits, review concurrency/expiry/history and frozen v1.2 upgrade/backfill. Local corrected run passed 154 assertions and cleanup; suites passed 344 offline xUnit/33 Python cases. Added a regression after the chunked-upload helper failed its first local run. Hosted evidence remains attached to the implementation PR; [details](../docs/TARIFF_PROVENANCE_REVIEW.md). No broader security/production completion claimed.
 - 2026-11-02: Task created. Existing implementation may be partial; completion has not been established.
 
 ## Risks and open questions
