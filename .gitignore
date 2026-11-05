@@ -4,6 +4,7 @@
 .env
 *.user
 /TestResults/
+**/TestResults/
 
 __pycache__/
 *.pyc

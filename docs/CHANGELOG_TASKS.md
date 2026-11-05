@@ -5,6 +5,12 @@
 - Add operator-only reference review/history, explicit attestation/expiry, idempotent replay and predecessor-bound revisions; renewals/rejections retain earlier decisions. Migration 005 preserves older staging, with exact document/row verification for backfill before review. No calculation provider or publication gate is enabled.
 - Local Release build/publish, 344 xUnit cases (52 new; ten optional live skips), 33 Python cases and repository guards passed. Corrected container run passed 154 assertions with cleanup, including review races/expiry and frozen v1.2 upgrade/backfill. [Current contract, migration and local evidence](TARIFF_PROVENANCE_REVIEW.md); [PR #5](https://github.com/abuzuhri/GlobalTradeTax/pull/5) retains final hosted checks/review. TASK-004 remains in progress.
 
+## 2026-11-05 — UK GB/XI shipment review (TASK-005–009)
+- Added separate territory-bound public/managed reference access, exact response digests, structured components/conditions/document alternatives and evidence v3. Added purpose-specific monthly invoice and XI tariff conversion; unknown evidence never selects zero or a cheapest rate.
+- Added merchant-authenticated bounded shipment review with explicit line origin/measure selections, cost scope/inclusion and exact penny allocation, mixed proposed VAT rates and reconciliation. Conditional VAT, NI, low-value/gift and special procedure paths remain unresolved; payable values always null. Fixed actual-origin provider matching and legacy VAT evidence suppression; UK/controlled-goods checks require manual review.
+- PASS locally: zero-warning Release test build, 380 offline xUnit cases/16 live skips, ten separate public live probes, 32 Python cases and 112 database/container assertions with cleanup. Added weekly public drift workflow, active only after merge. Managed probes remain unrun without provisioned credentials.
+- [API, sources, migration-free compatibility and exact remaining completion gates](UK_SHIPMENT_REVIEW.md). Task status reflects unmet acceptance criteria; no legal approval or deployment is implied.
+
 
 ## 2026-11-04 — TASK-003/010 PostgreSQL and container lifecycle
 - Added a disposable, labelled Compose test project derived from the root configuration and real Dockerfile. Verify fresh schema, original v0.4 upgrade/reapplication/rollback, authenticated merchant isolation/revocation, concurrent idempotency/staging, container recreation and isolated backup/restore.

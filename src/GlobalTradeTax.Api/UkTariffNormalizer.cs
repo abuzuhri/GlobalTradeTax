@@ -7,6 +7,9 @@ namespace GlobalTradeTax.Api;
 public static class UkTariffNormalizer
 {
     public static UkNormalizedCommodity Normalize(string requestedCode, UkReferenceResult result)
+        => NormalizeCore(requestedCode, result) with { DestinationTerritory = result.DestinationTerritory, ResponseSha256 = result.ResponseSha256 };
+
+    private static UkNormalizedCommodity NormalizeCore(string requestedCode, UkReferenceResult result)
     {
         if (result.Status != "reference_only" || result.Data is not { } document)
             return new(requestedCode, result.Status, null, null, null, [], result.SourceUrl,
@@ -68,4 +71,8 @@ public static class UkTariffNormalizer
 public sealed record UkMeasureReference(string Relation, string Id);
 public sealed record UkNormalizedCommodity(string RequestedCode, string Status, string? CommodityCode,
     string? Description, string? ValidFrom, UkMeasureReference[] MeasureReferences, string? SourceUrl,
-    string Attribution, bool VerifiedForCalculation, string Warning);
+    string Attribution, bool VerifiedForCalculation, string Warning)
+{
+    public string DestinationTerritory { get; init; } = "GB";
+    public string? ResponseSha256 { get; init; }
+}

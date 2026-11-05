@@ -8,7 +8,8 @@ public static class UkAreaMembership
     public static UkAreaMembershipReport Inspect(UkReferenceResult response, string areaId, string origin, DateOnly date)
     {
         UkAreaMembershipReport Unknown(string reason) => new(areaId, origin, date, "unknown", [reason],
-            response.SourceUrl, false, "Membership is indeterminate; no payable tariff conclusion.");
+            response.SourceUrl, false, "Membership is indeterminate; no payable tariff conclusion.")
+            { DestinationTerritory = response.DestinationTerritory };
 
         if (origin.Length != 2 || !origin.All(c => c is >= 'A' and <= 'Z')) return Unknown("invalid_origin");
         if (response.Status != "reference_only" || response.Data is not { } root ||
@@ -52,7 +53,7 @@ public static class UkAreaMembership
         if (membershipPath is null) return Unknown("no_explicit_dated_membership_proof");
         return new(areaId, origin, date, "candidate_membership_evidence", ["legal_eligibility_not_verified"],
             response.SourceUrl, false, "Dated reference membership only; exclusions, conditions and legal eligibility still require review.")
-            { MembershipPath = membershipPath };
+            { MembershipPath = membershipPath, DestinationTerritory = response.DestinationTerritory };
     }
 }
 
@@ -61,4 +62,5 @@ public sealed record UkAreaMembershipReport(string AreaId, string Origin, DateOn
     bool VerifiedForCalculation, string Warning)
 {
     public string[] MembershipPath { get; init; } = [];
+    public string DestinationTerritory { get; init; } = "GB";
 }

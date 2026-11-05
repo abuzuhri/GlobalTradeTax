@@ -7,4 +7,5 @@
   </ItemGroup>
   <ItemGroup><ProjectReference Include="../../src/GlobalTradeTax.Api/GlobalTradeTax.Api.csproj" /></ItemGroup>
   <ItemGroup><None Update="Fixtures/UkTariff/*.json" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
+  <ItemGroup><None Update="Fixtures/UkCompletion/*.json" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
 </Project>

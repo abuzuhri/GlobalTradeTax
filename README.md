@@ -2,7 +2,7 @@
 
 Latest tariff-data work: [exact upload archives and operator review history](docs/TARIFF_PROVENANCE_REVIEW.md), with duplicate/interval checks, reference-only review expiry and migration 005. Existing databases require the new migration before running the updated API.
 
-Latest UK reference work: [dated membership and measure candidate evidence](docs/UK_APPLICABILITY_EVIDENCE.md) covers historical requests, import/export linkage, inclusive dates and explicit exclusions. Assessments remain for review, with null duty/VAT; evidence envelopes use `uk-reference-evidence/v2`.
+Latest UK work: [GB/XI shipment review and remaining completion gates](docs/UK_SHIPMENT_REVIEW.md) covers separate territory references, typed duty/condition evidence, two currency feeds, per-line VAT cost allocation and UK control checks. Review results never authorize payment. Current assessment evidence uses `uk-reference-evidence/v3`; the [dated applicability slice](docs/UK_APPLICABILITY_EVIDENCE.md) remains historical evidence.
 
 # GlobalTradeTax — Cross-border Customs & Tax SaaS (C#)
 

@@ -302,7 +302,7 @@ class Integration:
         self.start_api()
         self.check('Runtime container runs without root', self.compose('exec', '-T', 'api', 'id', '-u').stdout.strip() != b'0')
         anonymous = assert_smoke(lambda path, method='GET', payload=None: fetch(self.base, path, method, payload))
-        self.check('General container smoke and anonymous routes', anonymous == 10, count=anonymous)
+        self.check('General container smoke and anonymous routes', anonymous == 11, count=anonymous)
         capabilities = self.request('GET', '/v1/capabilities')
         self.check('Database-backed capabilities', capabilities['persistence'] == 'postgresql' and
                    capabilities['tenantAuthentication'] == 'hashed-postgres-api-keys')
@@ -378,6 +378,23 @@ class Integration:
         self.check('Landed-cost estimate remains non-payable', estimate['total'] is None and estimate['importDuty'] is None and estimate['importTax'] is None)
         self.check('Audit JSON is stored as an object for the authenticated merchant',
                    self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='merchant-a' AND action='landed_cost_estimate' AND jsonb_typeof(details_json)='object';") == '1')
+        path = '/v1/references/uk/shipments/review'
+        for territory in ('GB', 'XI'):
+            review = self.request('POST', path, key=self.keys['rotated'], payload={
+                'destinationTerritory': territory, 'importDate': '2026-11-05', 'shipFrom': 'US',
+                'importProcedure': 'free_circulation', 'currency': 'GBP', 'costs': [],
+                'transactionKind': 'commercial', 'intrinsicValueGbp': 1000,
+                'lines': [{'lineId': 'a', 'commodityCode': '0101299000', 'goodsOrigin': 'CN', 'customsValue': 1000}]})
+            self.check('UK review retains uncertainty without configured territory sources',
+                       review['status'] == 'requires_review' and review['destinationTerritory'] == territory and
+                       review['approvedForPayment'] is False and review['verifiedForCalculation'] is False and
+                       all(review[name] is None for name in ('payableDutyGbp', 'payableVatGbp', 'payableLandedTotalGbp', 'illustrativeTotals')))
+        for malformed in ('{"currency":"GBP","Currency":"USD"}', '{"intrinsicValueGbp":1e-100}',
+                          '{"intrinsicValueGbp":"1e-100"}'):
+            self.request('POST', path, key=self.keys['rotated'], payload=malformed, expected=400)
+        self.request('POST', path, key=self.keys['rotated'], payload=' ' * 262145, expected=413)
+        self.check('UK evidence audit is tenant-bound, contains a digest and omits shipment details',
+                   self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='merchant-a' AND action='uk_shipment_review' AND details_json->>'approvedForPayment'='false' AND length(details_json->>'evidenceSha256')=64 AND NOT details_json ? 'lines';") == '2')
 
     def tariff_reviews(self, batch):
         self.phase('Checking reference reviews, expiry, revision preconditions and immutable history')
@@ -469,7 +486,7 @@ class Integration:
                    batch['review']['reviewId'] == self.review_id and not batch['approvedForCalculation'] and
                    self.sql('SELECT count(*) FROM tariff_reference_reviews;', database=database) == '4' and
                    self.sql("SELECT dataset_sha256=encode(sha256(document_bytes),'hex') FROM tariff_import_documents;", database=database) == 't')
-        self.check('Audit survives recreation/restore', self.sql('SELECT count(*) FROM audit_events;', database=database) == '1')
+        self.check('Audit survives recreation/restore', self.sql('SELECT count(*) FROM audit_events;', database=database) == '3')
 
     def persistence_and_restore(self):
         self.phase('Checking container recreation and isolated backup restoration')
@@ -504,7 +521,7 @@ class Integration:
         self.incomplete_quote(new_quote)
         self.request('POST', '/v1/landed-cost/estimate', key=self.keys['rotated'], payload=self.payload)
         self.check('Restored database accepts audit writes with its restored identity sequence',
-                   self.sql('SELECT count(*) FROM audit_events;', database='trade_restore') == '2')
+                   self.sql('SELECT count(*) FROM audit_events;', database='trade_restore') == '4')
         self.report['backup_bytes'] = len(dump)
 
     def upgrade(self):

@@ -50,8 +50,7 @@ public static class UkVatClassificationGate
         if (!input.VatTreatmentVerified) checks.Add("vat_treatment_not_verified");
         if (!input.ReliefsAndExemptionsVerified) checks.Add("reliefs_and_exemptions_not_verified");
         if (!input.SourceContractVerified) checks.Add("source_contract_not_verified");
-        if (!Uri.TryCreate(input.RateSourceUrl, UriKind.Absolute, out var uri) ||
-            uri.Scheme != Uri.UriSchemeHttps)
+        if (!UkDutyComponents.SafeHttps(input.RateSourceUrl))
             checks.Add("missing_https_authoritative_rate_source");
         if (input.RateEffectiveFrom is null) checks.Add("missing_rate_effective_from");
         if (input.ImportDate is not null && input.RateEffectiveFrom is not null &&

@@ -6,6 +6,9 @@ namespace GlobalTradeTax.Api;
 public static class UkGeographyResolver
 {
     public static UkGeographyReport Analyze(UkReferenceResult upstream, string commodityCode, string origin, DateOnly date)
+        => AnalyzeCore(upstream, commodityCode, origin, date) with { DestinationTerritory = upstream.DestinationTerritory, ResponseSha256 = upstream.ResponseSha256 };
+
+    private static UkGeographyReport AnalyzeCore(UkReferenceResult upstream, string commodityCode, string origin, DateOnly date)
     {
         var evidence = UkMeasureEvidence.Analyze(upstream, commodityCode, origin, date);
         if (upstream.Data is not { } root || root.ValueKind != JsonValueKind.Object ||
@@ -70,4 +73,8 @@ public static class UkGeographyResolver
 public sealed record UkGeographyMeasure(string MeasureId, string[] DirectCountryReferences,
     string[] UnresolvedChecks, string Status);
 public sealed record UkGeographyReport(string Status, string CommodityCode, string Origin, DateOnly ImportDate,
-    UkGeographyMeasure[] Measures, bool VerifiedForCalculation, string Warning);
+    UkGeographyMeasure[] Measures, bool VerifiedForCalculation, string Warning)
+{
+    public string DestinationTerritory { get; init; } = "GB";
+    public string? ResponseSha256 { get; init; }
+}

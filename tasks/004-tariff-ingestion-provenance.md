@@ -30,6 +30,10 @@ No staged records used as payable rates; duplicates rejected; provenance and exp
 - 2026-11-05: Started reference provenance and review slice: bounded strict UTF-8 uploads with exact-byte archives/hashes, duplicate/overlapping interval and precision checks, immutable operator review evidence with explicit licence metadata/expiry, and fresh/legacy/restore verification. Review is an operator attestation, not automatic licence verification or publication to payable providers. Historical unarchived batches remain visible and require matching document/row verification before review. Implementation and test evidence will follow below.
 - 2026-11-05: Implemented byte archives, append-only predecessor-bound reviews, explicit review expiry/history and migration 005. Local PASS: 344 offline xUnit cases (52 new; ten live skips), 33 Python cases, warnings-as-errors Release build/publish and 154 PostgreSQL/container assertions with cleanup. Frozen original v1.2 staging upgrades without invented provenance; mismatched backfill is rejected and matching bytes/rows can be archived/reviewed. [Contract, migration, limitations and local evidence](../docs/TARIFF_PROVENANCE_REVIEW.md); [PR #5](https://github.com/abuzuhri/GlobalTradeTax/pull/5) retains hosted verification/review.
 
+### PR #5 integration with main — 2026-11-05
+- Resolve conflicts against main c926938 after the UK shipment review merge. Preserve both documentation entries, exact archive/review restore assertions and the UK audit records (three before backup; four after a new restored write).
+- Combined warnings-as-errors Release tests pass 432 cases with 16 optional live skips; 33 Python cases and repository guards pass. Combined container and hosted evidence is recorded in [PR #5](https://github.com/abuzuhri/GlobalTradeTax/pull/5) after execution. No rates or payment gates are activated.
+
 ### Verified reference workflow slice
 - [x] Preserve exact UTF-8 bytes and enforce bounded uploads and database archive checksums.
 - [x] Reject within-batch duplicates/overlaps, unsupported precision and inconsistent source metadata without partial writes.

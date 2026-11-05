@@ -4,6 +4,8 @@ Implemented on 2026-11-05; [PR #5](https://github.com/abuzuhri/GlobalTradeTax/pu
 
 ## Upload validation and integrity
 
+PR #5 now integrates the GB/XI shipment review from main c926938. Both APIs and their documentation are retained. The combined database runner preserves archive/review checks and verifies the UK audit records across recreation and restore. Migration 005 remains required for existing databases; this integration does not activate reviewed rates. The PR records final combined verification.
+
 The existing eight-column [CSV schema](../data/SCHEMA.csv) is unchanged. Both merchant validation and operator staging now consume bounded bytes instead of a `StreamReader` that could discard a BOM or replace invalid encoding.
 
 - The limit is **1 MiB of bytes**, including chunked requests without `Content-Length`. Input must be strict UTF-8; an optional leading UTF-8 BOM, CRLF and trailing newlines are preserved. Malformed UTF-8/UTF-16 is rejected. SHA-256 covers exact uploaded bytes, not normalized text or remotely fetched source content.

@@ -83,4 +83,27 @@ public class UkVatQuoteReviewTests
         Assert.Contains("missing_or_invalid_commodity_code", result.UnresolvedChecks);
         Assert.Null(result.Amounts.IllustrativeTaxableBaseGbp);
     }
+
+    [Theory]
+    [InlineData("source")]
+    [InlineData("classification")]
+    [InlineData("procedure")]
+    [InlineData("treatment")]
+    [InlineData("relief")]
+    [InlineData("unsafe_url")]
+    public void Any_unresolved_classification_evidence_suppresses_amounts(string gap)
+    {
+        var request = Sample(); var input = request.Classification;
+        input = gap switch {
+            "source" => input with { SourceContractVerified = false },
+            "classification" => input with { CommodityClassificationVerified = false },
+            "procedure" => input with { ImportProcedureVerified = false },
+            "treatment" => input with { VatTreatmentVerified = false },
+            "relief" => input with { ReliefsAndExemptionsVerified = false },
+            _ => input with { RateSourceUrl = "https://user:secret@example.test/" } };
+        var result = UkVatQuoteReview.Evaluate(request with { Classification = input });
+        Assert.Null(result.Amounts.IllustrativeTaxableBaseGbp);
+        Assert.Null(result.Amounts.IllustrativeVatGbp);
+        Assert.Null(result.PayableVatGbp);
+    }
 }
