@@ -1,6 +1,8 @@
 # v1.1 — tariff data ingestion safety gate
 
 New endpoint: POST /v1/tariff-datasets/validate (authenticated, Content-Type: text/plain).
+
+**2026-11-05 update:** [current validation and provenance contract](TARIFF_PROVENANCE_REVIEW.md) requires bounded strict UTF-8 bytes, exact upload hashes, one source/version, four-decimal rates and nonoverlapping intervals. The schema's eight columns are unchanged; staging/review now have separate operator-only routes.
 It accepts UTF-8 CSV with exactly these fields:
 `destination,origin,hs_code,ad_valorem_percent,valid_from,valid_to,source_url,source_version`
 

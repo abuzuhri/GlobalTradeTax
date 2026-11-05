@@ -26,6 +26,7 @@ db/001_init.sql; db/004_tariff_staging.sql
 Fresh and upgraded DB pass migration tests; rollback and backup procedure documented.
 
 ## Evidence / decision log
+- 2026-11-05 / TASK-004: migration 005 adds exact upload archives and review history with digest/length/composite-FK constraints. Local 154-assertion integration run passed fresh/legacy/restored schema equality, original v1.2 staging preservation, guarded archive backfill and reapplication/rollback. [Migration and provenance evidence](../docs/TARIFF_PROVENANCE_REVIEW.md). Migration ledger/release policy and operational review remain open.
 - 2026-11-02: Task created. Existing implementation may be partial; completion has not been established.
 - 2026-11-04: Start the authorized container/database slice tracked under TASK-010: fresh initialization, seeded v0.4 upgrade, idempotent reapplication, transactional rollback, schema comparison and isolated backup/restore. Reuse the existing SQL scripts; do not claim a versioned migration ledger or automatic downgrade support.
 - 2026-11-04: Added a frozen v0.4 schema fixture checked against original commit bcec3f9. Fresh/upgraded/restored schemas are compared by columns, defaults, identities, constraints and indexes; historical and new quotes remain readable. Failed transaction DDL rolls back. Container recreation preserves quote/idempotency/revocation/staging/audit data, and restored databases accept new audit identity values.

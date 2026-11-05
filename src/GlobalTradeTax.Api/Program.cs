@@ -94,10 +94,8 @@ app.MapPost("/v1/tariff-datasets/validate", async (HttpRequest http, IServicePro
 {
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
     if (http.ContentLength is > 1_048_576) return Results.StatusCode(413);
-    using var reader = new StreamReader(http.Body);
-    var csv = await reader.ReadToEndAsync(ct);
-    if (csv.Length > 1_048_576) return Results.StatusCode(413);
-    var result = TariffDataset.Parse(csv);
+    var result = await TariffDataset.ReadAsync(http.Body, ct);
+    if (result.Status == "too_large") return Results.StatusCode(413);
     return result.Status == "rejected"
         ? Results.BadRequest(new { result.Status, result.Error, result.Sha256 })
         : Results.Ok(new { result.Status, result.Rows, result.Sha256,
@@ -110,16 +108,15 @@ app.MapPost("/v1/admin/tariff-datasets/stage", async (HttpRequest http, IService
     var staging = services.GetService<TariffStagingStore>();
     if (staging is null) return Results.Problem("PostgreSQL required", statusCode: 503);
     if (http.ContentLength is > 1_048_576) return Results.StatusCode(413);
-    using var reader = new StreamReader(http.Body);
-    var csv = await reader.ReadToEndAsync(ct);
-    if (csv.Length > 1_048_576) return Results.StatusCode(413);
-    var parsed = TariffDataset.Parse(csv);
+    var parsed = await TariffDataset.ReadAsync(http.Body, ct);
+    if (parsed.Status == "too_large") return Results.StatusCode(413);
     if (parsed.Status == "rejected") return Results.BadRequest(new { parsed.Error, parsed.Sha256 });
     if (parsed.Records.Select(x => x.SourceUrl).Distinct().Count() != 1 ||
         parsed.Records.Select(x => x.SourceVersion).Distinct().Count() != 1)
         return Results.BadRequest(new { error = "A batch must have one source URL and version." });
-    var (id, exists) = await staging.StageAsync(parsed, ct);
-    return Results.Ok(new { batchId = id, alreadyExists = exists, parsed.Rows, parsed.Sha256,
+    var staged = await staging.StageAsync(parsed, ct);
+    if (staged.Error is not null) return Results.Conflict(new { error = staged.Error });
+    return Results.Ok(new { batchId = staged.BatchId, alreadyExists = staged.AlreadyExists, parsed.Rows, parsed.Sha256,
         status = "staged_reference_only", warning = "Not connected to payable landed-cost calculation." });
 });
 app.MapGet("/v1/admin/tariff-datasets/{id:guid}", async (Guid id, HttpRequest http,
@@ -130,6 +127,39 @@ app.MapGet("/v1/admin/tariff-datasets/{id:guid}", async (Guid id, HttpRequest ht
     if (staging is null) return Results.Problem("PostgreSQL required", statusCode: 503);
     var batch = await staging.GetBatchAsync(id, ct);
     return batch is null ? Results.NotFound() : Results.Ok(batch);
+});
+// Append operator attestations only; a review never activates a payable rate.
+app.MapPost("/v1/admin/tariff-datasets/{id:guid}/reviews", async (Guid id, HttpRequest http,
+    IServiceProvider services, IConfiguration config, CancellationToken ct) =>
+{
+    if (!IsOperator(http, config)) return Results.Unauthorized();
+    var staging = services.GetService<TariffStagingStore>();
+    if (staging is null) return Results.Problem("PostgreSQL required", statusCode: 503);
+    if (http.ContentLength is > 32_768) return Results.StatusCode(413);
+    var bytes = await TariffDataset.ReadBytesAsync(http.Body, 32_768, ct);
+    if (bytes is null) return Results.StatusCode(413);
+    TariffReviewRequest? review;
+    try { review = JsonSerializer.Deserialize<TariffReviewRequest>(bytes, new JsonSerializerOptions(JsonSerializerDefaults.Web)); }
+    catch (JsonException) { return Results.BadRequest(new { error = "invalid_review_json" }); }
+    if (review is null) return Results.BadRequest(new { error = "review_required" });
+    var result = await staging.ReviewAsync(id, review, ct);
+    return result.Status switch
+    {
+        "not_found" => Results.NotFound(),
+        "invalid_request" => Results.BadRequest(result),
+        "conflict" => Results.Conflict(result),
+        _ => Results.Ok(result)
+    };
+});
+app.MapGet("/v1/admin/tariff-datasets/{id:guid}/reviews", async (Guid id, int? afterRevision, int? limit,
+    HttpRequest http, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
+{
+    if (!IsOperator(http, config)) return Results.Unauthorized();
+    if (afterRevision is < 0 || limit is < 1 or > 100) return Results.BadRequest(new { error = "invalid_review_page" });
+    var staging = services.GetService<TariffStagingStore>();
+    if (staging is null) return Results.Problem("PostgreSQL required", statusCode: 503);
+    var page = await staging.GetReviewsAsync(id, afterRevision ?? 0, limit ?? 50, ct);
+    return page is null ? Results.NotFound() : Results.Ok(page);
 });
 // Read-only UK commodity lookup. Requires merchant authentication; never returns payable amounts.
 app.MapGet("/v1/references/uk/commodities/{code}", async (string code, string? territory, HttpRequest http,
