@@ -3,6 +3,7 @@
 .vs/
 .env
 *.user
+/TestResults/
 
 __pycache__/
 *.pyc

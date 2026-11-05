@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Npgsql;
+using NpgsqlTypes;
 namespace GlobalTradeTax.Api;
 
 public sealed class AuditStore(NpgsqlDataSource database)
@@ -11,7 +12,7 @@ public sealed class AuditStore(NpgsqlDataSource database)
         cmd.Parameters.AddWithValue("tenant", tenant);
         cmd.Parameters.AddWithValue("action", action);
         cmd.Parameters.AddWithValue("status", status);
-        cmd.Parameters.AddWithValue("details", JsonSerializer.Serialize(details));
+        cmd.Parameters.AddWithValue("details", NpgsqlDbType.Jsonb, JsonSerializer.Serialize(details));
         await cmd.ExecuteNonQueryAsync(ct);
     }
 }

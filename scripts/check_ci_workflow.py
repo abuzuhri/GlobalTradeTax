@@ -9,6 +9,7 @@ REQUIRED = (
     'dotnet test', 'scripts/smoke_api.py', 'dependency-audit:', 'repository-checks:',
     'uk-live-contract:', 'TRADE_RUN_UK_LIVE_CONTRACT:', "--filter 'Category=UkLiveContract'",
     'uk-managed-live-contract:', 'TRADE_RUN_UK_MANAGED_LIVE_CONTRACT:', "--filter 'Category=UkManagedLiveContract'",
+    'container-postgres:', 'scripts/check_postgres_integration.py', 'postgres-integration-results',
 )
 
 def check(contents: str) -> list[str]:
