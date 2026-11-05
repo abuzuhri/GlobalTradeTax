@@ -3,7 +3,7 @@
 ## 2026-11-05 — TASK-004 exact-byte provenance and operator review
 - Preserve bounded strict UTF-8 upload bytes/digests, reject duplicate/overlapping intervals and rates requiring storage rounding, and require consistent source provenance. Archive documents transactionally with database digest/length/foreign-key checks.
 - Add operator-only reference review/history, explicit attestation/expiry, idempotent replay and predecessor-bound revisions; renewals/rejections retain earlier decisions. Migration 005 preserves older staging, with exact document/row verification for backfill before review. No calculation provider or publication gate is enabled.
-- Local Release build/publish, 343 xUnit cases (51 new; ten optional live skips), 33 Python cases and repository guards passed. Corrected container run passed 154 assertions with cleanup, including review races/expiry and frozen v1.2 upgrade/backfill. [Current contract, migration and final evidence](TARIFF_PROVENANCE_REVIEW.md). TASK-004 remains in progress.
+- Local Release build/publish, 343 xUnit cases (51 new; ten optional live skips), 33 Python cases and repository guards passed. Corrected container run passed 154 assertions with cleanup, including review races/expiry and frozen v1.2 upgrade/backfill. [Current contract, migration and local evidence](TARIFF_PROVENANCE_REVIEW.md); [PR #5](https://github.com/abuzuhri/GlobalTradeTax/pull/5) retains final hosted checks/review. TASK-004 remains in progress.
 
 
 ## 2026-11-04 — TASK-003/010 PostgreSQL and container lifecycle

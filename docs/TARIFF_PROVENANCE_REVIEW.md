@@ -1,6 +1,6 @@
 # Tariff upload archives and operator review evidence — TASK-004
 
-Implemented on 2026-11-05. This reference workflow preserves the uploaded document and an operator's review history. It does not verify licences automatically, publish an active tariff dataset or feed `IImportRateProvider`. Duty, VAT and payable totals remain unavailable without their existing verified provider/rule prerequisites. TASK-004 remains in progress for authoritative source onboarding, rights review and a separately controlled publication process.
+Implemented on 2026-11-05; [PR #5](https://github.com/abuzuhri/GlobalTradeTax/pull/5) records hosted checks and review. This reference workflow preserves the uploaded document and an operator's review history. It does not verify licences automatically, publish an active tariff dataset or feed `IImportRateProvider`. Duty, VAT and payable totals remain unavailable without their existing verified provider/rule prerequisites. TASK-004 remains in progress for authoritative source onboarding, rights review and a separately controlled publication process.
 
 ## Upload validation and integrity
 
@@ -65,7 +65,7 @@ Official database references: [binary SHA-256/byte-length functions](https://www
 - **33 Python cases** passed, including the streamed-request regression. Task integrity, static CI guard, limited source secret scan and whitespace checks passed.
 - The corrected local Docker/PostgreSQL run passed **154 assertions with cleanup=true**, including legacy upgrade/backfill and backup restoration. Its report is ignored `TestResults/postgres-provenance-integration.json`; the hosted artifact records the final checked runner separately.
 - The isolated Docker/PostgreSQL runner covers exact BOM/CRLF archives, database checksum/foreign-key constraints, streamed body limits, duplicate/precision rejection, operator/merchant separation, concurrent first reviews, real-clock expiry, post-expiry replay, renewal/rejection history and competing revision preconditions. Container recreation and backup restoration retain the archive, four review revisions, quotes and merchant revocations; staged/reviewed rates still produce null monetary outputs.
-- The runner uploads a redacted JSON report in the existing `container-postgres` CI job. Final hosted outcomes and exact assertion counts are recorded with the implementation PR once verification finishes. The initial local run found a chunked-request generator bug in the test helper; it cleaned up its private project after 55 assertions. The helper and a targeted regression test were corrected before the final checks.
+- The runner uploads a redacted JSON report in the existing `container-postgres` CI job. [PR #5](https://github.com/abuzuhri/GlobalTradeTax/pull/5) records final hosted outcomes and exact assertion counts. The initial local run found a chunked-request generator bug in the test helper; it cleaned up its private project after 55 assertions. The helper and a targeted regression test were corrected before the final checks.
 
 Reproduce with the existing [Docker/WSL commands](POSTGRES_CONTAINER_VERIFICATION.md#repeatable-test), or run locally:
 
