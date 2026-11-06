@@ -31,6 +31,7 @@ src/GlobalTradeTax.Api/LandedCost.cs
 Per-line and shipment totals reconcile; VAT exceptions tested; uncertainty reported.
 
 ## Evidence / decision log
+- 2026-11-06: Implementation commit `d9663d1` passed all six regular hosted CI jobs: 486 xUnit cases/16 optional live skips, 33 Python cases, 11 HTTP smoke assertions and 199 database/container assertions with cleanup=true. [Hosted run](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42294049414); [ready PR #8](https://github.com/abuzuhri/GlobalTradeTax/pull/8) retains final-head verification.
 - 2026-11-06: Implemented explicit VAT treatment/accounting review, segregated conditional art valuation, NI/special-procedure suppression, strict bounded legacy JSON and invoice/cost/VAT underflow guards. Shipment digest is `uk-shipment-review/v2`; no migration required. Warnings-as-errors Release suite passed 486 offline cases/16 optional live skips, 33 Python cases and repository guards. Added authenticated HTTP regressions to the hosted container suite; final hosted outcomes are recorded in the PR. [Contract, current HMRC sources and remaining approval gates](../docs/UK_VAT_EXCEPTIONS.md). Task remains in progress for independent tax approval.
 - 2026-11-02: Task created. Existing implementation may be partial; completion has not been established.
 
