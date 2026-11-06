@@ -39,25 +39,37 @@ public static class UkDutyComponents
                 {
                     currency = "GBP";
                     if (quantities.CustomsValueGbp is null) error = "customs_value_required_for_percentage";
-                    else sourceAmount = checked(quantities.CustomsValueGbp.Value * component.Amount.Value / 100m);
+                    else
+                    {
+                        sourceAmount = MultiplyDivide(quantities.CustomsValueGbp.Value,component.Amount.Value,100m);
+                        if (sourceAmount is null) error = "duty_arithmetic_precision_lost";
+                    }
                 }
                 else if (currency is "GBP" or "EUR" && component.Unit is not null)
                 {
                     var quantity = component.Unit switch
                     {
                         "KGM" => quantities.NetMassKg,
-                        "DTN" => quantities.NetMassKg / 100m,
-                        "TNE" => quantities.NetMassKg / 1000m,
+                        "DTN" or "TNE" => quantities.NetMassKg,
                         "NAR" => quantities.ItemCount is { } count && count == decimal.Truncate(count) ? count : null,
                         _ => null
                     };
                     if (quantity is null) error = "explicit_supported_quantity_required:" + component.Unit;
-                    else sourceAmount = checked(component.Amount.Value * quantity.Value);
+                    else
+                    {
+                        var divisor = component.Unit switch { "DTN" => 100m, "TNE" => 1000m, _ => 1m };
+                        sourceAmount = MultiplyDivide(component.Amount.Value,quantity.Value,divisor);
+                        if (sourceAmount is null) error = "duty_arithmetic_precision_lost";
+                    }
                 }
                 else error = "unsupported_currency_or_measurement_unit";
                 if (sourceAmount is not null)
                 {
-                    if (TryFactor(rates, currency!, "tariff_duty", date, out var factor)) gbp = checked(sourceAmount.Value * factor);
+                    if (TryFactor(rates, currency!, "tariff_duty", date, out var factor))
+                    {
+                        gbp = MultiplyDivide(sourceAmount.Value,factor,1m);
+                        if (gbp is null) error = "duty_arithmetic_precision_lost";
+                    }
                     else error = "tariff_currency_conversion_evidence_required:" + currency;
                 }
                 results.Add(new(component.Id, component.ExpressionCode!, sourceAmount, currency, gbp, error is null ? [] : [error]));
@@ -68,6 +80,13 @@ public static class UkDutyComponents
                 ["legal_measure_selection_and_conditions_require_review", "rounding_and_currency_basis_not_authorized_for_payment"]);
         }
         catch (OverflowException) { return Unknown("duty_arithmetic_overflow", results.ToArray()); }
+    }
+
+    // Scale after multiplication, preserving representable quantities. Positive underflow is unknown.
+    internal static decimal? MultiplyDivide(decimal amount, decimal quantity, decimal divisor)
+    {
+        var result = checked(amount * quantity / divisor);
+        return result == 0m && amount > 0m && quantity > 0m ? null : result;
     }
 
     public static bool TryFactor(IReadOnlyList<UkFxRate> rates, string currency, string purpose, DateOnly date, out decimal factor)

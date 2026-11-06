@@ -8,6 +8,8 @@
 
 **Latest UK completion pass (2026-11-05):** GB/XI shipment review, typed conditional duty evidence, separate invoice/tariff currency feeds, mixed-VAT cost reconciliation and UK manual control gates are implemented. Local checks passed 380 offline xUnit cases, ten public live probes, 32 Python tests and 112 isolated database/container assertions with cleanup. [Current contract and remaining gates](docs/UK_SHIPMENT_REVIEW.md) explicitly retain managed-live access, independently approved calculator cases and legal/valuation/NI approvals as unfinished; TASK-005–009 are not marked done.
 
+**Latest TASK-007 evidence (2026-11-06):** five live official calculator duty rows and four published calculator test examples now match. Four reproduced precision failures are corrected without enabling payment. The local Release suite passes 447 cases with 16 optional API skips. [Case evidence and remaining approval gates](docs/UK_DUTY_REFERENCE_CASES.md). TASK-007 remains in progress.
+
 ## Status vocabulary
 - `not-started`: not implemented.
 - `in-progress`: partial code exists; acceptance criteria unmet.

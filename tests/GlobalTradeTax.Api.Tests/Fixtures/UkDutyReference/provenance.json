@@ -1,0 +1,193 @@
+{
+  "schema_version": "uk-duty-reference-provenance/v1",
+  "captured_on": "2026-11-06",
+  "attribution": "Contains public sector information licensed under the Open Government Licence v3.0.",
+  "licence": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+  "purpose": "Observed synthetic calculator examples and version-pinned arithmetic expectations. No legal eligibility or payment approval.",
+  "approval_status": "awaiting_independent_review",
+  "approved_for_payment": false,
+  "source_frontend_revision": "bb5d3b83d07abb95b1cb6c6c548b7393786b86a9",
+  "revision_note": "Reviewed public source, not an attestation of deployed revision.",
+  "files": [
+    {
+      "file": "observations/gb-compound-confirm.txt",
+      "bytes": 553,
+      "sha256": "72aa753f4023ceb02aacce4c913416bf0a17f8d496864faa9e5d946b91e826c9",
+      "kind": "rendered_main_text",
+      "captured_at_utc": "2026-11-06T19:41:32.555264+00:00"
+    },
+    {
+      "file": "observations/gb-compound-result.txt",
+      "bytes": 1233,
+      "sha256": "74649e1282a240dce93a364a2a95d19d672ca5af76f13b75944b847aae81c1b8",
+      "kind": "rendered_main_text",
+      "captured_at_utc": "2026-11-06T19:41:32.556263+00:00"
+    },
+    {
+      "file": "observations/gb-compound.jpg",
+      "bytes": 303064,
+      "sha256": "73236e8205bbf232fd4009af52a7b3bfb0a9899690d10c0a517157028ffd8ef6",
+      "kind": "calculator_screenshot",
+      "captured_at_utc": "2026-11-06T19:41:33.932189+00:00"
+    },
+    {
+      "file": "observations/gb-percentage-confirm.txt",
+      "bytes": 501,
+      "sha256": "1423ebe0fb0166ba1bb3781d34706b24df87006ac8acbe5cc762498c6ccaa1f8",
+      "kind": "rendered_main_text",
+      "captured_at_utc": "2026-11-06T19:44:37.362617+00:00"
+    },
+    {
+      "file": "observations/gb-percentage-result.txt",
+      "bytes": 988,
+      "sha256": "159aaa848390f9e21602dc970f832343e18bee570e67de581ed717a743f9291f",
+      "kind": "rendered_main_text",
+      "captured_at_utc": "2026-11-06T19:44:37.366608+00:00"
+    },
+    {
+      "file": "observations/gb-percentage.jpg",
+      "bytes": 269659,
+      "sha256": "073fcf17aba971ef78238983ad013169d737f573a2efecc34c8795d9d8a44fe7",
+      "kind": "calculator_screenshot",
+      "captured_at_utc": "2026-11-06T19:44:38.931756+00:00"
+    },
+    {
+      "file": "observations/gb-specific-confirm.txt",
+      "bytes": 554,
+      "sha256": "f14528ff086901c49fff2f0922ed063fe4bcd8516ae914e28d29ad74c7890880",
+      "kind": "rendered_main_text",
+      "captured_at_utc": "2026-11-06T19:48:37.235114+00:00"
+    },
+    {
+      "file": "observations/gb-specific-result.txt",
+      "bytes": 1014,
+      "sha256": "329a56e02e6a0550c843c74eb5e921a3310b1abe812a71291154ed5c0d089ee0",
+      "kind": "rendered_main_text",
+      "captured_at_utc": "2026-11-06T19:48:37.241112+00:00"
+    },
+    {
+      "file": "observations/gb-specific.jpg",
+      "bytes": 274660,
+      "sha256": "42396686ba2244a933d0fc0e6defa855bca3e914257e881a25c17f6451a55439",
+      "kind": "calculator_screenshot",
+      "captured_at_utc": "2026-11-06T19:48:38.887921+00:00"
+    },
+    {
+      "file": "observations/gb-zero-confirm.txt",
+      "bytes": 501,
+      "sha256": "1423ebe0fb0166ba1bb3781d34706b24df87006ac8acbe5cc762498c6ccaa1f8",
+      "kind": "rendered_main_text",
+      "captured_at_utc": "2026-11-06T19:49:28.637041+00:00"
+    },
+    {
+      "file": "observations/gb-zero-result.txt",
+      "bytes": 1130,
+      "sha256": "cc82d2d80b01ec12ffa9a83d2a12f7d2751c42b0478ef6ffbaf7b137206315fa",
+      "kind": "rendered_main_text",
+      "captured_at_utc": "2026-11-06T19:49:28.639043+00:00"
+    },
+    {
+      "file": "observations/gb-zero.jpg",
+      "bytes": 283744,
+      "sha256": "3dd0db27caa06be353a6e8a895bdd45bb129b6478dceab9a3d9f35a5d5ccf3b1",
+      "kind": "calculator_screenshot",
+      "captured_at_utc": "2026-11-06T19:49:30.155206+00:00"
+    },
+    {
+      "file": "observations/xi-compound-confirm.txt",
+      "bytes": 575,
+      "sha256": "8475583b49a9cec8b523c6b75e208bcc4a4891dfcd7664099ee62db442d3d6da",
+      "kind": "rendered_main_text",
+      "captured_at_utc": "2026-11-06T19:51:16.271433+00:00"
+    },
+    {
+      "file": "observations/xi-compound-result.txt",
+      "bytes": 1052,
+      "sha256": "e20549a392ddac7a796d79f36bfbdff9ee4547695796d719fa8e7700d30a29c4",
+      "kind": "rendered_main_text",
+      "captured_at_utc": "2026-11-06T19:51:16.273428+00:00"
+    },
+    {
+      "file": "observations/xi-compound-route.txt",
+      "bytes": 174,
+      "sha256": "ffc9d5b366dc345afae0e59f8f97a9492392aa71d39c97ba144007cb84a910f0",
+      "kind": "rendered_main_text",
+      "captured_at_utc": "2026-11-06T19:51:16.308624+00:00"
+    },
+    {
+      "file": "observations/xi-compound.jpg",
+      "bytes": 274515,
+      "sha256": "dc335c81579f733b9c37ee0def0529721b8ef70d0e179a988010de63e45b4b14",
+      "kind": "calculator_screenshot",
+      "captured_at_utc": "2026-11-06T19:51:17.983307+00:00"
+    },
+    {
+      "file": "upstream/ad_valorem_spec.rb",
+      "bytes": 1558,
+      "sha256": "68892eae364b9da153790b1d08c9a7b78fa394c8e23f21b83dd381bd2bdf8513",
+      "kind": "official_test_source",
+      "source_url": "https://github.com/trade-tariff/trade-tariff-frontend/blob/bb5d3b83d07abb95b1cb6c6c548b7393786b86a9/spec/services/duty_calculator/expression_evaluators/ad_valorem_spec.rb",
+      "licence": "MIT; Crown Copyright (Government Digital Service); see upstream/LICENCE.md",
+      "transformation": "None; decoded UTF-8 file bytes match the pinned Git blob.",
+      "github_blob_sha": "5feabece0af12775d3801026993e91b5b8150775"
+    },
+    {
+      "file": "upstream/measure_unit_spec.rb",
+      "bytes": 3322,
+      "sha256": "ffa6ab811e795118476e2c5ec756dfc6f30a2bff61b9bb44560bea97f2a88f35",
+      "kind": "official_test_source",
+      "source_url": "https://github.com/trade-tariff/trade-tariff-frontend/blob/bb5d3b83d07abb95b1cb6c6c548b7393786b86a9/spec/services/duty_calculator/expression_evaluators/measure_unit_spec.rb",
+      "licence": "MIT; Crown Copyright (Government Digital Service); see upstream/LICENCE.md",
+      "transformation": "None; decoded UTF-8 file bytes match the pinned Git blob.",
+      "github_blob_sha": "93294a1b8e48ea579249ee70f164aae9a3031867"
+    },
+    {
+      "file": "upstream/user_session_factory.rb",
+      "bytes": 6153,
+      "sha256": "800576ce407d53b13aa33affc0ebe9c3139b482e0f9421b242fc01ec0462a9a5",
+      "kind": "official_test_source",
+      "source_url": "https://github.com/trade-tariff/trade-tariff-frontend/blob/bb5d3b83d07abb95b1cb6c6c548b7393786b86a9/spec/factories/duty_calculator/user_session.rb",
+      "licence": "MIT; Crown Copyright (Government Digital Service); see upstream/LICENCE.md",
+      "transformation": "None; decoded UTF-8 file bytes match the pinned Git blob.",
+      "github_blob_sha": "a79745dd845dff71d61772d30367ef8e85757d7d"
+    },
+    {
+      "file": "upstream/monetary_exchange_rates.json",
+      "bytes": 16191,
+      "sha256": "d05a1db3ac2ca0c03cf3b758b03a36eaa61dc3125b6992f8ad67b36c164b8a97",
+      "kind": "official_test_source",
+      "source_url": "https://github.com/trade-tariff/trade-tariff-frontend/blob/bb5d3b83d07abb95b1cb6c6c548b7393786b86a9/spec/fixtures/duty_calculator/xi/monetary_exchange_rates.json",
+      "licence": "MIT; Crown Copyright (Government Digital Service); see upstream/LICENCE.md",
+      "transformation": "None; decoded UTF-8 file bytes match the pinned Git blob.",
+      "github_blob_sha": "c2a8e7092a97f9b11dc72445dbca1f1346604444"
+    },
+    {
+      "file": "upstream/LICENCE.md",
+      "bytes": 1111,
+      "sha256": "9a3a72644f550464484865ed41f9da31125032333c65deb7ad191015a9e872cb",
+      "kind": "official_test_source",
+      "source_url": "https://github.com/trade-tariff/trade-tariff-frontend/blob/bb5d3b83d07abb95b1cb6c6c548b7393786b86a9/LICENCE.md",
+      "licence": "MIT; Crown Copyright (Government Digital Service); see upstream/LICENCE.md",
+      "transformation": "None; decoded UTF-8 file bytes match the pinned Git blob.",
+      "github_blob_sha": "abe30c9106ce2c061542bf83cab14ed0e50a6d8c"
+    }
+  ],
+  "responses": [
+    {
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/commodities/1001990094?as_of=2026-11-05",
+      "sha256": "df8dabbba7824cc347971f5bc656944bdc4c8d220a348253137c2680da628e30",
+      "bytes": 235298,
+      "retrieved_at_utc": "2026-11-06T19:47:06.750240+00:00",
+      "file": "api/1001990094.json",
+      "kind": "exact_api_response"
+    },
+    {
+      "url": "https://www.trade-tariff.service.gov.uk/uk/api/v2/commodities/8471300000?as_of=2026-11-05",
+      "sha256": "29e7043a115cb3c16dc1b6a8bb21bb15c26d76e2b07481e2e7a018e520d1cdbd",
+      "bytes": 381305,
+      "retrieved_at_utc": "2026-11-06T19:43:07.311513+00:00",
+      "file": "api/8471300000.json",
+      "kind": "exact_api_response"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+# Evidence hashes cover the captured bytes on Windows and Linux.
+/tests/GlobalTradeTax.Api.Tests/Fixtures/UkDutyReference/observations/* -text
+/tests/GlobalTradeTax.Api.Tests/Fixtures/UkDutyReference/api/* -text
+/tests/GlobalTradeTax.Api.Tests/Fixtures/UkDutyReference/upstream/* -text

@@ -16,4 +16,13 @@ public sealed class UkLegacyDutyRegressionTests
         Assert.Null(UkDutyExpressionEngine.Evaluate("0.00000000000000000000000000001 %",1000m,null,null).IllustrativeAmount);
         Assert.Null(UkDutyExpressionEngine.Evaluate(new string('1',1000)+" %",1000m,null,null).IllustrativeAmount);
     }
+
+    [Fact]
+    public void Legacy_evaluator_preserves_unit_precision_and_rejects_underflow()
+    {
+        const decimal smallest = 0.0000000000000000000000000001m;
+        Assert.Equal(smallest,UkDutyExpressionEngine.Evaluate("1000 GBP / tonne",null,smallest,null).IllustrativeAmount);
+        Assert.Null(UkDutyExpressionEngine.Evaluate("1 %",smallest,null,null).IllustrativeAmount);
+        Assert.Null(UkDutyExpressionEngine.Evaluate("1 % + 1 GBP / kg",smallest,1m,null).IllustrativeAmount);
+    }
 }
