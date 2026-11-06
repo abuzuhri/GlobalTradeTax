@@ -95,6 +95,14 @@ public sealed class UkDutyReferenceCasesTests
         Assert.Contains(date.ToString("d MMMM yyyy",CultureInfo.InvariantCulture),confirm);
         Assert.Contains("United States",confirm);
         Assert.Contains(Text(c,"destination_territory")=="XI" ? "Northern Ireland" : "England, Scotland or Wales (GB)",confirm);
+        var normalized = string.Join(" ",confirm.Split((char[]?)null,StringSplitOptions.RemoveEmptyEntries));
+        var value = Amount(c,"customs_value_gbp")!.Value.ToString("N2",CultureInfo.InvariantCulture);
+        Assert.Contains("Value of the goods being imported £"+value,normalized);
+        Assert.Contains("Shipping cost £0.00",normalized);
+        Assert.Contains("Insurance cost £0.00",normalized);
+        Assert.Contains("Valuation of import\t£"+value,result);
+        if (Amount(c,"net_mass_kg") is { } mass)
+            Assert.Contains("kilograms "+mass.ToString(CultureInfo.InvariantCulture),normalized);
         Assert.True(File.Exists(Path.Combine(Root,Text(c,"screenshot"))));
     }
 
