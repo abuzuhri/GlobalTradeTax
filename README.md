@@ -6,6 +6,8 @@ Latest UK work: [GB/XI shipment review and remaining completion gates](docs/UK_S
 
 Latest duty validation: [five live calculator comparisons and four pinned source examples](docs/UK_DUTY_REFERENCE_CASES.md), with captured inputs/results and fixes for positive arithmetic underflow. Comparisons remain unapproved for payment.
 
+Latest VAT work: [declared relief/accounting review and conditional reduced valuation](docs/UK_VAT_EXCEPTIONS.md), with separate NI checks, stricter financial input handling and shipment evidence `uk-shipment-review/v2`. Claims never establish zero tax or payable approval.
+
 # GlobalTradeTax — Cross-border Customs & Tax SaaS (C#)
 
 Initial working source scaffold for **US -> Worldwide**, designed to expand to **China/Worldwide -> US**.

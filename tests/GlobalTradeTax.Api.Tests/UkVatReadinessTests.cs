@@ -40,4 +40,12 @@ public class UkVatReadinessTests
         var result = UkVatReadiness.Evaluate(new UkVatInput(1000m, 100m, 0m, 0m, 0m, 120m));
         Assert.Equal("invalid_input", result.Status);
     }
+
+    [Fact]
+    public void Positive_VAT_below_decimal_precision_is_unknown()
+    {
+        var result=UkVatReadiness.Evaluate(new(0.0000000000000000000000000001m,0m,0m,0m,0m,1m,true,true,true,true,true));
+        Assert.Equal("requires_review",result.Status);Assert.Null(result.IllustrativeVatGbp);
+        Assert.Contains("vat_arithmetic_precision_lost",result.UnresolvedChecks);
+    }
 }

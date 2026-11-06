@@ -4,10 +4,15 @@
 - **Priority:** P0
 - **Owner:** Unassigned
 - **Dependencies:** Review related tasks in [master register](../TASKS.md) before starting.
-- **Last reviewed:** 2026-11-05
+- **Last reviewed:** 2026-11-06
 
 ## Objective
 Determine VAT rate, taxable base, reliefs, freight, insurance, currency conversion and rounding.
+
+## 2026-11-06 — VAT exception and accounting review slice
+- Add explicit per-line VAT treatment/accounting declarations and sourced review outcomes for reduced valuation, returned goods, temporary admission, exemption/other relief and postponed accounting. Claims never prove entitlement or zero the tax; NI stays separately unresolved.
+- Expose a segregated conditional 25%-valuation/20%-VAT arithmetic scenario where inputs permit, prevent stacking it with a proposed reduced rate, and exclude it from ordinary shipment totals. Bind claims/results into versioned shipment evidence.
+- Close invoice/cost FX underflow and legacy special-procedure/input-parsing gaps with meaningful regressions, authenticated container checks and compatibility documentation. Verify local/hosted outcomes and leave the completed PR ready for review. Independent tax eligibility and payable approval remain open.
 
 ## Existing project references
 src/GlobalTradeTax.Api/LandedCost.cs
@@ -26,6 +31,7 @@ src/GlobalTradeTax.Api/LandedCost.cs
 Per-line and shipment totals reconcile; VAT exceptions tested; uncertainty reported.
 
 ## Evidence / decision log
+- 2026-11-06: Implemented explicit VAT treatment/accounting review, segregated conditional art valuation, NI/special-procedure suppression, strict bounded legacy JSON and invoice/cost/VAT underflow guards. Shipment digest is `uk-shipment-review/v2`; no migration required. Warnings-as-errors Release suite passed 486 offline cases/16 optional live skips, 33 Python cases and repository guards. Added authenticated HTTP regressions to the hosted container suite; final hosted outcomes are recorded in the PR. [Contract, current HMRC sources and remaining approval gates](../docs/UK_VAT_EXCEPTIONS.md). Task remains in progress for independent tax approval.
 - 2026-11-02: Task created. Existing implementation may be partial; completion has not been established.
 
 ## Risks and open questions

@@ -15,7 +15,9 @@ public sealed record UkVatClassificationInput(
     bool ImportProcedureVerified = false,
     bool VatTreatmentVerified = false,
     bool ReliefsAndExemptionsVerified = false,
-    bool SourceContractVerified = false);
+    bool SourceContractVerified = false,
+    UkVatTreatmentClaim? VatTreatment = null,
+    string? ShipFrom = null);
 
 public sealed record UkVatClassificationDecision(
     string Status,
@@ -34,6 +36,13 @@ public static class UkVatClassificationGate
         // Northern Ireland goods movements have distinct treatment; do not infer GB treatment.
         if (input.DestinationTerritory == "XI") checks.Add("northern_ireland_specific_rules_not_implemented");
         if (string.IsNullOrWhiteSpace(input.ImportProcedure)) checks.Add("missing_import_procedure");
+        else if (input.ImportProcedure != "free_circulation") checks.Add("special_vat_import_procedure_requires_review");
+        checks.AddRange(UkVatTreatments.Validate(input.VatTreatment));
+        if (input.VatTreatment is { Treatment: not "ordinary" }) checks.Add("vat_treatment_exception_requires_review");
+        if (input.VatTreatment?.AccountingMethod == "seller_collected") checks.Add("vat_seller_collection_requires_review");
+        if (input.ShipFrom is not null && (input.ShipFrom.Length != 2 || !input.ShipFrom.All(c=>c is >= 'A' and <= 'Z')))
+            checks.Add("invalid_vat_dispatch_country");
+        if (input.ShipFrom is "GB" or "XI") checks.Add("intra_uk_vat_movement_requires_review");
         if (!input.ImportProcedureVerified) checks.Add("import_procedure_not_verified");
         if (string.IsNullOrWhiteSpace(input.CommodityCode) ||
             input.CommodityCode.Length is < 8 or > 10 ||

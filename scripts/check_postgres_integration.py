@@ -384,17 +384,73 @@ class Integration:
                 'destinationTerritory': territory, 'importDate': '2026-11-05', 'shipFrom': 'US',
                 'importProcedure': 'free_circulation', 'currency': 'GBP', 'costs': [],
                 'transactionKind': 'commercial', 'intrinsicValueGbp': 1000,
-                'lines': [{'lineId': 'a', 'commodityCode': '0101299000', 'goodsOrigin': 'CN', 'customsValue': 1000}]})
+                'lines': [{'lineId': 'a', 'commodityCode': '0101299000', 'goodsOrigin': 'CN', 'customsValue': 1000,
+                           'vatTreatment': {'treatment': 'returned_goods_relief', 'evidenceReference': 'synthetic-return'}}]})
             self.check('UK review retains uncertainty without configured territory sources',
                        review['status'] == 'requires_review' and review['destinationTerritory'] == territory and
                        review['approvedForPayment'] is False and review['verifiedForCalculation'] is False and
                        all(review[name] is None for name in ('payableDutyGbp', 'payableVatGbp', 'payableLandedTotalGbp', 'illustrativeTotals')))
+            decision = review['lines'][0]['vatTreatmentReview']
+            self.check('VAT claim is retained as unapproved review evidence',
+                       review['schemaVersion'] == 'uk-shipment-review/v2' and decision['claimedTreatment'] == 'returned_goods_relief' and
+                       decision['declaredEvidenceReference'] == 'synthetic-return' and decision['approvedForPayment'] is False and
+                       decision['suppressOrdinaryIllustration'] is True)
         for malformed in ('{"currency":"GBP","Currency":"USD"}', '{"intrinsicValueGbp":1e-100}',
                           '{"intrinsicValueGbp":"1e-100"}'):
             self.request('POST', path, key=self.keys['rotated'], payload=malformed, expected=400)
         self.request('POST', path, key=self.keys['rotated'], payload=' ' * 262145, expected=413)
         self.check('UK evidence audit is tenant-bound, contains a digest and omits shipment details',
                    self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='merchant-a' AND action='uk_shipment_review' AND details_json->>'approvedForPayment'='false' AND length(details_json->>'evidenceSha256')=64 AND NOT details_json ? 'lines';") == '2')
+
+    def vat_review_exceptions(self):
+        self.phase('Checking VAT relief, conditional valuation, accounting and strict financial JSON')
+        path = '/v1/references/uk/vat/review'
+        classification = dict(destinationTerritory='GB', importProcedure='free_circulation', commodityCode='9701100000',
+                              goodsOrigin='US', shipFrom='US', importDate='2026-11-05', proposedVatRatePercent=20,
+                              rateSourceUrl='https://www.gov.uk/guidance/how-to-value-goods-for-import-vat', rateEffectiveFrom='2026-11-02',
+                              commodityClassificationVerified=True, importProcedureVerified=True, vatTreatmentVerified=True,
+                              reliefsAndExemptionsVerified=True, sourceContractVerified=True,
+                              vatTreatment=dict(treatment='reduced_valuation_art', accountingMethod='pay_at_import', evidenceReference='synthetic-art'))
+        amounts = dict(customsValueGbp=1000, importDutyGbp=100, freightToFirstDestinationGbp=30, insuranceGbp=10,
+                       otherTaxableCostsGbp=0, vatRatePercent=20, customsValueVerified=True, dutyVerified=True,
+                       costsVerified=True, vatRateVerified=True, reliefsAndExemptionsVerified=True)
+        payload = dict(classification=classification, amounts=amounts, amountCurrency='GBP')
+        self.request('POST', path, payload=b'{', expected=401)
+        result = self.request('POST', path, key=self.keys['rotated'], payload=payload)
+        decision = result['vatTreatmentReview']
+        self.check('Art valuation is conditional and never replaces ordinary or payable VAT',
+                   result['status'] == 'requires_review' and result['amounts']['illustrativeVatGbp'] is None and
+                   result['payableVatGbp'] is None and result['verifiedForCalculation'] is False and
+                   decision['approvedForPayment'] is False and decision['conditionalScenario']['conditionalBaseGbp'] == 285 and
+                   decision['conditionalScenario']['conditionalVatGbp'] == 57)
+        for treatment in ('returned_goods_relief', 'temporary_admission', 'vat_exemption', 'other_relief', 'unknown'):
+            probe = copy.deepcopy(payload)
+            probe['classification'].update(proposedVatRatePercent=0, vatTreatment=dict(treatment=treatment))
+            probe['amounts']['vatRatePercent'] = 0
+            result = self.request('POST', path, key=self.keys['rotated'], payload=probe)
+            self.check('A relief claim does not turn self-asserted evidence into zero VAT',
+                       result['amounts']['illustrativeVatGbp'] is None and result['payableVatGbp'] is None and
+                       result['vatTreatmentReview']['conditionalScenario'] is None)
+        probe = copy.deepcopy(payload)
+        probe['classification']['vatTreatment'] = dict(treatment='ordinary', accountingMethod='postponed_accounting')
+        result = self.request('POST', path, key=self.keys['rotated'], payload=probe)
+        self.check('Postponed accounting retains VAT liability without enabling payment',
+                   result['amounts']['illustrativeVatGbp'] == 228 and result['payableVatGbp'] is None)
+        for territory, dispatch in (('XI', 'GB'), ('XI', 'US'), ('GB', 'XI')):
+            probe = copy.deepcopy(payload)
+            probe['classification'].update(destinationTerritory=territory, shipFrom=dispatch)
+            result = self.request('POST', path, key=self.keys['rotated'], payload=probe)
+            self.check('NI movement context prevents ordinary and conditional VAT amounts',
+                       result['amounts']['illustrativeVatGbp'] is None and result['vatTreatmentReview']['conditionalScenario'] is None and
+                       result['vatTreatmentReview']['suppressOrdinaryIllustration'] is True)
+        probe = copy.deepcopy(payload)
+        probe['classification']['vatTreatment'] = dict(treatment='approved')
+        self.request('POST', path, key=self.keys['rotated'], payload=probe, expected=400)
+        for malformed in (b'{', b'{"amountCurrency":"GBP","AmountCurrency":"USD"}',
+                          b'{"amounts":{"customsValueGbp":1e-100}}', b'{"amounts":{"customsValueGbp":"1e-100"}}'):
+            self.request('POST', path, key=self.keys['rotated'], payload=malformed, expected=400)
+        self.request('POST', path, key=self.keys['rotated'], payload=b' ' * 65537, expected=413)
+        self.request('POST', path, key=self.keys['rotated'], payload=b' ' * 65537, chunked=True, expected=413)
 
     def tariff_reviews(self, batch):
         self.phase('Checking reference reviews, expiry, revision preconditions and immutable history')
@@ -601,6 +657,7 @@ class Integration:
             self.prepare()
             self.fresh_api()
             self.staging_and_audit()
+            self.vat_review_exceptions()
             self.persistence_and_restore()
             self.upgrade()
             self.report['status'] = 'passed'

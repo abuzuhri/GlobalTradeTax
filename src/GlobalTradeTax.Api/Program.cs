@@ -321,10 +321,17 @@ app.MapPost("/v1/references/uk/shipments/review", async (HttpRequest http, UkShi
     return result.Status == "invalid_input" ? Results.BadRequest(result) : Results.Ok(result);
 });
 app.MapPost("/v1/references/uk/vat/review", async (HttpRequest http,
-    UkVatQuoteReviewRequest request, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
+    IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
-    if (request.Classification is null || request.Amounts is null)
+    if (http.ContentLength is > 65_536) return Results.StatusCode(413);
+    using var body = new StreamContent(http.Body);
+    var bytes = await UkTariffHttp.ReadReferenceBytesAsync(body,65_536,ct);
+    if (bytes is null) return Results.StatusCode(413);
+    UkVatQuoteReviewRequest? request;
+    try { request = ExactJsonInput.Deserialize<UkVatQuoteReviewRequest>(bytes); }
+    catch (JsonException) { return Results.BadRequest(new { error = "invalid_or_inexact_vat_review_json" }); }
+    if (request?.Classification is null || request.Amounts is null)
         return Results.BadRequest(new { error = "classification_and_amounts_required" });
     var result = UkVatQuoteReview.Evaluate(request);
     return result.Status == "invalid_input" ? Results.BadRequest(result) : Results.Ok(result);

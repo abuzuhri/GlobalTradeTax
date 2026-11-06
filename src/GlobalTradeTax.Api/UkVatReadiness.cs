@@ -39,7 +39,8 @@ public static class UkVatReadiness
             var taxableBase = checked(input.CustomsValueGbp!.Value + input.ImportDutyGbp!.Value
                 + input.FreightToFirstDestinationGbp!.Value + input.InsuranceGbp!.Value
                 + input.OtherTaxableCostsGbp!.Value);
-            var vat = checked(taxableBase * input.VatRatePercent!.Value / 100m);
+            var vat = UkDutyComponents.MultiplyDivide(taxableBase,input.VatRatePercent!.Value,100m);
+            if (vat is null) return new("requires_review",taxableBase,null,null,["vat_arithmetic_precision_lost"]);
             // Even with user-supplied verification flags, independent authoritative evidence,
             // legal rounding, and import procedure must be checked before payable output.
             return new("illustrative_only", taxableBase, vat, null,

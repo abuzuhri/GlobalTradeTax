@@ -1,5 +1,7 @@
 # v3.0 — UK VAT review orchestration (TASK-008)
 
+**Current update (2026-11-06):** optional `classification.vatTreatment` and `classification.shipFrom` now route relief/accounting/NI review. Authentication precedes bounded exact JSON parsing (64 KiB). Caller verification flags cannot clear special procedures or claimed exceptions. [Current contract and executed tests](UK_VAT_EXCEPTIONS.md) supersede the historical validation status below.
+
 ## Implemented
 - `UkVatQuoteReview` joins the independent classification and amount readiness checks.
 - New tenant-authenticated `POST /v1/references/uk/vat/review` endpoint.
