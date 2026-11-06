@@ -10,7 +10,7 @@ public sealed class UkDutyComponentsTests
     public void Recorded_GB_rates_produce_reference_arithmetic_without_legal_approval(string fixture, string code, decimal expected)
     {
         var rules = UkMeasureRules.Read(Fixture(fixture), code);
-        // The graph also contains a future zero-rate measure. Select this recorded ID explicitly.
+        // The graph also contains an origin-restricted zero rate. Select this recorded ID explicitly.
         var mfn = Assert.Single(rules.Measures, x => x.MeasureId == (code == "0101299000" ? "20000002" : "20000070"));
         Assert.True(mfn.Complete, string.Join(",", mfn.Checks));
         var result = UkDutyComponents.Evaluate(mfn.Components, new(1000m, 100m, 1m), Date, []);
@@ -95,5 +95,35 @@ public sealed class UkDutyComponentsTests
         Assert.Null(Evaluate(rate with { ValidTo = Date.AddDays(-1) }).IllustrativeGbp);
         Assert.Null(Evaluate(rate with { SourceUrl = "http://example.test/reference" }).IllustrativeGbp);
         Assert.Null(Evaluate(rate, rate).IllustrativeGbp);
+    }
+
+    [Fact]
+    public void Unit_conversion_preserves_a_nonzero_representable_amount()
+    {
+        const decimal smallest = 0.0000000000000000000000000001m;
+        var component = new UkRuleComponent("c","01",1000m,"GBP","TNE",null,true);
+        var result = UkDutyComponents.Evaluate([component],new(null,smallest,null),Date,[]);
+        Assert.Equal(smallest,result.IllustrativeGbp);
+    }
+
+    [Fact]
+    public void Percentage_precision_loss_is_unknown_instead_of_a_zero_rate()
+    {
+        const decimal smallest = 0.0000000000000000000000000001m;
+        var result = UkDutyComponents.Evaluate([Percent(1)],new(smallest,null,null),Date,[]);
+        Assert.Null(result.IllustrativeGbp);
+        Assert.Contains(result.Components,x=>x.Checks.Contains("duty_arithmetic_precision_lost"));
+        Assert.Equal(0m,UkDutyComponents.Evaluate([Percent(0)],new(smallest,null,null),Date,[]).IllustrativeGbp);
+    }
+
+    [Fact]
+    public void FX_precision_loss_is_unknown_instead_of_a_zero_converted_amount()
+    {
+        const decimal smallest = 0.0000000000000000000000000001m;
+        var component = new UkRuleComponent("c","01",1m,"EUR","KGM",null,true);
+        var fx = new UkFxRate("EUR","tariff_duty",.1m,Date,Date,"https://example.test/reference",null);
+        var result = UkDutyComponents.Evaluate([component],new(null,smallest,null),Date,[fx]);
+        Assert.Null(result.IllustrativeGbp);
+        Assert.Contains(result.Components,x=>x.Checks.Contains("duty_arithmetic_precision_lost"));
     }
 }

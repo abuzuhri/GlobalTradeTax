@@ -82,6 +82,8 @@ Shipment duty/VAT totals are suppressed for XI, GB↔XI movements, unknown/speci
 
 No lowest-rate selection is performed. A selected duty with conditions, quota/additional-code links or a nonstandard preference code remains unresolved. Other applicable measures, controls, excise, trade remedies and special VAT treatments still require review even when a simple component scenario is mathematically available. Explicit zero rates can be illustrated only when present in selected source data; missing data never becomes a zero rate.
 
+**2026-11-06 duty comparison update:** [five observed live duty rows and four pinned official-test examples](UK_DUTY_REFERENCE_CASES.md) now match, with precision regressions corrected. These observations remain awaiting independent approval and do not change the payment or NI gates below.
+
 ## Current completion gates
 
 | Task | Implemented and verifiable | Remaining before claiming full task completion |

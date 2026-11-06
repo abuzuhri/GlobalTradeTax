@@ -1,0 +1,35 @@
+Back
+Calculate import costs
+Import cost estimate
+
+Based on the value of the goods, shipping and insurance, this is the estimated amount of duty and VAT on this import.
+
+Estimated duty and VAT using standard duty
+
+This is the default rate if you cannot claim a reduced duty rate.
+
+Third-country duty
+£381.58
+Hide calculations
+Third-country duty
+
+This rate applies to imports into the UK from countries with no trade agreement or preference scheme.
+
+This rate also applies if you cannot provide valid proof of origin, or the quota has been exhausted.
+
+Data	Calculation	Value
+Valuation for import	Valuation of goods + freight + insurance costs	£1,000.00
+Import duty
+Third-country duty (EU)	12.80 % + 303.40 EUR / 100 kg	£381.58
+VAT
+Zero rate	0.00% * £1,381.58	£0.00
+Duty Total		£381.58
+Details used for this estimate
+Import to	Northern Ireland
+Origin	United States
+Commodity code	0201 30 00 90
+Classification	Other
+Import date	5 November 2026
+Valuation of import	£1,000.00
+
+Please note - the current page uses an exchange rate of 0.8358 GBP to EUR.

@@ -1,0 +1,39 @@
+Back
+Calculate import costs
+Check your answers
+Tell us about this import	
+
+Which part of the UK are you importing into?
+England, Scotland or Wales (GB)
+
+What is the country of origin?
+United States (US)
+
+Date of import
+5 November 2026
+
+	Change
+ import details
+
+What did you pay for the goods and delivery?	
+
+Value of the goods being imported
+£1,000.00
+
+Shipping cost
+£0.00
+
+Insurance cost
+£0.00
+
+	Change
+ value of the import
+
+Import quantity	
+kilograms
+100
+	Change
+ Import quantity
+
+Which VAT rate applies to your import?	Zero-rate VAT (0%)	
+Continue

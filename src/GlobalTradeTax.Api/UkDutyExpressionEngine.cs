@@ -29,7 +29,7 @@ public static class UkDutyExpressionEngine
             if (match.Success)
             {
                 if (customsValueGbp is null) return Unknown("missing_verified_customs_value_gbp");
-                return Result(checked(Rate(match.Groups[1].Value) * customsValueGbp.Value / 100m));
+                return Proportion(match.Groups[1].Value,customsValueGbp.Value,100m);
             }
             match = Specific.Match(expression);
             if (match.Success)
@@ -40,8 +40,9 @@ public static class UkDutyExpressionEngine
                 if (customsValueGbp is null) return Unknown("missing_verified_customs_value_gbp");
                 var unit = UnitAmount(match.Groups[2].Value, match.Groups[3].Value);
                 if (unit.IllustrativeAmount is null) return unit;
-                var percent = Rate(match.Groups[1].Value);
-                return Result(checked(percent * customsValueGbp.Value / 100m + unit.IllustrativeAmount.Value));
+                var percent = Proportion(match.Groups[1].Value,customsValueGbp.Value,100m);
+                if (percent.IllustrativeAmount is null) return percent;
+                return Result(checked(percent.IllustrativeAmount.Value + unit.IllustrativeAmount.Value));
             }
             return Unknown("unsupported_duty_expression");
         }
@@ -56,13 +57,18 @@ public static class UkDutyExpressionEngine
             decimal? quantity = unit switch
             {
                 "kg" => netMassKg,
-                "100kg" => netMassKg / 100m,
-                "tonne" => netMassKg / 1000m,
+                "100kg" or "tonne" => netMassKg,
                 "item" => itemCount is { } count && count == decimal.Truncate(count) ? count : null,
                 _ => null
             };
             if (quantity is null) return Unknown("missing_quantity_for_" + unit.Replace(' ', '_'));
-            return Result(checked(Rate(rateText) * quantity.Value));
+            var divisor = unit switch { "100kg" => 100m, "tonne" => 1000m, _ => 1m };
+            return Proportion(rateText,quantity.Value,divisor);
+        }
+        UkDutyExpressionResult Proportion(string rateText, decimal quantity, decimal divisor)
+        {
+            var value = UkDutyComponents.MultiplyDivide(Rate(rateText),quantity,divisor);
+            return value is null ? Unknown("arithmetic_precision_lost") : Result(value.Value);
         }
         static decimal Rate(string text)
         {

@@ -4,6 +4,8 @@ Latest tariff-data work: [exact upload archives and operator review history](doc
 
 Latest UK work: [GB/XI shipment review and remaining completion gates](docs/UK_SHIPMENT_REVIEW.md) covers separate territory references, typed duty/condition evidence, two currency feeds, per-line VAT cost allocation and UK control checks. Review results never authorize payment. Current assessment evidence uses `uk-reference-evidence/v3`; the [dated applicability slice](docs/UK_APPLICABILITY_EVIDENCE.md) remains historical evidence.
 
+Latest duty validation: [five live calculator comparisons and four pinned source examples](docs/UK_DUTY_REFERENCE_CASES.md), with captured inputs/results and fixes for positive arithmetic underflow. Comparisons remain unapproved for payment.
+
 # GlobalTradeTax — Cross-border Customs & Tax SaaS (C#)
 
 Initial working source scaffold for **US -> Worldwide**, designed to expand to **China/Worldwide -> US**.

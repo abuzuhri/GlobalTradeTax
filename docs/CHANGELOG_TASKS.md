@@ -1,5 +1,10 @@
 # Task register change log
 
+## 2026-11-06 — TASK-007 official duty reference cases
+- Capture five synthetic live calculator journeys and pin four further arithmetic examples to maintained official tests. Archive inputs, duty rows, screenshots, exact API/source files, hashes and OGL/MIT attribution. Keep displayed duty separate from headline duty+VAT and source comparisons separate from deployed results.
+- Reproduce four positive-precision-loss failures before fixing unit scaling, percentages and currency multiplication in both evaluators. Explicit zero rates remain valid; unknown/unsupported evidence and payment gates remain unchanged.
+- Local warnings-as-errors Release suite passes 447 offline xUnit cases/16 optional API skips. [Evidence, replay and independent approval limits](UK_DUTY_REFERENCE_CASES.md); hosted results are recorded in the review PR. TASK-007 remains in progress.
+
 ## 2026-11-05 — TASK-004 exact-byte provenance and operator review
 - Preserve bounded strict UTF-8 upload bytes/digests, reject duplicate/overlapping intervals and rates requiring storage rounding, and require consistent source provenance. Archive documents transactionally with database digest/length/foreign-key checks.
 - Add operator-only reference review/history, explicit attestation/expiry, idempotent replay and predecessor-bound revisions; renewals/rejections retain earlier decisions. Migration 005 preserves older staging, with exact document/row verification for backfill before review. No calculation provider or publication gate is enabled.
