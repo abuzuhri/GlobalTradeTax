@@ -1,4 +1,5 @@
 # Evidence hashes cover the captured bytes on Windows and Linux.
-/tests/GlobalTradeTax.Api.Tests/Fixtures/UkDutyReference/observations/* -text
+# Rendered captures include tabs for empty cells; retain their exact whitespace.
+/tests/GlobalTradeTax.Api.Tests/Fixtures/UkDutyReference/observations/* -text -whitespace
 /tests/GlobalTradeTax.Api.Tests/Fixtures/UkDutyReference/api/* -text
 /tests/GlobalTradeTax.Api.Tests/Fixtures/UkDutyReference/upstream/* -text
