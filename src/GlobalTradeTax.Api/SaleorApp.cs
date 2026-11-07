@@ -11,7 +11,7 @@ public sealed record SaleorAppRegistration(string Id, string TenantId, string Ap
 
 public sealed record SaleorAppVerificationKey(string KeyId, string PublicKeyPem);
 
-public sealed class SaleorApp(IConfiguration configuration, IHostEnvironment environment, SaleorAppStore store, IHttpClientFactory clients)
+public sealed class SaleorApp(IConfiguration configuration, IHostEnvironment environment, SaleorAppStore store, IHttpClientFactory clients, TenantRateLimit rateLimit)
 {
     public const string Identifier = "globaltradetax.checkout-review";
 
@@ -119,6 +119,7 @@ public sealed class SaleorApp(IConfiguration configuration, IHostEnvironment env
         return Results.Ok(new { accepted = true, duplicate = false, reference = review.Reference });
     }
 
+    /// <summary>Authenticate staff and apply the registered tenant budget before reading protected review state.</summary>
     public async Task<IResult> ReviewsAsync(HttpRequest request, SaleorAppRegistration registration, CancellationToken cancellationToken)
     {
         if (!AuthenticationHeaderValue.TryParse(request.Headers.Authorization, out var authorization) || authorization.Scheme != "Bearer" ||
@@ -126,6 +127,12 @@ public sealed class SaleorApp(IConfiguration configuration, IHostEnvironment env
         using var identity = await QueryAsync(registration, authorization.Parameter, "{ me { isStaff } checkouts(first: 1) { totalCount } }", cancellationToken);
         if (identity is null || !identity.RootElement.TryGetProperty("data", out var data) ||
             !data.TryGetProperty("me", out var user) || user.ValueKind != JsonValueKind.Object || !user.GetProperty("isStaff").GetBoolean()) return Results.Unauthorized();
+        var retry = rateLimit.Acquire(registration.TenantId);
+        if (retry > 0)
+        {
+            request.HttpContext.Response.Headers.RetryAfter = retry.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return Results.Json(new { error = "tenant_rate_limit_exceeded" }, statusCode: 429);
+        }
         var state = await store.ReadAsync(registration.TenantId, registration.ApiUrl, cancellationToken);
         request.HttpContext.Response.Headers.CacheControl = "no-store";
         if (state is not null && (!state.Active || state.Revoked)) return Results.StatusCode(403);

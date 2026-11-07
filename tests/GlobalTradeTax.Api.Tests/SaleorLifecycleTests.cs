@@ -74,9 +74,11 @@ public sealed class SaleorLifecycleTests : IDisposable
         public string AppId { get; set; } = "app-1";
         public string Permission { get; set; } = "MANAGE_CHECKOUTS";
         public bool Unavailable { get; set; }
+        public int Calls { get; private set; }
         public HttpClient CreateClient(string name) => new(this, disposeHandler: false);
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            Calls++;
             Assert.Equal(ApiUrl, request.RequestUri!.AbsoluteUri);
             if (Unavailable) throw new HttpRequestException("Unavailable");
             var identity = request.Headers.Authorization!.Parameter == "staff-token"
@@ -158,13 +160,38 @@ public sealed class SaleorLifecycleTests : IDisposable
     }
 
     [Fact]
+    public async Task Staff_review_shares_tenant_budget_and_rejects_before_installation_query()
+    {
+        var configuration = Configuration();
+        var store = new SaleorAppStore(configuration);
+        await store.RegisterAsync("tenant-a", ApiUrl, "app-1", "secret-token-a", default);
+        using var identity = new IdentityServer();
+        var settings = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["TenantRateLimit:PermitLimit"] = "1"
+        }).Build();
+        var limiter = new TenantRateLimit(settings, TimeProvider.System);
+        var service = new SaleorApp(configuration, new TestEnvironment(), store, identity, limiter);
+        var unauthorized = Request();
+        unauthorized.Headers.Authorization = "";
+        Assert.Equal(401, ((IStatusCodeHttpResult)await service.ReviewsAsync(unauthorized, Registration(), default)).StatusCode);
+        Assert.Equal(0, limiter.Acquire("tenant-a"));
+        var request = Request();
+        var rejected = await service.ReviewsAsync(request, Registration(), default);
+        Assert.Equal(429, ((IStatusCodeHttpResult)rejected).StatusCode);
+        Assert.True(int.Parse(request.HttpContext.Response.Headers.RetryAfter.ToString()) > 0);
+        Assert.Equal(1, identity.Calls);
+        Assert.Equal(0, limiter.Acquire("another-tenant"));
+    }
+
+    [Fact]
     public async Task SignedDeactivationBlocksReadsAndUnverifiedReactivationFailsClosed()
     {
         var configuration = Configuration();
         var store = new SaleorAppStore(configuration);
         await store.RegisterAsync("tenant-a", ApiUrl, "app-1", "secret-token-a", default);
         using var identity = new IdentityServer();
-        var service = new SaleorApp(configuration, new TestEnvironment(), store, identity);
+        var service = new SaleorApp(configuration, new TestEnvironment(), store, identity, new TenantRateLimit(configuration, TimeProvider.System));
         Assert.Equal(200, ((IStatusCodeHttpResult)await service.ReceiveAsync(Request(Lifecycle()), Registration(), default)).StatusCode);
         Assert.Equal(403, ((IStatusCodeHttpResult)await service.ReviewsAsync(Request(), Registration(), default)).StatusCode);
         identity.Active = false;
@@ -184,7 +211,7 @@ public sealed class SaleorLifecycleTests : IDisposable
         var store = new SaleorAppStore(configuration);
         await store.RegisterAsync("tenant-a", ApiUrl, "app-1", "secret-token-a", default);
         using var identity = new IdentityServer { Permission = "MANAGE_ORDERS" };
-        var service = new SaleorApp(configuration, new TestEnvironment(), store, identity);
+        var service = new SaleorApp(configuration, new TestEnvironment(), store, identity, new TenantRateLimit(configuration, TimeProvider.System));
         Assert.Equal(503, ((IStatusCodeHttpResult)await service.ReviewsAsync(Request(), Registration(), default)).StatusCode);
         identity.Unavailable = true;
         await Assert.ThrowsAsync<HttpRequestException>(() => service.ReviewsAsync(Request(), Registration(), default));
@@ -198,7 +225,7 @@ public sealed class SaleorLifecycleTests : IDisposable
         var store = new SaleorAppStore(configuration);
         await store.RegisterAsync("tenant-a", ApiUrl, "app-1", "secret-token-a", default);
         using var identity = new IdentityServer();
-        var service = new SaleorApp(configuration, new TestEnvironment(), store, identity);
+        var service = new SaleorApp(configuration, new TestEnvironment(), store, identity, new TenantRateLimit(configuration, TimeProvider.System));
         var body = Checkout();
         Assert.Equal(200, ((IStatusCodeHttpResult)await service.ReceiveAsync(Request(body, "checkout_created"), Registration(), default)).StatusCode);
         Assert.Equal(200, ((IStatusCodeHttpResult)await service.ReceiveAsync(Request(body, "checkout_created"), Registration(), default)).StatusCode);
@@ -221,7 +248,7 @@ public sealed class SaleorLifecycleTests : IDisposable
         await store.RegisterAsync("tenant-a", ApiUrl, "app-1", "secret-token-old", default);
         await store.ApplyLifecycleAsync("tenant-a", ApiUrl, new("app-1", false, true, DateTimeOffset.UtcNow), default);
         using var identity = new IdentityServer { Active = false };
-        var service = new SaleorApp(configuration, new TestEnvironment(), store, identity);
+        var service = new SaleorApp(configuration, new TestEnvironment(), store, identity, new TenantRateLimit(configuration, TimeProvider.System));
         var body = JsonSerializer.SerializeToUtf8Bytes(new { auth_token = "candidate-token-new" });
         Assert.Equal(401, ((IStatusCodeHttpResult)await service.RegisterAsync(Request(body), Registration(), default)).StatusCode);
         identity.Active = true;

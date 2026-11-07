@@ -18,6 +18,9 @@ services:
       - "8080:8080"
     environment:
       TRADE_POSTGRES_CONNECTION: Host=postgres;Port=5432;Database=trade;Username=trade;Password=${POSTGRES_PASSWORD}
+      TenantRateLimit__PermitLimit: ${TenantRateLimit__PermitLimit:-120}
+      TenantRateLimit__WindowSeconds: ${TenantRateLimit__WindowSeconds:-60}
+      TenantRateLimit__MaxTenants: ${TenantRateLimit__MaxTenants:-10000}
     depends_on:
       postgres:
         condition: service_healthy
