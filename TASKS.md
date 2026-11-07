@@ -2,7 +2,7 @@
 
 **Single source of truth for planned work.** Detailed task files live in `tasks/`. This tracker describes implementation status, not regulatory approval or production readiness.
 
-**TASK-002 rate-limit slice (2026-11-07):** authenticated merchant routes use bounded process-local tenant budgets, with 429 and Retry-After on exhaustion. See [configuration and limitations](docs/TENANT_RATE_LIMITS.md); distributed enforcement, production authorization and threat-model approval remain open.
+**TASK-002 rate-limit slice (2026-11-07):** authenticated merchant routes use bounded process-local tenant budgets, with 429 and Retry-After on exhaustion. Implementation commit `a960d8c` passed [six hosted jobs](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42377007491), including 309 database assertions; [PR #10](https://github.com/abuzuhri/GlobalTradeTax/pull/10) tracks later-head checks. See [configuration and limitations](docs/TENANT_RATE_LIMITS.md); distributed enforcement, production authorization and threat-model approval remain open.
 
 **Latest TASK-004 slice (2026-11-05):** strict byte-preserving uploads, duplicate/overlap checks, archived provenance and append-only operator review/expiry are implemented. Local suites: 344 offline xUnit and 33 Python cases passed; [full container/upgrade/restore evidence and limits](docs/TARIFF_PROVENANCE_REVIEW.md) track final verification. TASK-004 remains in progress for authoritative source agreements, independent rights review and controlled publication; no reviewed/staged record is a payable rate.
 
