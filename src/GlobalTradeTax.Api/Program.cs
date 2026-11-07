@@ -50,14 +50,8 @@ app.Use(async (context, next) =>
         var tenant = await AuthenticateAsync(context.Request, context.RequestServices, app.Configuration, context.RequestAborted);
         if (tenant is null) { context.Response.StatusCode = 401; return; }
         context.Items["AuthenticatedTenant"] = tenant;
-        var retry = context.RequestServices.GetRequiredService<TenantRateLimit>().Acquire(tenant);
-        if (retry > 0)
-        {
-            context.Response.StatusCode = 429;
-            context.Response.Headers.RetryAfter = retry.ToString(System.Globalization.CultureInfo.InvariantCulture);
-            await context.Response.WriteAsJsonAsync(new { error = "tenant_rate_limit_exceeded" }, context.RequestAborted);
-            return;
-        }
+        await context.RequestServices.GetRequiredService<TenantRateLimit>().InvokeAsync(context, next, tenant);
+        return;
     }
     await next(context);
 });

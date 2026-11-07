@@ -1,5 +1,7 @@
 using GlobalTradeTax.Api;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 public sealed class TenantRateLimitTests
@@ -52,6 +54,20 @@ public sealed class TenantRateLimitTests
         var results = Enumerable.Range(0, 100).AsParallel().Select(_ => limiter.Acquire("a")).ToArray();
         Assert.Equal(25, results.Count(result => result == 0));
         Assert.Equal(75, results.Count(result => result > 0));
+    }
+
+    [Fact]
+    public async Task Exhausted_requests_do_not_execute_endpoint_work()
+    {
+        var limiter = Create(new Clock(), limit: "1");
+        Assert.Equal(0, limiter.Acquire("a"));
+        var calls = 0;
+        var context = new DefaultHttpContext { RequestServices = new ServiceCollection().AddLogging().AddOptions().BuildServiceProvider() };
+        context.Response.Body = new MemoryStream();
+        await limiter.InvokeAsync(context, _ => { calls++; return Task.CompletedTask; }, "a");
+        Assert.Equal(0, calls);
+        Assert.Equal(429, context.Response.StatusCode);
+        Assert.Equal("10", context.Response.Headers.RetryAfter.ToString());
     }
 
     [Theory]

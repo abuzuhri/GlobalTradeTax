@@ -31,6 +31,20 @@ public sealed class TenantRateLimit
         return parsed;
     }
 
+    /// <summary>Stops exhausted requests before executing the endpoint and supplies retry guidance.</summary>
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next, string tenant)
+    {
+        var retry = Acquire(tenant);
+        if (retry == 0)
+        {
+            await next(context);
+            return;
+        }
+        context.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.Response.Headers.RetryAfter = retry.ToString(CultureInfo.InvariantCulture);
+        await context.Response.WriteAsJsonAsync(new { error = "tenant_rate_limit_exceeded" }, context.RequestAborted);
+    }
+
     /// <summary>Atomically consumes a permit or returns the seconds until retry; capacity exhaustion also fails closed.</summary>
     public int Acquire(string tenant)
     {
