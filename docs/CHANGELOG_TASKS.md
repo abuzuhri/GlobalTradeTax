@@ -1,5 +1,11 @@
 # Task register change log
 
+## 2026-11-06 — TASK-008 VAT exceptions and accounting review
+- Implementation commit `d9663d1` passed all six regular hosted jobs, including 486 xUnit cases/16 optional live skips, 33 Python cases, 11 HTTP smoke assertions and 199 PostgreSQL/container assertions with cleanup=true. [Hosted run](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42294049414); [ready PR #8](https://github.com/abuzuhri/GlobalTradeTax/pull/8) records final-head status.
+- Add declared per-line treatment/accounting claims and sourced review decisions. Relief claims never establish zero VAT; conditional art valuation is segregated from ordinary totals, postponed accounting preserves liability illustrations, and NI/special procedures remain unresolved.
+- Guard invoice/cost/VAT precision loss; authenticate before bounded exact JSON parsing on the legacy VAT route. Version shipment evidence as `uk-shipment-review/v2`; no database migration.
+- Local warnings-as-errors Release tests pass 486 offline xUnit cases/16 optional API skips, 33 Python cases and repository guards. Extend authenticated container coverage; final hosted verification is recorded in the review PR. [Contract, current sources and compatibility](UK_VAT_EXCEPTIONS.md). Independent eligibility, valuation/rounding and payable approval remain open; TASK-008 stays in progress.
+
 ## 2026-11-06 — TASK-007 official duty reference cases
 - Capture five synthetic live calculator journeys and pin four further arithmetic examples to maintained official tests. Archive inputs, duty rows, screenshots, exact API/source files, hashes and OGL/MIT attribution. Keep displayed duty separate from headline duty+VAT and source comparisons separate from deployed results.
 - Reproduce four positive-precision-loss failures before fixing unit scaling, percentages and currency multiplication in both evaluators. Explicit zero rates remain valid; unknown/unsupported evidence and payment gates remain unchanged.

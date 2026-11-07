@@ -15,7 +15,10 @@ public sealed record UkVatQuoteReviewResult(
     string[] UnresolvedChecks,
     decimal? PayableVatGbp,
     decimal? PayableLandedTotalGbp,
-    bool VerifiedForCalculation = false);
+    bool VerifiedForCalculation = false)
+{
+    public UkVatTreatmentDecision? VatTreatmentReview { get; init; }
+}
 
 public static class UkVatQuoteReview
 {
@@ -37,11 +40,17 @@ public static class UkVatQuoteReview
         if (request.ShipmentId is { Length: > 128 }) checks.Add("shipment_id_too_long");
         // Do not display GBP illustrative figures when the currency, rate, or
         // territory is inconsistent. They would otherwise look like a valid GBP quote.
-        var canShowIllustration = request.AmountCurrency == "GBP"
+        var consistentBase = request.AmountCurrency == "GBP"
             && request.Classification.DestinationTerritory == "GB"
             && request.Classification.ProposedVatRatePercent == request.Amounts.VatRatePercent
-            && classification.UnresolvedChecks.All(x => x == "independent_authoritative_vat_determination_not_implemented")
+            && classification.UnresolvedChecks.All(x => x is "independent_authoritative_vat_determination_not_implemented" or
+                "vat_treatment_exception_requires_review" or "vat_seller_collection_requires_review")
             && amounts.Status == "illustrative_only";
+        var treatment = UkVatTreatments.Assess(request.Classification.VatTreatment,request.Classification.DestinationTerritory,
+            request.Classification.ImportProcedure,request.Classification.ProposedVatRatePercent,
+            consistentBase ? amounts.IllustrativeTaxableBaseGbp : null,request.Classification.ShipFrom,request.Classification.CommodityCode);
+        checks.AddRange(treatment.RequiredChecks);
+        var canShowIllustration = consistentBase && !treatment.SuppressOrdinaryIllustration;
         if (!canShowIllustration)
         {
             amounts = amounts with
@@ -53,9 +62,9 @@ public static class UkVatQuoteReview
         }
         // An unverified proposal must never be promoted to a legal rate by this join.
         checks.Add("authoritative_duty_and_vat_determination_required");
-        var status = amounts.Status == "invalid_input" || checks.Contains("shipment_id_too_long")
+        var status = amounts.Status == "invalid_input" || treatment.Status == "invalid_input" || checks.Contains("invalid_vat_dispatch_country") || checks.Contains("shipment_id_too_long")
             ? "invalid_input" : "requires_review";
         return new(status, request.ShipmentId, classification, amounts,
-            checks.Distinct(StringComparer.Ordinal).ToArray(), null, null);
+            checks.Distinct(StringComparer.Ordinal).ToArray(), null, null) { VatTreatmentReview = treatment };
     }
 }

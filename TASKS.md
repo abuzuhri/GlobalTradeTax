@@ -10,6 +10,8 @@
 
 **Latest TASK-007 evidence (2026-11-06):** five live official calculator duty rows and four published calculator test examples now match. Four reproduced precision failures are corrected without enabling payment. The local Release suite passes 447 cases with 16 optional API skips. [Case evidence and remaining approval gates](docs/UK_DUTY_REFERENCE_CASES.md). TASK-007 remains in progress.
 
+**Latest TASK-008 evidence (2026-11-06):** explicit VAT treatment/accounting claims, separate conditional art valuation, NI movement checks and strict legacy JSON are implemented. Local Release tests pass 486 offline cases/16 optional live skips and 33 Python cases. [Contract, compatibility and remaining tax approval](docs/UK_VAT_EXCEPTIONS.md). Shipment evidence is now `uk-shipment-review/v2`; TASK-008 remains in progress.
+
 ## Status vocabulary
 - `not-started`: not implemented.
 - `in-progress`: partial code exists; acceptance criteria unmet.

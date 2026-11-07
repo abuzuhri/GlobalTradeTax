@@ -58,7 +58,7 @@ Responses contain:
 - `lines`: source assessments, explicit reference duty scenarios, selected illustrative duty, proposed VAT rate, illustrative VAT base/VAT, allocated costs, declared document matches and unresolved checks.
 - `fxRates`: purpose-specific dated evidence, never caller-supplied rates on this HTTP endpoint.
 - `illustrativeTotals`: sums of completed line illustrations, or null if any line is incomplete. `valuePlusTaxesGbp` is declared customs value plus additional costs/duty/VAT; it is not a payable invoice or a verified landed total.
-- `evidenceSha256`: deterministic `uk-shipment-review/v1` digest binding request, context, source assessments, rates and results. Reordering lines/costs does not change it. This is an integrity aid, not a signature.
+- `evidenceSha256`: deterministic `uk-shipment-review/v2` digest binding request, context, source assessments, rates and results, including declared VAT treatment/accounting and review decisions. Reordering lines/costs does not change it. Store the schema version with the digest; earlier v1 hashes are not comparable. This is an integrity aid, not a signature.
 - Unconditional false verification/payment flags and null payable amounts.
 
 With PostgreSQL, the existing audit store records tenant, review status, digest, territory, date and false approval. It does not store the line inputs or retrieved reference bodies. Capture the original request, full review and raw referenced responses securely if independent replay or source-digest verification is required. No database migration is needed for this endpoint.
@@ -83,6 +83,8 @@ Shipment duty/VAT totals are suppressed for XI, GB↔XI movements, unknown/speci
 No lowest-rate selection is performed. A selected duty with conditions, quota/additional-code links or a nonstandard preference code remains unresolved. Other applicable measures, controls, excise, trade remedies and special VAT treatments still require review even when a simple component scenario is mathematically available. Explicit zero rates can be illustrated only when present in selected source data; missing data never becomes a zero rate.
 
 **2026-11-06 duty comparison update:** [five observed live duty rows and four pinned official-test examples](UK_DUTY_REFERENCE_CASES.md) now match, with precision regressions corrected. These observations remain awaiting independent approval and do not change the payment or NI gates below.
+
+**2026-11-06 VAT exception update:** lines accept optional `vatTreatment` declarations and return `vatTreatmentReview`. Relief claims suppress ordinary VAT; conditional art valuation remains separate from totals, and postponed accounting preserves liability illustrations. Known NI movements stay unresolved. [Claim tokens, exact JSON bounds, sources and v2 compatibility](UK_VAT_EXCEPTIONS.md) describe the current contract and 486-case local verification. The dated implementation evidence below remains historical.
 
 ## Current completion gates
 

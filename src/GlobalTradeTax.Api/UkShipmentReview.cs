@@ -5,7 +5,7 @@ namespace GlobalTradeTax.Api;
 
 public sealed record UkImportLineInput(string? LineId, string? CommodityCode, string? GoodsOrigin, decimal? CustomsValue,
     decimal? NetMassKg = null, decimal? ItemCount = null, string? DutyMeasureId = null, string? VatMeasureId = null,
-    string[]? DeclaredDocuments = null);
+    string[]? DeclaredDocuments = null, UkVatTreatmentClaim? VatTreatment = null);
 public sealed record UkImportCost(string? CostId, decimal? Amount, bool? IncludedInCustomsValue,
     string[]? LineIds = null, string? Category = "incidental");
 public sealed record UkShipmentReviewRequest(string? DestinationTerritory, DateOnly? ImportDate, string? ShipFrom,
@@ -20,6 +20,7 @@ public sealed record UkShipmentLineReview(string LineId, string CommodityCode, s
     decimal? IllustrativeVatBaseGbp, decimal? IllustrativeVatGbp, UkDocumentDeclaration[] DocumentDeclarations, string[] Checks)
 {
     public bool VerifiedForCalculation => false;
+    public UkVatTreatmentDecision? VatTreatmentReview { get; init; }
 }
 public sealed record UkIllustrativeTotals(decimal CustomsValueGbp, decimal ImportDutyGbp,
     decimal AdditionalVatCostsGbp, decimal VatBaseGbp, decimal ImportVatGbp, decimal ValuePlusTaxesGbp);
@@ -27,7 +28,7 @@ public sealed record UkShipmentReviewResult(string Status, string? ShipmentId, s
     DateOnly? ImportDate, UkShipmentLineReview[] Lines, UkFxRate[] FxRates, UkIllustrativeTotals? IllustrativeTotals,
     string[] Checks, string EvidenceSha256)
 {
-    public string SchemaVersion => "uk-shipment-review/v1";
+    public string SchemaVersion => "uk-shipment-review/v2";
     public bool VerifiedForCalculation => false;
     public bool ApprovedForPayment => false;
     public decimal? PayableDutyGbp => null;
@@ -99,6 +100,7 @@ public sealed class UkShipmentReview(UkImportAssessment assessment, UkTariffRefe
             if (lines.Select(x => x.LineId).Distinct(StringComparer.Ordinal).Count() != lines.Length) errors.Add("duplicate_line_id");
             foreach (var line in lines)
             {
+                errors.UnionWith(UkVatTreatments.Validate(line.VatTreatment));
                 if (!Tag(line.LineId, 64) || line.CommodityCode is not { Length: 10 } || !line.CommodityCode.All(char.IsAsciiDigit) || !Country(line.GoodsOrigin))
                     errors.Add("invalid_line_identity_classification_or_origin");
                 if (line.CustomsValue is null or < 0 or > 1_000_000_000_000m || line.NetMassKg is <= 0 or > 1_000_000_000m ||
@@ -140,7 +142,18 @@ public sealed class UkShipmentReview(UkImportAssessment assessment, UkTariffRefe
         var values = new Dictionary<string, decimal>(StringComparer.Ordinal);
         bool fxOk = UkDutyComponents.TryFactor(fx, request.Currency!, "invoice_customs_value", date, out var valueFactor);
         if (!fxOk) checks.Add("dated_invoice_currency_conversion_missing");
-        try { if (fxOk) foreach (var line in request.Lines!) values[line.LineId!] = checked(line.CustomsValue!.Value * valueFactor); }
+        try
+        {
+            if (fxOk) foreach (var line in request.Lines!)
+            {
+                var value = UkDutyComponents.MultiplyDivide(line.CustomsValue!.Value,valueFactor,1m);
+                if (value is null)
+                {
+                    fxOk = false; values.Clear(); checks.Add("invoice_currency_conversion_precision_lost"); break;
+                }
+                values[line.LineId!] = value.Value;
+            }
+        }
         catch (OverflowException) { fxOk = false; values.Clear(); checks.Add("invoice_currency_conversion_overflow"); }
         var allocations = request.Lines!.ToDictionary(x => x.LineId!, _ => 0m, StringComparer.Ordinal);
         var costsOk = fxOk;
@@ -154,7 +167,9 @@ public sealed class UkShipmentReview(UkImportAssessment assessment, UkTariffRefe
             try
             {
                 var weights = values.Where(x => cost.LineIds is null || cost.LineIds.Contains(x.Key, StringComparer.Ordinal)).ToDictionary(x => x.Key, x => x.Value, StringComparer.Ordinal);
-                var split = UkMoneyAllocation.Allocate(checked(cost.Amount!.Value * valueFactor), weights);
+                var convertedCost = UkDutyComponents.MultiplyDivide(cost.Amount!.Value,valueFactor,1m);
+                if (convertedCost is null) { costsOk = false; checks.Add("cost_conversion_precision_lost:"+cost.CostId); continue; }
+                var split = UkMoneyAllocation.Allocate(convertedCost.Value, weights);
                 if (split is null) { costsOk = false; checks.Add("cost_allocation_indeterminate:" + cost.CostId); continue; }
                 foreach (var item in split) allocations[item.Key] = checked(allocations[item.Key] + item.Value);
             }
@@ -201,13 +216,23 @@ public sealed class UkShipmentReview(UkImportAssessment assessment, UkTariffRefe
                 if (!vatTreatmentCanIllustrate) local.Add("vat_conditions_additional_code_or_footnote_treatment_requires_review");
             }
             else local.Add("selected_vat_measure_or_treatment_unverified");
-            decimal? vatBase = null, vatAmount = null;
+            decimal? fullBase = null, vatBase = null, vatAmount = null;
             try
             {
-                if (contextSupportsIllustration && fxOk && costsOk && duty is not null && vatRate is not null && vatTreatmentCanIllustrate)
+                if (contextSupportsIllustration && fxOk && costsOk && duty is not null)
+                    fullBase = checked(values[line.LineId!] + duty.Value + allocations[line.LineId!]);
+            }
+            catch (OverflowException) { local.Add("vat_arithmetic_overflow"); }
+            var treatment = UkVatTreatments.Assess(line.VatTreatment,request.DestinationTerritory,request.ImportProcedure,
+                vatRate,fullBase,request.ShipFrom,line.CommodityCode);
+            local.UnionWith(treatment.RequiredChecks);
+            try
+            {
+                if (fullBase is not null && vatRate is not null && vatTreatmentCanIllustrate && !treatment.SuppressOrdinaryIllustration)
                 {
-                    vatBase = checked(values[line.LineId!] + duty.Value + allocations[line.LineId!]);
-                    vatAmount = decimal.Round(checked(vatBase.Value * vatRate.Value / 100m), 2, MidpointRounding.AwayFromZero);
+                    var amount = UkDutyComponents.MultiplyDivide(fullBase.Value,vatRate.Value,100m);
+                    if (amount is null) local.Add("vat_arithmetic_precision_lost");
+                    else { vatBase = fullBase; vatAmount = decimal.Round(amount.Value,2,MidpointRounding.AwayFromZero); }
                 }
             }
             catch (OverflowException) { vatBase = vatAmount = null; local.Add("vat_arithmetic_overflow"); }
@@ -216,7 +241,8 @@ public sealed class UkShipmentReview(UkImportAssessment assessment, UkTariffRefe
             var documents = (line.DeclaredDocuments ?? []).Order(StringComparer.Ordinal).Select(code => new UkDocumentDeclaration(code,
                 references.Contains(code) ? "declared_reference_match_not_verified" : "declared_document_not_matched_not_verified")).ToArray();
             results.Add(new(line.LineId!, line.CommodityCode!, line.GoodsOrigin!, report, fxOk ? values[line.LineId!] : null,
-                costsOk ? allocations[line.LineId!] : null, scenarios, duty, vatRate, vatBase, vatAmount, documents, local.Order(StringComparer.Ordinal).ToArray()));
+                costsOk ? allocations[line.LineId!] : null, scenarios, duty, vatRate, vatBase, vatAmount, documents, local.Order(StringComparer.Ordinal).ToArray())
+                { VatTreatmentReview = treatment });
         }
         UkIllustrativeTotals? totals = null;
         if (contextSupportsIllustration && results.All(x => x.IllustrativeVatGbp is not null))
@@ -238,7 +264,7 @@ public sealed class UkShipmentReview(UkImportAssessment assessment, UkTariffRefe
     private static UkShipmentReviewResult Finish(string status, UkShipmentReviewRequest request, UkShipmentLineReview[] lines,
         UkFxRate[] rates, UkIllustrativeTotals? totals, string[] checks)
     {
-        var payload = new { Schema = "uk-shipment-review/v1", Request = request with
+        var payload = new { Schema = "uk-shipment-review/v2", Request = request with
             { Lines = request.Lines?.OrderBy(x => x?.LineId, StringComparer.Ordinal).Select(x => x is null ? null! : x with
                 { DeclaredDocuments = x.DeclaredDocuments?.Order(StringComparer.Ordinal).ToArray() }).ToArray(),
                 Costs = request.Costs?.OrderBy(x => x?.CostId, StringComparer.Ordinal).Select(x => x is null ? null! : x with

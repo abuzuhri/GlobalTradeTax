@@ -106,4 +106,62 @@ public class UkVatQuoteReviewTests
         Assert.Null(result.Amounts.IllustrativeVatGbp);
         Assert.Null(result.PayableVatGbp);
     }
+
+    [Theory]
+    [InlineData("customs_warehousing")]
+    [InlineData("temporary_admission")]
+    [InlineData("inward_processing")]
+    public void Self_asserted_verification_flags_do_not_clear_special_procedures(string procedure)
+    {
+        var r=Sample();var result=UkVatQuoteReview.Evaluate(r with { Classification=r.Classification with { ImportProcedure=procedure } });
+        Assert.Null(result.Amounts.IllustrativeVatGbp);
+        Assert.Contains("special_vat_import_procedure_requires_review",result.UnresolvedChecks);
+    }
+
+    [Fact]
+    public void Art_claim_is_conditional_and_never_replaces_the_ordinary_quote()
+    {
+        var r=Sample();var result=UkVatQuoteReview.Evaluate(r with { Classification=r.Classification with {
+            CommodityCode="9701100000",VatTreatment=new("reduced_valuation_art") } });
+        Assert.Null(result.Amounts.IllustrativeVatGbp);Assert.Null(result.PayableVatGbp);
+        Assert.Equal(57m,result.VatTreatmentReview!.ConditionalScenario!.ConditionalVatGbp);
+        Assert.False(result.VatTreatmentReview.ApprovedForPayment);
+    }
+
+    [Theory]
+    [InlineData("returned_goods_relief")]
+    [InlineData("temporary_admission")]
+    [InlineData("vat_exemption")]
+    public void Claimed_relief_does_not_bypass_flags_or_become_zero(string treatment)
+    {
+        var r=Sample();var result=UkVatQuoteReview.Evaluate(r with { Classification=r.Classification with { VatTreatment=new(treatment) } });
+        Assert.Null(result.Amounts.IllustrativeTaxableBaseGbp);Assert.Null(result.Amounts.IllustrativeVatGbp);
+        Assert.Null(result.PayableVatGbp);Assert.Null(result.VatTreatmentReview!.ConditionalScenario);
+    }
+
+    [Fact]
+    public void Postponed_accounting_retains_the_illustrative_liability()
+    {
+        var r=Sample();var result=UkVatQuoteReview.Evaluate(r with { Classification=r.Classification with { VatTreatment=new("ordinary","postponed_accounting") } });
+        Assert.Equal(228m,result.Amounts.IllustrativeVatGbp);Assert.Null(result.PayableVatGbp);
+        Assert.Contains("postponed_accounting_does_not_zero_vat_liability",result.UnresolvedChecks);
+    }
+
+    [Fact]
+    public void Missing_evidence_blocks_even_a_conditional_art_scenario()
+    {
+        var r=Sample();var result=UkVatQuoteReview.Evaluate(r with { Classification=r.Classification with {
+            CommodityCode="9701100000",VatTreatment=new("reduced_valuation_art"),SourceContractVerified=false } });
+        Assert.Null(result.VatTreatmentReview!.ConditionalScenario);Assert.Null(result.Amounts.IllustrativeVatGbp);
+    }
+
+    [Theory]
+    [InlineData("GB")]
+    [InlineData("XI")]
+    public void Known_intra_UK_dispatch_suppresses_legacy_VAT_despite_verification_flags(string shipFrom)
+    {
+        var r=Sample();var result=UkVatQuoteReview.Evaluate(r with { Classification=r.Classification with { ShipFrom=shipFrom } });
+        Assert.Null(result.Amounts.IllustrativeVatGbp);Assert.Null(result.PayableVatGbp);
+        Assert.Contains("intra_uk_vat_movement_requires_review",result.UnresolvedChecks);
+    }
 }
