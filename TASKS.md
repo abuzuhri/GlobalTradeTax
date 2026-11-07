@@ -12,7 +12,7 @@
 
 **Latest TASK-008 evidence (2026-11-06):** explicit VAT treatment/accounting claims, separate conditional art valuation, NI movement checks and strict legacy JSON are implemented. Local Release tests pass 486 offline cases/16 optional live skips and 33 Python cases. [Contract, compatibility and remaining tax approval](docs/UK_VAT_EXCEPTIONS.md). Shipment evidence is now `uk-shipment-review/v2`; TASK-008 remains in progress.
 
-**Latest TASK-009/002 evidence (2026-11-07):** declared licence/ITAR holds now prevent provider access and monetary completion across quote/compliance routes, with durable hold evidence and false shipment-release approval. Strict authenticated input parsing rejects duplicate control flags and invalid/overflowing requests. Local checks pass 514 offline xUnit cases/16 optional skips and 33 Python cases. [Behavior, compatibility, sources and remaining approval](docs/COMPLIANCE_HOLDS.md). Both tasks remain in progress.
+**Latest TASK-009/002 evidence (2026-11-07):** declared licence/ITAR holds now block quote completion and landed-cost provider calls and totals. Compliance checks report stable hold reasons and false shipment-release approval. Strict authenticated input parsing rejects duplicate control flags and invalid/overflowing requests. Local checks pass 514 offline xUnit cases/16 optional skips and 33 Python cases. [Behavior, compatibility, sources and remaining approval](docs/COMPLIANCE_HOLDS.md). Both tasks remain in progress.
 
 ## Status vocabulary
 - `not-started`: not implemented.
