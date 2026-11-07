@@ -1,5 +1,9 @@
 # Task register change log
 
+## 2026-11-07 — TASK-002 tenant request budgets
+- Added bounded process-local tenant request budgets for authenticated merchant routes, shared across keys and checked before body parsing and upstream work. See [configuration and limitations](TENANT_RATE_LIMITS.md). Distributed enforcement and independent approvals remain open.
+- Implementation commit `a960d8c81e0116686cdb689cae39865ed08f90dd` passed [hosted run 42377007491](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42377007491): six regular jobs, 524 xUnit passes/16 optional skips, 33 Python passes and 309 PostgreSQL/container assertions with cleanup. [PR #10](https://github.com/abuzuhri/GlobalTradeTax/pull/10) tracks later-head status.
+
 ## 2026-11-07 — TASK-009 declared control holds and TASK-002 input safeguards
 - Implementation commit `8dc1bf6` passed all six regular hosted jobs: 514 xUnit cases/16 optional skips, 33 Python cases, 11 HTTP smoke assertions and 297 PostgreSQL/container assertions with cleanup=true. [Hosted run](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42355867265); [ready PR #9](https://github.com/abuzuhri/GlobalTradeTax/pull/9) tracks per-commit verification.
 - Reproduce eight failures, then enforce declared export licence/ITAR holds before rate-provider access and financial completion. Persist compliance evidence with quote/idempotency snapshots and landed-cost audits; shipment-release approval is always false.

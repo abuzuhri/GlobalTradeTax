@@ -159,7 +159,7 @@ public sealed class SaleorAppTests : IDisposable
             ["SaleorApp:Stores:0:CallbackBaseUrl"] = "http://gtt.sandbox.test:8080", ["SaleorApp:Stores:0:DashboardOrigin"] = "http://localhost:19090",
             ["SaleorApp:Stores:0:KeyId"] = "pinned", ["SaleorApp:Stores:0:PublicKeyPem"] = "pinned-public-key"
         }).Build();
-        var service = new SaleorApp(config, new EnvironmentInfo(environment), new SaleorAppStore(config), new NoNetwork());
+        var service = new SaleorApp(config, new EnvironmentInfo(environment), new SaleorAppStore(config), new NoNetwork(), new TenantRateLimit(config, TimeProvider.System));
         var registration = service.Resolve("sandbox");
         Assert.Equal(expected, registration is not null);
         if (registration is not null)

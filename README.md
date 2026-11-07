@@ -40,6 +40,8 @@ See docs/ROADMAP.md and docs/SOURCES.md.
 ## v0.2 development additions
 API key required for quote operations, idempotency key on creation, tenant-scoped quote retrieval, and Dockerfile. Set `TRADE_API_KEY` and `TRADE_TENANT_ID` before running; see `docs/IMPLEMENTATION.md`. This is development-only authentication and ephemeral storage, not a production SaaS implementation.
 
+Authenticated merchant endpoints have a configurable process-local tenant request budget. See [limits, HTTP 429 behavior and deployment limitations](docs/TENANT_RATE_LIMITS.md).
+
 ## v0.3 — US export destination routing
 - `GET /v1/destinations/{country}` returns a compliance checklist for EU, GCC, selected Latin American destinations, or other countries (requires `X-API-Key`).
 - US outbound quotes now include destination-specific required actions without fabricating rates.
