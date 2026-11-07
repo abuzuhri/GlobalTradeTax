@@ -1,5 +1,7 @@
 # v0.6 — US to Worldwide landed-cost integration boundary
 
+**2026-11-07 update:** [declared control holds](COMPLIANCE_HOLDS.md) now block provider calls and financial completion. Every new estimate carries a separate compliance result with false shipment-release approval; the authenticated request uses bounded exact JSON.
+
 Added `POST /v1/landed-cost/estimate` (authenticated) and `IImportRateProvider`.
 
 ## Security and correctness

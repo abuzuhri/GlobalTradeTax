@@ -402,6 +402,68 @@ class Integration:
         self.check('UK evidence audit is tenant-bound, contains a digest and omits shipment details',
                    self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='merchant-a' AND action='uk_shipment_review' AND details_json->>'approvedForPayment'='false' AND length(details_json->>'evidenceSha256')=64 AND NOT details_json ? 'lines';") == '2')
 
+    def compliance_holds(self):
+        self.phase('Checking declared control holds, exact request parsing and durable quote evidence')
+        paths = ('/v1/quotes', '/v1/landed-cost/estimate', '/v1/compliance/check')
+        before_quotes = int(self.sql('SELECT count(*) FROM quotes;'))
+        before_audits = int(self.sql('SELECT count(*) FROM audit_events;'))
+        held = copy.deepcopy(self.payload)
+        held.update(shipTo='GB', currency='GBP', itarControlled=True)
+        duplicate = json.dumps(held)[:-1] + ',"ItarControlled":false}'
+        # Build the numeric probe directly, independently of the sample price spelling.
+        exponent_probe = copy.deepcopy(held)
+        exponent_probe['lines'][0]['unitPrice'] = 'INEXACT_NUMBER'
+        exponent = json.dumps(exponent_probe).replace('"INEXACT_NUMBER"', '1e-100')
+        invalid_payloads = [b'{', b'null', duplicate, exponent]
+        for changed in ({'lines': [None]}, {'lines': None}, {'lines': []},
+                        {'lines': held['lines'] * 101}, {'shipFrom': '12'}, {'currency': 'G1P'},
+                        {'itarControlled': 'false'}):
+            invalid_payloads.append({**held, **changed})
+        overflow = copy.deepcopy(held)
+        overflow['lines'][0].update(unitPrice=9999999999999999999999999999, quantity=100)
+        invalid_payloads.append(overflow)
+        for path in paths:
+            self.request('POST', path, payload=b'{', expected=401)
+            self.request('POST', path, payload=b' ' * 65537, expected=401)
+            for invalid in invalid_payloads:
+                self.request('POST', path, key=self.keys['rotated'], payload=invalid,
+                             idempotency='invalid-control-input', expected=400)
+            self.request('POST', path, key=self.keys['rotated'], payload=b' ' * 65537,
+                         idempotency='oversized-control-input', expected=413)
+            self.request('POST', path, key=self.keys['rotated'], payload=b' ' * 65537,
+                         idempotency='oversized-control-input', chunked=True, expected=413)
+        self.check('Rejected quote/control requests create neither quotes nor audit rows',
+                   int(self.sql('SELECT count(*) FROM quotes;')) == before_quotes and
+                   int(self.sql('SELECT count(*) FROM audit_events;')) == before_audits)
+        self.held_quotes = []
+        cases = [('US', 'GB', 'GBP', True, False), ('US', 'XI', 'USD', False, True), ('CN', 'GB', 'EUR', True, True)]
+        for index, (dispatch, destination, currency, licence, itar) in enumerate(cases):
+            payload = copy.deepcopy(self.payload)
+            payload.update(shipFrom=dispatch, shipTo=destination, currency=currency,
+                           requiresExportLicense=licence, itarControlled=itar)
+            compliance = self.request('POST', paths[2], key=self.keys['rotated'], payload=payload)
+            quote = self.request('POST', paths[0], key=self.keys['rotated'], payload=payload, idempotency='control-hold-' + str(index))
+            estimate = self.request('POST', paths[1], key=self.keys['rotated'], payload=payload)
+            self.check('Declared control holds agree across compliance, stored quote and landed-cost routes',
+                       compliance == quote['compliance'] == estimate['compliance'] and
+                       compliance['specialistHoldRequired'] is True and compliance['shipmentReleaseApproved'] is False and
+                       ('declared_export_licence' in compliance['holdReasons']) == licence and
+                       ('declared_itar_control' in compliance['holdReasons']) == itar and
+                       quote['status'] == estimate['status'] == 'manual_review_required' and
+                       all(quote[name] is None for name in ('importDuty', 'importTax', 'landedTotal')) and
+                       all(estimate[name] is None for name in ('importDuty', 'importTax', 'clearanceFee', 'total', 'evidence')))
+            replay = self.request('POST', paths[0], key=self.keys['rotated'], payload=payload, idempotency='control-hold-' + str(index))
+            self.check('Held quote replay retains the same evidence', replay == quote)
+            self.request('POST', paths[0], key=self.keys['rotated'], payload={**payload, 'requiresExportLicense': not licence},
+                         idempotency='control-hold-' + str(index), expected=409)
+            self.held_quotes.append((quote, payload, 'control-hold-' + str(index)))
+        self.expected_audit_count = before_audits + len(cases)
+        self.check('Held estimates are audited with false release approval and explicit reasons',
+                   int(self.sql('SELECT count(*) FROM audit_events;')) == self.expected_audit_count and
+                   self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='merchant-a' AND status='manual_review_required' "
+                            "AND details_json->>'specialistHoldRequired'='true' AND details_json->>'shipmentReleaseApproved'='false' "
+                            "AND jsonb_array_length(details_json->'holdReasons')>0;") == str(len(cases)))
+
     def vat_review_exceptions(self):
         self.phase('Checking VAT relief, conditional valuation, accounting and strict financial JSON')
         path = '/v1/references/uk/vat/review'
@@ -542,7 +604,12 @@ class Integration:
                    batch['review']['reviewId'] == self.review_id and not batch['approvedForCalculation'] and
                    self.sql('SELECT count(*) FROM tariff_reference_reviews;', database=database) == '4' and
                    self.sql("SELECT dataset_sha256=encode(sha256(document_bytes),'hex') FROM tariff_import_documents;", database=database) == 't')
-        self.check('Audit survives recreation/restore', self.sql('SELECT count(*) FROM audit_events;', database=database) == '3')
+        for quote, payload, idempotency in self.held_quotes:
+            saved = self.request('GET', '/v1/quotes/' + quote['quoteId'], key=self.keys['rotated'])
+            replay = self.request('POST', '/v1/quotes', key=self.keys['rotated'], payload=payload, idempotency=idempotency)
+            self.check('Declared hold and its idempotency survive recreation/restore', saved == replay == quote)
+        self.check('Audit survives recreation/restore',
+                   self.sql('SELECT count(*) FROM audit_events;', database=database) == str(self.expected_audit_count))
 
     def persistence_and_restore(self):
         self.phase('Checking container recreation and isolated backup restoration')
@@ -577,7 +644,7 @@ class Integration:
         self.incomplete_quote(new_quote)
         self.request('POST', '/v1/landed-cost/estimate', key=self.keys['rotated'], payload=self.payload)
         self.check('Restored database accepts audit writes with its restored identity sequence',
-                   self.sql('SELECT count(*) FROM audit_events;', database='trade_restore') == '4')
+                   self.sql('SELECT count(*) FROM audit_events;', database='trade_restore') == str(self.expected_audit_count + 1))
         self.report['backup_bytes'] = len(dump)
 
     def upgrade(self):
@@ -658,6 +725,7 @@ class Integration:
             self.fresh_api()
             self.staging_and_audit()
             self.vat_review_exceptions()
+            self.compliance_holds()
             self.persistence_and_restore()
             self.upgrade()
             self.report['status'] = 'passed'

@@ -42,12 +42,14 @@ app.MapPost("/v1/integrations/saleor/reviews", async (HttpRequest request, IServ
     return tenant is null ? Results.Unauthorized()
         : await SaleorReviewEndpoint.HandleAsync(request, tenant, configuration, cancellationToken);
 });
-app.MapPost("/v1/quotes", async (HttpRequest http, QuoteRequest request, QuoteService service, QuoteStore store, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
+app.MapPost("/v1/quotes", async (HttpRequest http, QuoteService service, QuoteStore store, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
     var tenant = await AuthenticateAsync(http, services, config, ct);
     if (tenant is null) return Results.Unauthorized();
     if (!http.Headers.TryGetValue("Idempotency-Key", out var key) || string.IsNullOrWhiteSpace(key.ToString()) || key.ToString().Length > 128)
         return Results.BadRequest(new { error = "Idempotency-Key header required (1-128 characters)." });
+    var (request,bodyError) = await ReadQuoteRequestAsync(http,ct);
+    if (request is null) return bodyError!;
     var errors = QuoteService.Validate(request);
     if (errors.Count > 0) return Results.ValidationProblem(errors);
     var (quote, error) = services.GetService<PostgresQuoteStore>() is { } postgres
@@ -56,16 +58,21 @@ app.MapPost("/v1/quotes", async (HttpRequest http, QuoteRequest request, QuoteSe
     return error is not null ? Results.Conflict(new { error }) : Results.Ok(quote);
 });
 // Standalone landed-cost endpoint: no monetary total without verified provider evidence.
-app.MapPost("/v1/landed-cost/estimate", async (HttpRequest http, QuoteRequest request,
+app.MapPost("/v1/landed-cost/estimate", async (HttpRequest http,
     LandedCostService calculator, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
-    if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
+    var tenant = await AuthenticateAsync(http, services, config, ct);
+    if (tenant is null) return Results.Unauthorized();
+    var (request,bodyError) = await ReadQuoteRequestAsync(http,ct);
+    if (request is null) return bodyError!;
     var errors = QuoteService.Validate(request);
     if (errors.Count > 0) return Results.ValidationProblem(errors);
     var result = await calculator.CalculateAsync(request, ct);
-    var tenant = await AuthenticateAsync(http, services, config, ct);
-    if (tenant is not null && services.GetService<AuditStore>() is { } audit)
-        await audit.WriteAsync(tenant, "landed_cost_estimate", result.Status, new { request.ShipFrom, request.ShipTo, request.Currency, result.Total, result.Evidence }, ct);
+    if (services.GetService<AuditStore>() is { } audit)
+        await audit.WriteAsync(tenant, "landed_cost_estimate", result.Status,
+            new { request.ShipFrom, request.ShipTo, request.Currency, result.Total, result.Evidence,
+                specialistHoldRequired = result.Compliance!.SpecialistHoldRequired, holdReasons = result.Compliance.HoldReasons,
+                shipmentReleaseApproved = result.Compliance.ShipmentReleaseApproved }, ct);
     return Results.Ok(result);
 });
 app.MapGet("/v1/quotes/{id}", async (string id, HttpRequest http, QuoteStore store, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
@@ -83,9 +90,11 @@ app.MapGet("/v1/destinations/{country}", async (string country, HttpRequest http
     if (country.Length != 2 || !country.All(char.IsLetter)) return Results.BadRequest(new { error = "ISO alpha-2 country required" });
     return Results.Ok(DestinationPolicies.Resolve(country));
 });
-app.MapPost("/v1/compliance/check", async (HttpRequest http, QuoteRequest request, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
+app.MapPost("/v1/compliance/check", async (HttpRequest http, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
 {
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
+    var (request,bodyError) = await ReadQuoteRequestAsync(http,ct);
+    if (request is null) return bodyError!;
     var errors = QuoteService.Validate(request);
     return errors.Count > 0 ? Results.ValidationProblem(errors) : Results.Ok(ShipmentCompliance.Evaluate(request));
 });
@@ -351,6 +360,20 @@ app.MapGet("/v1/capabilities", () => Results.Ok(new {
     disclaimer = "No authoritative tariff dataset configured. Quotes are incomplete."
 }));
 app.Run();
+
+static async Task<(QuoteRequest? Request,IResult? Error)> ReadQuoteRequestAsync(HttpRequest http,CancellationToken ct)
+{
+    if (http.ContentLength is > 65_536) return (null,Results.StatusCode(413));
+    using var body = new StreamContent(http.Body);
+    var bytes = await UkTariffHttp.ReadReferenceBytesAsync(body,65_536,ct);
+    if (bytes is null) return (null,Results.StatusCode(413));
+    try
+    {
+        var request = ExactJsonInput.Deserialize<QuoteRequest>(bytes);
+        return request is null ? (null,Results.BadRequest(new { error = "quote_request_required" })) : (request,null);
+    }
+    catch (JsonException) { return (null,Results.BadRequest(new { error = "invalid_or_inexact_quote_json" })); }
+}
 
 static async Task<string?> AuthenticateAsync(HttpRequest request, IServiceProvider services, IConfiguration config, CancellationToken ct)
 {

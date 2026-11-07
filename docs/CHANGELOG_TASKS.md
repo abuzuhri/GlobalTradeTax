@@ -1,5 +1,10 @@
 # Task register change log
 
+## 2026-11-07 — TASK-009 declared control holds and TASK-002 input safeguards
+- Reproduce eight failures, then enforce declared export licence/ITAR holds before rate-provider access and financial completion. Persist compliance evidence with quote/idempotency snapshots and landed-cost audits; shipment-release approval is always false.
+- Authenticate before bounded exact JSON on all three quote/compliance routes. Reject duplicate flags, null nested inputs, field/count violations and overflow; preserve case compatibility and existing unflagged financial provider gates. No database migration.
+- Release warnings-as-errors suite passes 514 offline xUnit cases/16 optional tariff API skips, 33 Python tests and repository guards. Add actual authenticated database/API, audit, recreation and restore regressions; final hosted evidence is recorded in the ready PR. [Contract, official sources and limitations](COMPLIANCE_HOLDS.md). TASK-009/002 remain in progress.
+
 ## 2026-11-06 — TASK-008 VAT exceptions and accounting review
 - Implementation commit `d9663d1` passed all six regular hosted jobs, including 486 xUnit cases/16 optional live skips, 33 Python cases, 11 HTTP smoke assertions and 199 PostgreSQL/container assertions with cleanup=true. [Hosted run](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42294049414); [ready PR #8](https://github.com/abuzuhri/GlobalTradeTax/pull/8) records final-head status.
 - Add declared per-line treatment/accounting claims and sourced review decisions. Relief claims never establish zero VAT; conditional art valuation is segregated from ordinary totals, postponed accounting preserves liability illustrations, and NI/special procedures remain unresolved.
