@@ -4,7 +4,12 @@
 - **Priority:** P1
 - **Owner:** Unassigned
 - **Dependencies:** Review related tasks in [master register](../TASKS.md) before starting.
-- **Last reviewed:** 2026-11-05
+- **Last reviewed:** 2026-11-07
+
+## 2026-11-07 — Enforce declared control holds
+- Carry explicit licence/ITAR holds through quote creation and landed-cost estimation, without treating a provider's verified financial response as clearance. A declared hold must suppress monetary completion and avoid requesting a provider quote, regardless of shipping country or currency.
+- Expose stable hold reasons and an unconditional false shipment-release approval in compliance results. Preserve existing UK manual review requirements; absent flags do not establish that goods are uncontrolled.
+- Authenticate before bounded exact JSON parsing on the three quote/compliance routes, rejecting duplicate control flags and invalid nested/null/overflow inputs before persistence or provider access. Add unit and real authenticated database/API regressions, document compatibility and keep the finished PR ready for review. Actual licensing, sanctions checks and specialist clearance remain external.
 
 ## Objective
 Review US export EEI/AES and UK import licensing, prohibitions, certificates, importer responsibility.
@@ -26,6 +31,8 @@ src/GlobalTradeTax.Api/ShipmentCompliance.cs
 Manual review gates for controlled goods; no legal clearance asserted by heuristic.
 
 ## Evidence / decision log
+- 2026-11-07: Implementation commit `8dc1bf6` passed all six regular hosted CI jobs, with 514 xUnit passes/16 optional skips, 33 Python passes, 11 HTTP smoke assertions and 297 database/container assertions with cleanup=true. Actual HTTP checks verify duplicate-flag rejection, consistent holds, audit persistence and durable replay after recreation/restoration. [Hosted run](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42355867265); [ready PR #9](https://github.com/abuzuhri/GlobalTradeTax/pull/9) tracks per-commit verification.
+- 2026-11-07: Reproduced eight quote/provider hold failures, then enforced declared licence/ITAR holds before provider access and quote completion. Added structured hold/release evidence, durable quote/idempotency coverage and exact authenticated request parsing. Warnings-as-errors Release tests pass 514 offline cases/16 optional tariff API skips; 33 Python cases and repository guards pass. [Contract, official sources, compatibility and final hosted evidence](../docs/COMPLIANCE_HOLDS.md). No licence is authenticated or shipment released; task remains in progress.
 - 2026-11-02: Task created. Existing implementation may be partial; completion has not been established.
 
 ## Risks and open questions

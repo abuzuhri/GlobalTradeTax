@@ -1,5 +1,7 @@
 # v0.9 — US outbound foundation: multiple delivery steps
 
+**2026-11-07 update:** [licence/ITAR hold enforcement and input compatibility](COMPLIANCE_HOLDS.md) now apply across quoting, landed-cost estimation and compliance checks. A provider's financial verification cannot clear a declared control hold or approve release.
+
 ## Delivered
 - HTTPS external landed-cost provider adapter (contract-based; not connected to a live tariff vendor)
 - Evidence validation including provider, reference, effective date, origin, destination, HS and currency

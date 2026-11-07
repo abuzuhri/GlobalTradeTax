@@ -8,6 +8,8 @@ Latest duty validation: [five live calculator comparisons and four pinned source
 
 Latest VAT work: [declared relief/accounting review and conditional reduced valuation](docs/UK_VAT_EXCEPTIONS.md), with separate NI checks, stricter financial input handling and shipment evidence `uk-shipment-review/v2`. Claims never establish zero tax or payable approval.
 
+Latest controls work: [declared licence/ITAR holds across quotes and landed-cost estimates](docs/COMPLIANCE_HOLDS.md), with provider calls blocked during a hold, durable compliance evidence and exact bounded request parsing. Financial evidence never approves shipment release.
+
 # GlobalTradeTax — Cross-border Customs & Tax SaaS (C#)
 
 Initial working source scaffold for **US -> Worldwide**, designed to expand to **China/Worldwide -> US**.

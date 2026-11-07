@@ -22,13 +22,27 @@ public sealed class UnconfiguredImportRateProvider : IImportRateProvider
 
 public sealed record LandedCostBreakdown(decimal Merchandise, decimal Shipping, decimal Insurance,
     decimal? ImportDuty, decimal? ImportTax, decimal? ClearanceFee, decimal? Total,
-    string Status, RateEvidence? Evidence, string[] Warnings);
+    string Status, RateEvidence? Evidence, string[] Warnings)
+{
+    public ComplianceResult? Compliance { get; init; }
+}
 
 public sealed class LandedCostService(IImportRateProvider provider)
 {
+    /// <summary>
+    /// Returns declared costs and a separately gated provider estimate. Declared control
+    /// holds short-circuit provider access; financial verification never clears goods.
+    /// The HTTP boundary must validate request shape and amount bounds first.
+    /// </summary>
     public async Task<LandedCostBreakdown> CalculateAsync(QuoteRequest request, CancellationToken ct)
     {
         var merchandise = request.Lines.Sum(x => x.Quantity * x.UnitPrice);
+        var compliance = ShipmentCompliance.Evaluate(request);
+        if (compliance.SpecialistHoldRequired)
+            return new(merchandise,request.ShippingCost,request.InsuranceCost,null,null,null,null,
+                "manual_review_required",null,[..compliance.Warnings,
+                    "Declared control hold: obtain specialist review before requesting a provider quote or completing payment."])
+                { Compliance = compliance };
         var result = await provider.GetRatesAsync(request, ct);
         var verified = result.Status == "verified" && result.Evidence is not null &&
             result.Evidence.ExpiresAt > DateTimeOffset.UtcNow &&
@@ -52,6 +66,7 @@ public sealed class LandedCostService(IImportRateProvider provider)
             verified ? result.Duty : null, verified ? result.Tax : null,
             verified ? result.ClearanceFee : null, total,
             verified ? "verified" : "requires_provider_quote", verified ? result.Evidence : null,
-            verified ? result.Warnings : [..result.Warnings, "Quote is not payable: missing or invalid verified rate evidence."]);
+            verified ? result.Warnings : [..result.Warnings, "Quote is not payable: missing or invalid verified rate evidence."])
+            { Compliance = compliance };
     }
 }

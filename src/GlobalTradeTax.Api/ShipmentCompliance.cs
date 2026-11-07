@@ -1,12 +1,24 @@
 namespace GlobalTradeTax.Api;
 
-public sealed record ComplianceResult(string Route, string Decision, string[] RequiredChecks, string[] Warnings);
+public sealed record ComplianceResult(string Route, string Decision, string[] RequiredChecks, string[] Warnings)
+{
+    public string[] HoldReasons { get; init; } = [];
+    public bool SpecialistHoldRequired => HoldReasons.Length > 0;
+    public bool ShipmentReleaseApproved => false;
+}
 public static class ShipmentCompliance
 {
+    /// <summary>
+    /// Collects route checks and caller-declared control holds. Neither missing flags
+    /// nor a financial provider response can approve shipment release.
+    /// </summary>
     public static ComplianceResult Evaluate(QuoteRequest request)
     {
         var checks = new List<string> { "Confirm HS classification and actual country of origin", "Confirm importer of record and destination import restrictions", "Check denied-party, sanctions and export-control requirements" };
         var warnings = new List<string>();
+        var holds = new List<string>();
+        if (request.RequiresExportLicense) holds.Add("declared_export_licence");
+        if (request.ItarControlled) holds.Add("declared_itar_control");
         if (request.RequiresExportLicense || request.ItarControlled)
             warnings.Add("Export-control flag set: hold for specialist review; do not automate clearance.");
         if (request.ShipFrom.Equals("US", StringComparison.OrdinalIgnoreCase))
@@ -16,7 +28,7 @@ public static class ShipmentCompliance
         }
         if (request.ShipTo.Equals("US", StringComparison.OrdinalIgnoreCase))
             checks.Add("Check HTSUS, additional duties, CBP entry, origin and agency admissibility");
-        if (request.ShipTo is "DE" or "FR" or "SE" or "NL" or "ES" or "IT")
+        if (request.ShipTo.ToUpperInvariant() is "DE" or "FR" or "SE" or "NL" or "ES" or "IT")
             checks.Add("Assess EU VAT/IOSS eligibility separately from customs duties and clearance fees");
         if (request.ShipTo.Equals("GB", StringComparison.OrdinalIgnoreCase) || request.ShipTo.Equals("XI", StringComparison.OrdinalIgnoreCase))
         {
@@ -30,6 +42,7 @@ public static class ShipmentCompliance
                 checks.Add("Review Northern Ireland movement, at-risk status, UKIMS authorisation and relevant Union/UK tariff and VAT rules separately");
         }
         return new(request.ShipFrom.ToUpperInvariant()+"->"+request.ShipTo.ToUpperInvariant(),
-            warnings.Count > 0 ? "manual_review_required" : "checks_required", checks.ToArray(), warnings.ToArray());
+            warnings.Count > 0 ? "manual_review_required" : "checks_required", checks.ToArray(), warnings.ToArray())
+            { HoldReasons = holds.ToArray() };
     }
 }
