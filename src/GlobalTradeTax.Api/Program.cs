@@ -361,7 +361,7 @@ app.MapGet("/v1/capabilities", () => Results.Ok(new {
 }));
 app.Run();
 
-// Called only after authentication (and quote idempotency-header validation).
+// Called only after authentication; quote creation also validates its idempotency header.
 // The byte limit also covers chunked bodies; exact JSON rejects duplicate control flags.
 static async Task<(QuoteRequest? Request,IResult? Error)> ReadQuoteRequestAsync(HttpRequest http,CancellationToken ct)
 {
