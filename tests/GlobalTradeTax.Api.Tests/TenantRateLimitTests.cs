@@ -43,6 +43,8 @@ public sealed class TenantRateLimitTests
         var limiter = Create(clock, capacity: "1");
         Assert.Equal(0, limiter.Acquire("a"));
         Assert.Equal(10, limiter.Acquire("b"));
+        clock.Timestamp = 9;
+        Assert.Equal(1, limiter.Acquire("b"));
         clock.Timestamp = 10;
         Assert.Equal(0, limiter.Acquire("b"));
     }

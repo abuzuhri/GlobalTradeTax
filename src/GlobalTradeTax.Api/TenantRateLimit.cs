@@ -62,7 +62,9 @@ public sealed class TenantRateLimit
             {
                 foreach (var expired in windows.Where(entry => clock.GetElapsedTime(entry.Value.Start, now) >= TimeSpan.FromSeconds(seconds)).Select(entry => entry.Key).ToArray())
                     windows.Remove(expired);
-                if (windows.Count >= capacity) return seconds;
+                if (windows.Count >= capacity)
+                    return Math.Max(1, (int)Math.Ceiling(windows.Values.Min(entry =>
+                        (TimeSpan.FromSeconds(seconds) - clock.GetElapsedTime(entry.Start, now)).TotalSeconds)));
             }
             windows[tenant] = new Window(now, 1);
             return 0;
