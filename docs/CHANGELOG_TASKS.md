@@ -1,6 +1,7 @@
 # Task register change log
 
 ## 2026-11-07 — TASK-009 declared control holds and TASK-002 input safeguards
+- Implementation commit `8dc1bf6` passed all six regular hosted jobs: 514 xUnit cases/16 optional skips, 33 Python cases, 11 HTTP smoke assertions and 297 PostgreSQL/container assertions with cleanup=true. [Hosted run](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42355867265); [ready PR #9](https://github.com/abuzuhri/GlobalTradeTax/pull/9) retains final-head status.
 - Reproduce eight failures, then enforce declared export licence/ITAR holds before rate-provider access and financial completion. Persist compliance evidence with quote/idempotency snapshots and landed-cost audits; shipment-release approval is always false.
 - Authenticate before bounded exact JSON on all three quote/compliance routes. Reject duplicate flags, null nested inputs, field/count violations and overflow; preserve case compatibility and existing unflagged financial provider gates. No database migration.
 - Release warnings-as-errors suite passes 514 offline xUnit cases/16 optional tariff API skips, 33 Python tests and repository guards. Add actual authenticated database/API, audit, recreation and restore regressions; final hosted evidence is recorded in the ready PR. [Contract, official sources and limitations](COMPLIANCE_HOLDS.md). TASK-009/002 remain in progress.
