@@ -11,6 +11,7 @@ builder.Services.AddHttpClient<IImportRateProvider, ExternalImportRateProvider>(
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
 builder.Services.AddSingleton<LandedCostService>();
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<TenantRateLimit>();
 builder.Services.AddHttpClient(UkTariffAccessTokenProvider.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(8))
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
 builder.Services.AddSingleton<UkTariffAccessTokenProvider>();
@@ -33,6 +34,33 @@ if (!string.IsNullOrWhiteSpace(pgConnection))
     builder.Services.AddScoped<TariffStagingStore>();
 }
 var app = builder.Build();
+_ = app.Services.GetRequiredService<TenantRateLimit>();
+app.UseRouting();
+app.Use(async (context, next) =>
+{
+    var route = (context.GetEndpoint() as Microsoft.AspNetCore.Routing.RouteEndpoint)?.RoutePattern.RawText;
+    if (route is not null && (route.StartsWith("/v1/references/uk/", StringComparison.OrdinalIgnoreCase)
+        || route.StartsWith("/v1/quotes", StringComparison.OrdinalIgnoreCase)
+        || route.StartsWith("/v1/destinations/", StringComparison.OrdinalIgnoreCase)
+        || route.Equals("/v1/landed-cost/estimate", StringComparison.OrdinalIgnoreCase)
+        || route.Equals("/v1/compliance/check", StringComparison.OrdinalIgnoreCase)
+        || route.Equals("/v1/tariff-datasets/validate", StringComparison.OrdinalIgnoreCase)
+        || route.Equals("/v1/integrations/saleor/reviews", StringComparison.OrdinalIgnoreCase)))
+    {
+        var tenant = await AuthenticateAsync(context.Request, context.RequestServices, app.Configuration, context.RequestAborted);
+        if (tenant is null) { context.Response.StatusCode = 401; return; }
+        context.Items["AuthenticatedTenant"] = tenant;
+        var retry = context.RequestServices.GetRequiredService<TenantRateLimit>().Acquire(tenant);
+        if (retry > 0)
+        {
+            context.Response.StatusCode = 429;
+            context.Response.Headers.RetryAfter = retry.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            await context.Response.WriteAsJsonAsync(new { error = "tenant_rate_limit_exceeded" }, context.RequestAborted);
+            return;
+        }
+    }
+    await next(context);
+});
 SaleorApp.Map(app);
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", version = "2.3.0" }));
 app.MapPost("/v1/integrations/saleor/reviews", async (HttpRequest request, IServiceProvider services,
@@ -379,6 +407,7 @@ static async Task<(QuoteRequest? Request,IResult? Error)> ReadQuoteRequestAsync(
 
 static async Task<string?> AuthenticateAsync(HttpRequest request, IServiceProvider services, IConfiguration config, CancellationToken ct)
 {
+    if (request.HttpContext.Items.TryGetValue("AuthenticatedTenant", out var cached)) return cached as string;
     if (services.GetService<TenantAuth>() is { } auth) return await auth.AuthenticateAsync(request, ct);
     // Explicitly development-only; never enable fallback when PostgreSQL is configured.
     if (!string.Equals(config["ASPNETCORE_ENVIRONMENT"], "Development", StringComparison.OrdinalIgnoreCase)) return null;

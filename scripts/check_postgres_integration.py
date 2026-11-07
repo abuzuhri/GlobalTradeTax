@@ -194,6 +194,7 @@ class Integration:
             'TRADE_API_KEY': '${GTT_TEST_FALLBACK_KEY}', 'TRADE_TENANT_ID': 'fallback-must-not-authenticate',
             'TRADE_OPERATOR_KEY': '${GTT_TEST_OPERATOR_KEY}',
             'SaleorApp__Enabled': 'false',
+            'TenantRateLimit__PermitLimit': '10000',
             'Logging__LogLevel__Microsoft.AspNetCore': 'Warning',
         }
         validate_spec(spec, self.project, self.run_id)
@@ -253,7 +254,8 @@ class Integration:
             time.sleep(.25)
         raise VerificationError('Container API did not become reachable')
 
-    def request(self, method, path, *, key=None, operator=False, payload=None, idempotency=None, expected=200, chunked=False):
+    def request(self, method, path, *, key=None, operator=False, payload=None, idempotency=None, expected=200, chunked=False, retry_after=False):
+        """Make an isolated API request and optionally validate a positive retry header."""
         headers = {}
         if key is not None:
             headers['X-API-Key'] = key
@@ -279,9 +281,12 @@ class Integration:
             response = error
         with response:
             status = response.status
+            retry = response.headers.get('Retry-After') if retry_after else None
             raw = response.read(1_048_576)
         self.check(f'{method} {path} expects HTTP {expected} (received {status})',
                    status in expected if isinstance(expected, tuple) else status == expected)
+        if retry_after:
+            self.check('Rate limit returns a positive Retry-After', bool(retry and retry.isdigit() and int(retry) > 0))
         try:
             return json.loads(raw) if raw else None
         except ValueError:
@@ -334,6 +339,35 @@ class Integration:
         self.provision('merchant-a', self.keys['rotated'])
         self.sql("UPDATE tenants SET enabled=false WHERE tenant_id='merchant-b';")
         self.request('GET', '/v1/quotes/' + quote_b['quoteId'], key=self.keys['b'], expected=401)
+
+    def rate_limits(self):
+        """Exercise real tenant and rotated-key limits in a separate API process."""
+        self.phase('Checking isolated tenant rate limits')
+        first, rotated, other = (self.new_key() for _ in range(3))
+        self.provision('rate-a', first)
+        self.provision('rate-a', rotated)
+        self.provision('rate-b', other)
+        spec = json.loads(self.compose_file.read_text(encoding='utf-8'))
+        environment = spec['services']['api']['environment']
+        environment['TenantRateLimit__PermitLimit'] = '2'
+        environment['TenantRateLimit__WindowSeconds'] = '60'
+        validate_spec(spec, self.project, self.run_id)
+        self.compose_file.write_text(json.dumps(spec), encoding='utf-8')
+        self.start_api()
+        self.request('GET', '/v1/destinations/GB', key=first)
+        self.request('GET', '/v1/destinations/GB', key=rotated)
+        self.request('POST', '/v1/landed-cost/estimate', key=first, payload=b'not json', expected=429, retry_after=True)
+        self.request('POST', '/v1/landed-cost/estimate', key=first, payload=self.payload, expected=429, retry_after=True)
+        self.check('Rejected estimate produced no audit',
+                   self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='rate-a';") == '0')
+        self.request('GET', '/v1/references/uk/commodities/1234567890', key=rotated, expected=429, retry_after=True)
+        self.request('GET', '/v1/destinations/GB', key=other)
+        self.request('GET', '/v1/destinations/GB', expected=401)
+        self.request('GET', '/health')
+        environment['TenantRateLimit__PermitLimit'] = '10000'
+        del environment['TenantRateLimit__WindowSeconds']
+        self.compose_file.write_text(json.dumps(spec), encoding='utf-8')
+        self.start_api()
 
     def staging_and_audit(self):
         self.phase('Checking tariff staging and database audit writes')
@@ -727,6 +761,7 @@ class Integration:
         try:
             self.prepare()
             self.fresh_api()
+            self.rate_limits()
             self.staging_and_audit()
             self.vat_review_exceptions()
             self.compliance_holds()
