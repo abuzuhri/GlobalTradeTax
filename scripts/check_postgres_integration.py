@@ -403,6 +403,7 @@ class Integration:
                    self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='merchant-a' AND action='uk_shipment_review' AND details_json->>'approvedForPayment'='false' AND length(details_json->>'evidenceSha256')=64 AND NOT details_json ? 'lines';") == '2')
 
     def compliance_holds(self):
+        """Prove strict ingress, consistent declared holds and durable tenant/audit evidence."""
         self.phase('Checking declared control holds, exact request parsing and durable quote evidence')
         paths = ('/v1/quotes', '/v1/landed-cost/estimate', '/v1/compliance/check')
         before_quotes = int(self.sql('SELECT count(*) FROM quotes;'))
@@ -591,6 +592,7 @@ class Integration:
                  '::uuid,dataset_sha256,document_bytes FROM tariff_import_documents LIMIT 1;', error_state='23503')
 
     def verify_saved_data(self, database='trade'):
+        """Compare quotes, hold snapshots, archives and audits after restart or restoration."""
         quote = self.request('GET', '/v1/quotes/' + self.quote_a['quoteId'], key=self.keys['rotated'])
         self.check('Saved quote remains equivalent as JSON', quote == self.quote_a)
         replay = self.request('POST', '/v1/quotes', key=self.keys['rotated'], payload=self.payload, idempotency='shared-key')
@@ -612,6 +614,7 @@ class Integration:
                    self.sql('SELECT count(*) FROM audit_events;', database=database) == str(self.expected_audit_count))
 
     def persistence_and_restore(self):
+        """Recreate private containers and restore a backup without losing review evidence."""
         self.phase('Checking container recreation and isolated backup restoration')
         old_api = self.compose('ps', '-q', 'api').stdout.strip()
         self.start_api()
@@ -719,6 +722,7 @@ class Integration:
         self.report['cleanup'] = True
 
     def execute(self):
+        """Run isolated database/API checks and always clean up owned resources."""
         started = time.monotonic()
         try:
             self.prepare()

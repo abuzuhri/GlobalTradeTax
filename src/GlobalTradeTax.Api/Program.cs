@@ -361,6 +361,8 @@ app.MapGet("/v1/capabilities", () => Results.Ok(new {
 }));
 app.Run();
 
+// Called only after authentication (and quote idempotency-header validation).
+// The byte limit also covers chunked bodies; exact JSON rejects duplicate control flags.
 static async Task<(QuoteRequest? Request,IResult? Error)> ReadQuoteRequestAsync(HttpRequest http,CancellationToken ct)
 {
     if (http.ContentLength is > 65_536) return (null,Results.StatusCode(413));

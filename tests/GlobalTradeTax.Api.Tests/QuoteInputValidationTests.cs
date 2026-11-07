@@ -8,6 +8,7 @@ public sealed class QuoteInputValidationTests
     [Fact]
     public void Missing_request_is_invalid_instead_of_throwing() => Assert.Contains("request",QuoteService.Validate(null).Keys);
 
+    /// <summary>Rejects nested shape, field-bound and overflow failures before calculation.</summary>
     [Theory]
     [InlineData("null_line")]
     [InlineData("missing_lines")]

@@ -8,6 +8,10 @@ public sealed record ComplianceResult(string Route, string Decision, string[] Re
 }
 public static class ShipmentCompliance
 {
+    /// <summary>
+    /// Collects route checks and caller-declared control holds. Neither missing flags
+    /// nor a financial provider response can approve shipment release.
+    /// </summary>
     public static ComplianceResult Evaluate(QuoteRequest request)
     {
         var checks = new List<string> { "Confirm HS classification and actual country of origin", "Confirm importer of record and destination import restrictions", "Check denied-party, sanctions and export-control requirements" };

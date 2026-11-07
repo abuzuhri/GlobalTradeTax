@@ -13,19 +13,21 @@ public record QuoteResponse(string QuoteId, string Status, decimal MerchandiseVa
 
 public sealed class QuoteService
 {
+    /// <summary>
+    /// Rejects malformed, unbounded or overflowing input before storage or provider use.
+    /// Format checks do not establish classification, country membership or licensing.
+    /// </summary>
     public static Dictionary<string, string[]> Validate(QuoteRequest? r)
     {
         var e = new Dictionary<string, string[]>();
         if (r is null) { e["request"] = ["Quote request required."]; return e; }
-        static bool Country(string? value) => value is { Length: 2 } && value.All(char.IsAsciiLetter);
-        static bool Tag(string? value,int maximum) => !string.IsNullOrWhiteSpace(value) && value.Length <= maximum && !value.Any(char.IsControl);
-        if (!Country(r.ShipFrom)) e["shipFrom"] = ["Use ISO 3166-1 alpha-2 letters."];
-        if (!Country(r.ShipTo)) e["shipTo"] = ["Use ISO 3166-1 alpha-2 letters."];
+        if (!HasCountryShape(r.ShipFrom)) e["shipFrom"] = ["Use ISO 3166-1 alpha-2 letters."];
+        if (!HasCountryShape(r.ShipTo)) e["shipTo"] = ["Use ISO 3166-1 alpha-2 letters."];
         if (string.Equals(r.ShipFrom, r.ShipTo, StringComparison.OrdinalIgnoreCase)) e["route"] = ["International route required."];
         if (r.Currency is not { Length: 3 } || !r.Currency.All(char.IsAsciiLetter)) e["currency"] = ["Use ISO 4217 currency letters."];
         if (r.Lines is null || r.Lines.Count is < 1 or > 100) e["lines"] = ["One to 100 complete lines required."];
-        else if (r.Lines.Any(x => x is null || x.Quantity <= 0 || x.UnitPrice < 0 || !Tag(x.Sku,128) ||
-            !Tag(x.HsCode,32) || !Country(x.CountryOfOrigin))) e["lines"] = ["Each line needs bounded SKU/HS code, origin letters, positive quantity and nonnegative price."];
+        else if (r.Lines.Any(x => x is null || x.Quantity <= 0 || x.UnitPrice < 0 || !HasReferenceShape(x.Sku,128) ||
+            !HasReferenceShape(x.HsCode,32) || !HasCountryShape(x.CountryOfOrigin))) e["lines"] = ["Each line needs bounded SKU/HS code, origin letters, positive quantity and nonnegative price."];
         if (r.ShippingCost < 0 || r.InsuranceCost < 0) e["costs"] = ["Costs cannot be negative."];
         if (r.Incoterm is not ("DDP" or "DAP")) e["incoterm"] = ["MVP supports DDP or DAP."];
         if (!e.ContainsKey("lines") && !e.ContainsKey("costs"))
@@ -39,6 +41,10 @@ public sealed class QuoteService
         }
         return e;
     }
+    /// <summary>
+    /// Creates a reference quote from a validated request, preserving declared holds and
+    /// preliminary EEI checks. It never supplies destination duty, tax or a landed total.
+    /// </summary>
     public QuoteResponse Calculate(QuoteRequest r)
     {
         decimal merchandise = r.Lines.Sum(x => x.UnitPrice * x.Quantity);
@@ -76,4 +82,11 @@ public sealed class QuoteService
             r.InsuranceCost, null, null, null, eei, "unconfigured", warnings.ToArray(), actions.ToArray())
             { Compliance = compliance };
     }
+
+    /// <summary>Checks ASCII country-code syntax without asserting country membership.</summary>
+    private static bool HasCountryShape(string? value) => value is { Length: 2 } && value.All(char.IsAsciiLetter);
+
+    /// <summary>Bounds an untrusted reference string and excludes control characters.</summary>
+    private static bool HasReferenceShape(string? value,int maximum) =>
+        !string.IsNullOrWhiteSpace(value) && value.Length <= maximum && !value.Any(char.IsControl);
 }

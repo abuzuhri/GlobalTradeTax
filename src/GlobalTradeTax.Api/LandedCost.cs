@@ -29,6 +29,11 @@ public sealed record LandedCostBreakdown(decimal Merchandise, decimal Shipping, 
 
 public sealed class LandedCostService(IImportRateProvider provider)
 {
+    /// <summary>
+    /// Returns declared costs and a separately gated provider estimate. Declared control
+    /// holds short-circuit provider access; financial verification never clears goods.
+    /// The HTTP boundary must validate request shape and amount bounds first.
+    /// </summary>
     public async Task<LandedCostBreakdown> CalculateAsync(QuoteRequest request, CancellationToken ct)
     {
         var merchandise = request.Lines.Sum(x => x.Quantity * x.UnitPrice);

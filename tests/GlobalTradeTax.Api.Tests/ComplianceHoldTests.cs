@@ -52,6 +52,7 @@ public sealed class ComplianceHoldTests
         Assert.False(result.Compliance.ShipmentReleaseApproved);
     }
 
+    /// <summary>Proves that a valid financial estimate cannot become shipment-release approval.</summary>
     [Theory]
     [InlineData("GB")]
     [InlineData("XI")]
