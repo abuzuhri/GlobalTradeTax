@@ -12,8 +12,10 @@ MANIFEST = (
     ('003_audit.sql', 'b8fbf8b5922a71cf1cdd7e4c56becc5f860b08873f908f78e5bff619801f3c2e'),
     ('004_tariff_staging.sql', '0048a3c02374b4b47c0f499cc6fbab50faa3192ec64b0bc1d27bf0373aa52bb4'),
     ('005_tariff_provenance.sql', '8f30848f5d1cc4b2302c534bfac1ad109424593f10afe8f27fea5783e4b625f3'),
+    ('006_api_key_expiry.sql',
+     'bc0c049a2883a7424b74a4dc1920675565a758f517f9871be57d32849115bae6'),
 )
-BASELINES = {'v0.4': 1, 'v1.2': 4, 'current': 5}
+BASELINES = {'v0.4': 1, 'v1.2': 4, 'v1.3': 5, 'current': 6}
 
 
 def load_migrations(directory):

@@ -16,7 +16,7 @@ public sealed class TenantAuth(NpgsqlDataSource database)
         await using var connection = await database.OpenConnectionAsync(ct);
         await using var command = new NpgsqlCommand("""
             SELECT k.tenant_id FROM tenant_api_keys k JOIN tenants t ON t.tenant_id=k.tenant_id
-            WHERE k.key_hash=@hash AND k.enabled AND k.revoked_at IS NULL AND t.enabled
+            WHERE k.key_hash=@hash AND k.enabled AND k.revoked_at IS NULL AND (k.expires_at IS NULL OR k.expires_at > clock_timestamp()) AND t.enabled
             """, connection);
         command.Parameters.AddWithValue("hash", hash);
         return await command.ExecuteScalarAsync(ct) as string;

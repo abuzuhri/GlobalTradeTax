@@ -28,6 +28,7 @@ On this Windows checkout, use the existing WSL Docker installation:
 wsl -d Ubuntu -u root --exec python3 /mnt/d/Project/Source/Repos/abuzuhri/GlobalTradeTax/scripts/check_postgres_integration.py --report /mnt/d/Project/Source/Repos/abuzuhri/GlobalTradeTax/TestResults/postgres-integration.json
 ```
 
+Install `psycopg[binary]` in the Python environment before running the integration suite; the operator lifecycle checks use it to connect to the disposable database.
 The runner reads the real root Compose configuration with an empty environment file, assigns a random `gtt-pgtest-*` project, adds ownership labels and replaces the API port with a dynamic loopback port. The application image retains the real Dockerfile/build context. It adds a second database initialized from [the frozen v0.4 fixture](../tests/fixtures/postgres/v04-schema.sql), copied from `db/001_init.sql` at commit `bcec3f994af5ac04cb7dc5f1fa15f41bc6452f02`. The fixture deliberately stays separate from current migration files.
 
 Generated database passwords and merchant/operator keys are supplied through the child environment. Neither key values nor verifiers are printed; failure diagnostics are redacted. Backups stay in process memory. `TestResults/` is ignored by Git and excluded from the Docker context.
@@ -97,7 +98,7 @@ The generator validates the exact committed bytes against its release manifest b
 
 ```bash
 set -euo pipefail
-python3 scripts/migrate_postgres.py apply --adopt current | docker compose exec -T postgres psql -X -U trade -d trade -v ON_ERROR_STOP=1 -f -
+python3 scripts/migrate_postgres.py apply --adopt v1.3 | docker compose exec -T postgres psql -X -U trade -d trade -v ON_ERROR_STOP=1 -f -
 # For a tracked database or an empty database:
 python3 scripts/migrate_postgres.py apply | docker compose exec -T postgres psql -X -U trade -d trade -v ON_ERROR_STOP=1 -f -
 ```
@@ -110,3 +111,5 @@ The comparison checks relations, columns, defaults, constraints, indexes and seq
 Validate restored application data, ledger and sequence writes before switching a connection. This dump does not cover global roles, external Saleor state, TLS or retention. There is no automatic downgrade: on failure, stop writers, investigate the error and restore a verified backup into an isolated database under an approved recovery plan. Recovery can lose writes made since the backup; practice the procedure and establish recovery objectives before production.
 
 Release policy: append a uniquely ordered immutable migration and its exact SHA-256 to the manifest; never rewrite, remove or reorder a released migration. Every migration must be reviewed as transaction-safe, schema-relocatable DDL: the preflight executes each recorded script again in a temporary reference schema. Scripts must not create currently unsupported functions, triggers, policies, extensions or custom enum/domain/range types, change public explicitly, perform data mutations or external side effects, control transactions, or depend on application data. A future migration that needs those capabilities requires a separately designed runner before release. Review compatibility and locking, test fresh, upgrade and restore paths, and publish the release artifact together with its manifest. Transaction-incompatible operations need a separately designed and reviewed procedure; this runner does not support them. Test backups and rollback plans before release, and retain evidence for the exact release commit. TASK-003 remains in progress for production privilege, index and operational review and recovery exercises.
+
+Migration 006 adds key expiry. For an untracked schema matching migrations 001–005 use `--adopt v1.3`; `current` now identifies 001–006. Ledger-tracked databases use apply without adoption. Verify the matching baseline and protected backup first.

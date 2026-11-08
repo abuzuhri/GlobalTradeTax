@@ -1,0 +1,1 @@
+ALTER TABLE tenant_api_keys ADD COLUMN IF NOT EXISTS expires_at timestamptz;
