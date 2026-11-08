@@ -18,6 +18,8 @@
 
 **Latest TASK-003 slice (2026-11-08):** an operator-invoked migration ledger now checks immutable files and ordered history, verifies explicit legacy adoption and schema drift, serializes migrations and records changes transactionally. Local checks passed 525 offline xUnit cases (16 optional live skips), 37 Python cases and 334 isolated PostgreSQL/container assertions on implementation commit `eaefcf0` with cleanup. [Runbook and limitations](docs/POSTGRES_CONTAINER_VERIFICATION.md); hosted per-commit results belong to the PR. TASK-003 remains in progress for production privileges, index review and recovery exercises.
 
+**Latest TASK-011 slice (2026-11-08):** authenticated source guidance covers 27 EU member-state codes, with explicit unresolved territory and separate tariff and national VAT review. Local Release tests passed 563 cases with 16 optional live skips; 37 Python tests passed. [Guidance and limits](docs/EU_DESTINATION_REFERENCE.md). Actual tariff and VAT integration, source rights and independent legal approval remain open.
+
 **TASK-002 API-key lifecycle slice (2026-11-08):** expiry and operator-managed issue, list, rotation and revocation are implemented with transactional tenant-bound audit. [Runbook and limits](docs/TENANT_KEY_LIFECYCLE.md); production authorization and threat-model approval remain open. PR checks track current verification.
 
 **TASK-011 GCC reference slice (2026-11-08):** six national destination references are available for review only; calculation, legal approval and data rights remain open. See [scope and evidence](tasks/011-eu-taric-destination-expansion.md).

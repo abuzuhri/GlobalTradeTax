@@ -55,6 +55,10 @@ Example:
 curl http://localhost:5080/v1/destinations/SE -H 'X-API-Key: your-secret-key'
 ```
 
+## EU destination reference guidance
+
+Authenticated reference guidance now covers all 27 EU member-state destinations, with separate territorial, TARIC and national VAT checks. It does not determine applicable rates or enable payment. See [EU destination guidance](docs/EU_DESTINATION_REFERENCE.md).
+
 ## v0.4 PostgreSQL persistence
 
 See [docs/V04_POSTGRES.md](docs/V04_POSTGRES.md). Docker Compose provisions PostgreSQL and the API. The old in-memory store is used only when no connection string is supplied. Customs duties and taxes remain unavailable until an authoritative provider is connected.
