@@ -4,7 +4,6 @@ import argparse
 import hashlib
 import json
 import os
-import re
 import secrets
 import sys
 import uuid
@@ -14,8 +13,8 @@ from psycopg.types.json import Jsonb
 
 
 def tenant_id(value):
-    if not re.fullmatch(r'[A-Za-z0-9_-]{1,100}', value):
-        raise argparse.ArgumentTypeError('tenant ID must be 1-100 ASCII letters, digits, underscores or hyphens')
+    if not value or len(value) > 100 or not all(c.isalnum() or c in '-_' for c in value):
+        raise argparse.ArgumentTypeError('tenant ID must be 1-100 letters, digits, underscores or hyphens')
     return value
 
 

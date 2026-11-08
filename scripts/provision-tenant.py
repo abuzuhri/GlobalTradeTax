@@ -13,7 +13,7 @@ def main():
     parser.add_argument('tenant', type=tenant_id)
     parser.add_argument('name')
     args = parser.parse_args()
-    if not 1 <= len(args.name) <= 200 or any(ord(c) < 32 for c in args.name):
+    if not 1 <= len(args.name) <= 200 or not args.name.isprintable():
         parser.error('display name must be 1-200 printable characters')
     args.action, args.days = 'issue', 90
     try:

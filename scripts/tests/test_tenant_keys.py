@@ -27,11 +27,12 @@ class LifecycleGuards(unittest.TestCase):
         for value in ('0', '366', '-1', 'abc'):
             with self.assertRaises(Exception):
                 keys.days(value)
-        for value in ('', 'x' * 101, '../other', '商'):
+        for value in ('', 'x' * 101, '../other', 'a b'):
             with self.assertRaises(Exception):
                 keys.tenant_id(value)
         self.assertEqual(keys.days('365'), 365)
         self.assertEqual(keys.tenant_id('merchant_1-A'), 'merchant_1-A')
+        self.assertEqual(keys.tenant_id('商'), '商')
 
     def test_database_errors_are_redacted(self):
         from io import StringIO

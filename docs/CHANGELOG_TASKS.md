@@ -166,6 +166,6 @@
 - Added exact UI dependencies, generated third-party notices and a lockfile/audit/generated-bundle CI job.
 - Verified locally: 124 xUnit tests, 25 Python tests, container build, 10 HTTP smoke assertions, npm audit, static CI guards/actionlint, encrypted persistence and rendered Dashboard reviews. See [evidence](SALEOR_INSTALLED_APP.md). Production hardening, key lifecycle, distributed storage and authoritative calculation remain open.
 
-## 2026-11-08 — TASK-002 key lifecycle
+## 2026-11-08 â€” TASK-002 key lifecycle
 
 Added migration 006, server-time expiry enforcement and a tenant-bound operator command for issue, metadata listing, rotation and revocation. Legacy keys retain nullable expiry; new keys have bounded lifetimes. Transactional audit and operator limitations are described in [the runbook](TENANT_KEY_LIFECYCLE.md). Local Release tests: 525 passed, 16 optional skipped; Python: 39 passed. Docker verification is tracked on the PR; local Docker access was denied. Production authorization and threat-model approval remain open.
