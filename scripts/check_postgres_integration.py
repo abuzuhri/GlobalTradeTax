@@ -310,7 +310,15 @@ class Integration:
         self.start_api()
         self.check('Runtime container runs without root', self.compose('exec', '-T', 'api', 'id', '-u').stdout.strip() != b'0')
         anonymous = assert_smoke(lambda path, method='GET', payload=None: fetch(self.base, path, method, payload))
-        self.check('General container smoke and anonymous routes', anonymous == 11, count=anonymous)
+        self.check('General container smoke and anonymous routes', anonymous == 12, count=anonymous)
+        for country in ('DE', 'PL', 'CY'):
+            reference = self.request('GET', '/v1/references/eu/destinations/' + country.lower(), key=self.keys['a'])
+            self.check('EU country guidance remains reference only: ' + country,
+                       reference['country'] == country and reference['status'] == 'reference_only' and
+                       reference['territoryStatus'] == 'unresolved' and not reference['verifiedForCalculation'] and
+                       reference['referenceReviewedOn'] == '2026-11-08')
+        self.request('GET', '/v1/references/eu/destinations/GB', key=self.keys['a'], expected=404)
+        self.request('GET', '/v1/references/eu/destinations/123', key=self.keys['a'], expected=400)
         capabilities = self.request('GET', '/v1/capabilities')
         self.check('Database-backed capabilities', capabilities['persistence'] == 'postgresql' and
                    capabilities['tenantAuthentication'] == 'hashed-postgres-api-keys')
