@@ -1,4 +1,4 @@
-# GlobalTradeTax â€” Master task register
+# GlobalTradeTax — Master task register
 
 **Single source of truth for planned work.** Detailed task files live in `tasks/`. This tracker describes implementation status, not regulatory approval or production readiness.
 
@@ -8,7 +8,7 @@
 
 **Latest TASK-006 evidence (2026-11-05):** date-scoped UK requests/cache, typed membership paths, import/export linkage, effective windows and explicit exclusions now have 292 passing offline xUnit cases, six separately enabled public live probes and 35 dated HTTP assertions. [Scope, compatibility and verification](docs/UK_APPLICABILITY_EVIDENCE.md). TASK-006 remains in progress; legal conditions, certificates, quotas and preferences are still unresolved. The dated baseline below records the preceding slice.
 
-**Latest UK completion pass (2026-11-05):** GB/XI shipment review, typed conditional duty evidence, separate invoice/tariff currency feeds, mixed-VAT cost reconciliation and UK manual control gates are implemented. Local checks passed 380 offline xUnit cases, ten public live probes, 32 Python tests and 112 isolated database/container assertions with cleanup. [Current contract and remaining gates](docs/UK_SHIPMENT_REVIEW.md) explicitly retain managed-live access, independently approved calculator cases and legal/valuation/NI approvals as unfinished; TASK-005â€“009 are not marked done.
+**Latest UK completion pass (2026-11-05):** GB/XI shipment review, typed conditional duty evidence, separate invoice/tariff currency feeds, mixed-VAT cost reconciliation and UK manual control gates are implemented. Local checks passed 380 offline xUnit cases, ten public live probes, 32 Python tests and 112 isolated database/container assertions with cleanup. [Current contract and remaining gates](docs/UK_SHIPMENT_REVIEW.md) explicitly retain managed-live access, independently approved calculator cases and legal/valuation/NI approvals as unfinished; TASK-005–009 are not marked done.
 
 **Latest TASK-007 evidence (2026-11-06):** five live official calculator duty rows and four published calculator test examples now match. Four reproduced precision failures are corrected without enabling payment. The local Release suite passes 447 cases with 16 optional API skips. [Case evidence and remaining approval gates](docs/UK_DUTY_REFERENCE_CASES.md). TASK-007 remains in progress.
 

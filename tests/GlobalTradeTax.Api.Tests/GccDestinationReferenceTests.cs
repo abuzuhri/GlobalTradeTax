@@ -16,7 +16,7 @@ public sealed class GccDestinationReferenceTests
         var request = new QuoteRequest("US", country.ToLowerInvariant(), "USD", "DDP", [new("item", "0101299000", "US", 1, 100m)]);
         var compliance = ShipmentCompliance.Evaluate(request);
         Assert.Equal("manual_review_required", compliance.Decision); Assert.False(compliance.ShipmentReleaseApproved);
-        Assert.Contains(result.UnresolvedChecks[0], compliance.RequiredChecks);
+        Assert.All(result.UnresolvedChecks, check => Assert.Contains(check, compliance.RequiredChecks));
         var quote = new QuoteService().Calculate(request); Assert.Null(quote.LandedTotal);
     }
     [Theory]

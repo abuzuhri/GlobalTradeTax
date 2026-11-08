@@ -435,7 +435,7 @@ class Integration:
             self.check('GCC reference remains unapproved ' + country,
                        result['country'] == country and result['status'] == 'reference_only' and
                        result['importDuty'] is None and result['importTax'] is None and result['landedTotal'] is None and
-                       not result['verifiedForCalculation'] and not result['paymentApproved'] and not result['shipmentReleaseApproved'])
+                       result['verifiedForCalculation'] is False and result['paymentApproved'] is False and result['shipmentReleaseApproved'] is False)
         self.request('GET', '/v1/references/gcc/US', key=first, expected=400)
         self.request('GET', '/v1/references/gcc/USA', key=first, expected=400)
 
