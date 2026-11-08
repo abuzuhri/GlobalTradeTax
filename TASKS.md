@@ -22,6 +22,8 @@
 
 **TASK-002 API-key lifecycle slice (2026-11-08):** expiry and operator-managed issue, list, rotation and revocation are implemented with transactional tenant-bound audit. [Runbook and limits](docs/TENANT_KEY_LIFECYCLE.md); production authorization and threat-model approval remain open. PR checks track current verification.
 
+**TASK-011 GCC reference slice (2026-11-08):** six national destination references are available for review only; calculation, legal approval and data rights remain open. See [scope and evidence](tasks/011-eu-taric-destination-expansion.md).
+
 ## Status vocabulary
 - `not-started`: not implemented.
 - `in-progress`: partial code exists; acceptance criteria unmet.

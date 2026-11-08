@@ -40,7 +40,8 @@ app.Use(async (context, next) =>
 {
     var route = (context.GetEndpoint() as Microsoft.AspNetCore.Routing.RouteEndpoint)?.RoutePattern.RawText;
     if (route is not null && ((route.StartsWith("/v1/references/uk/", StringComparison.OrdinalIgnoreCase)
-            || route.StartsWith("/v1/references/eu/", StringComparison.OrdinalIgnoreCase))
+        || route.StartsWith("/v1/references/gcc/", StringComparison.OrdinalIgnoreCase)
+        || route.StartsWith("/v1/references/eu/", StringComparison.OrdinalIgnoreCase))
         || route.StartsWith("/v1/quotes", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/destinations/", StringComparison.OrdinalIgnoreCase)
         || route.Equals("/v1/landed-cost/estimate", StringComparison.OrdinalIgnoreCase)
@@ -112,6 +113,11 @@ app.MapGet("/v1/destinations/{country}", async (string country, HttpRequest http
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
     if (country.Length != 2 || !country.All(char.IsLetter)) return Results.BadRequest(new { error = "ISO alpha-2 country required" });
     return Results.Ok(DestinationPolicies.Resolve(country));
+});
+app.MapGet("/v1/references/gcc/{country}", (string country) =>
+{
+    var reference = GccDestinationReference.Find(country);
+    return reference is null ? Results.BadRequest(new { error = "supported GCC ISO alpha-2 country required" }) : Results.Ok(reference);
 });
 // Source guidance only: no tariff, VAT or territorial eligibility is inferred.
 app.MapGet("/v1/references/eu/destinations/{country}", async (string country, HttpRequest http, IServiceProvider services, IConfiguration config, CancellationToken ct) =>

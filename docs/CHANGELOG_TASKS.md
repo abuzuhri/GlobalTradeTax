@@ -169,3 +169,6 @@
 ## 2026-11-08 — TASK-002 key lifecycle
 
 Added migration 006, server-time expiry enforcement and a tenant-bound operator command for issue, metadata listing, rotation and revocation. Legacy keys retain nullable expiry; new keys have bounded lifetimes. Transactional audit and operator limitations are described in [the runbook](TENANT_KEY_LIFECYCLE.md). Local Release tests: 525 passed, 16 optional skipped; Python: 39 passed. Docker verification is tracked on the PR; local Docker access was denied. Production authorization and threat-model approval remain open.
+
+## 2026-11-08 — TASK-011 GCC reference guidance
+Added authenticated tenant-limited national references for all six GCC destinations, country-specific source routing and compliance review checks. This is reference coverage only; live data, rights and independent approvals remain open. Local tests: 537 .NET passed, 16 optional live skipped; 39 Python passed. Hosted evidence follows the PR head. See [task](../tasks/011-eu-taric-destination-expansion.md).
