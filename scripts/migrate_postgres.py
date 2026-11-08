@@ -57,7 +57,7 @@ END $check$;
 # Compare structural catalog metadata in a transaction-created reference schema. The
 # search path makes pg_get_* output independent of schema qualification.
 SIGNATURE = r"""
-CREATE FUNCTION pg_temp.schema_signature(ns text) RETURNS TABLE(kind text, identity text, definition text)
+CREATE OR REPLACE FUNCTION pg_temp.schema_signature(ns text) RETURNS TABLE(kind text, identity text, definition text)
 LANGUAGE sql AS $signature$
  SELECT 'relation', c.relname, concat_ws('|',c.relkind,c.relpersistence,c.relrowsecurity,c.relforcerowsecurity)
  FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
@@ -182,6 +182,8 @@ END $guard$;"""]
                     r'\if :pending', 'SET LOCAL search_path = public, pg_catalog;', body,
                     f"INSERT INTO public.gtt_schema_migrations(version,name,checksum,origin) VALUES ({i},'{name}','{digest}','applied');", r'\endif']
         sql.append(validation())
+        # Validate the resulting schema before committing the migrations and ledger.
+        sql += reference_check(migrations)
     if mode == 'status':
         values = ','.join("(%d,'%s')" % (i, name) for i, (name, _) in enumerate(MANIFEST, 1))
         sql += [r'\if :ledger_exists', f"SELECT e.version,e.name,CASE WHEN m.version IS NULL THEN 'pending' ELSE m.origin END AS state,m.recorded_at FROM (VALUES {values}) AS e(version,name) LEFT JOIN public.gtt_schema_migrations m USING(version) ORDER BY e.version;", r'\endif']

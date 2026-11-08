@@ -763,7 +763,7 @@ class Integration:
     def migration_ledger(self):
         """Exercise adoption, integrity, serialization, atomic failure and restored history."""
         self.phase('Checking versioned migration ledger')
-        for database in ('migration_fresh', 'migration_v04', 'migration_v12', 'migration_current', 'migration_bad', 'migration_fail'):
+        for database in ('migration_fresh', 'migration_v04', 'migration_v12', 'migration_current', 'migration_bad', 'migration_fail', 'migration_unsupported'):
             self.compose('exec', '-T', 'postgres', 'createdb', '-U', 'trade', database)
         self.migration_command('migration_fresh')
         self.check('Fresh ledger records five applied migrations',
@@ -812,6 +812,12 @@ class Integration:
         failing = migrate_postgres.build_sql(migrations, 'apply').replace(migrations[4], migrations[4] + '\nSELECT 1/0;')
         self.migration_rejected('Failed migration returns error', self.migration_command('migration_fail', sql=failing, check=False), 'division by zero')
         self.check('Failed transaction leaves neither schema nor ledger', self.sql("SELECT to_regclass('public.quotes') IS NULL AND to_regclass('public.gtt_schema_migrations') IS NULL;", database='migration_fail') == 't')
+        generated = migrate_postgres.build_sql(migrations, 'apply')
+        insert5 = "INSERT INTO public.gtt_schema_migrations(version,name,checksum,origin) VALUES (5,"
+        offset = generated.index(insert5)
+        generated = generated[:offset] + "CREATE FUNCTION public.unsupported() RETURNS integer LANGUAGE sql AS $$ SELECT 1 $$;\n" + generated[offset:]
+        self.migration_rejected('Unsupported pending migration rolls back', self.migration_command('migration_unsupported', sql=generated, check=False), 'Unsupported schema object')
+        self.check('Unsupported pending migration leaves no ledger', self.sql("SELECT to_regclass('public.gtt_schema_migrations') IS NULL AND to_regclass('public.quotes') IS NULL;", database='migration_unsupported') == 't')
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
             results = list(executor.map(lambda _: self.migration_command('migration_fail', check=False), range(2)))
         self.check('Concurrent migrators both succeed', all(r.returncode == 0 for r in results))
