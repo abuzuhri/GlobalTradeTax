@@ -1,21 +1,30 @@
 #!/usr/bin/env python3
-"""Provision a merchant and API key; requires psycopg >= 3 and DATABASE_URL."""
-import hashlib
+"""Compatibility provisioning entry point; emits the new secret once on stdout."""
+import argparse
+import json
 import os
-import secrets
 import sys
-import uuid
 import psycopg
+from tenant_keys import manage, tenant_id
 
-if len(sys.argv) != 3:
-    raise SystemExit('Usage: python scripts/provision-tenant.py TENANT_ID "Display Name"')
-tenant, name = sys.argv[1:]
-if not tenant or len(tenant) > 100 or not all(c.isalnum() or c in '-_' for c in tenant):
-    raise SystemExit('Tenant ID must contain only letters, digits, - or _ (max 100)')
-key = 'gtt_live_' + secrets.token_urlsafe(36)
-with psycopg.connect(os.environ['DATABASE_URL']) as db:
-    with db.cursor() as cur:
-        cur.execute('INSERT INTO tenants (tenant_id, display_name) VALUES (%s,%s) ON CONFLICT (tenant_id) DO NOTHING', (tenant, name))
-        cur.execute('INSERT INTO tenant_api_keys (key_id,tenant_id,key_prefix,key_hash) VALUES (%s,%s,%s,%s)', (uuid.uuid4(), tenant, key[:18], hashlib.sha256(key.encode()).hexdigest().upper()))
-print('SAVE THIS KEY SECURELY; IT WILL NOT BE SHOWN AGAIN:')
-print(key)
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('tenant', type=tenant_id)
+    parser.add_argument('name')
+    args = parser.parse_args()
+    if not 1 <= len(args.name) <= 200 or any(ord(c) < 32 for c in args.name):
+        parser.error('display name must be 1-200 printable characters')
+    args.action, args.days = 'issue', 90
+    try:
+        with psycopg.connect(os.environ['DATABASE_URL']) as db:
+            result = manage(db, args, create_name=args.name)
+        print(json.dumps(result))
+        return 0
+    except (KeyError, ValueError, psycopg.Error):
+        print('Operation failed; verify target, permissions and database configuration.', file=sys.stderr)
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())

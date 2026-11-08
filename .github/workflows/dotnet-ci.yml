@@ -32,6 +32,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Install lifecycle test dependency
+        run: python3 -m pip install 'psycopg[binary]>=3.1,<4'
       - name: Verify Docker and PostgreSQL lifecycle
         run: python3 scripts/check_postgres_integration.py --report TestResults/postgres-integration.json
       - name: Upload database integration evidence

@@ -9,7 +9,7 @@ import migrate_postgres as migrations
 
 class MigrationGuards(unittest.TestCase):
     def test_manifest_matches_committed_files(self):
-        self.assertEqual(len(migrations.load_migrations(migrations.ROOT / 'db')), 5)
+        self.assertEqual(len(migrations.load_migrations(migrations.ROOT / 'db')), 6)
 
     def test_modified_missing_and_extra_files_are_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:

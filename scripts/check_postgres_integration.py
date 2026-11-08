@@ -173,6 +173,7 @@ class Integration:
         for service in spec['services'].values():
             service.setdefault('labels', {})[MARKER] = self.run_id
         pg = spec['services']['postgres']
+        pg['ports'] = [{'target': 5432, 'published': '0', 'host_ip': '127.0.0.1', 'protocol': 'tcp'}]
         pg['environment']['POSTGRES_PASSWORD'] = '${POSTGRES_PASSWORD:?}'
         pg['healthcheck'] = {'test': ['CMD', 'pg_isready', '-h', '127.0.0.1', '-U', 'trade', '-d', 'trade'],
                              'interval': '2s', 'timeout': '2s', 'retries': 40}
@@ -180,6 +181,7 @@ class Integration:
         legacy_init.mkdir()
         (legacy_init / '001_init.sql').write_bytes((self.repo / 'tests/fixtures/postgres/v04-schema.sql').read_bytes())
         upgrade = copy.deepcopy(pg)
+        upgrade.pop('ports', None)
         upgrade['volumes'] = [
             {'type': 'volume', 'source': 'upgrade_pg', 'target': '/var/lib/postgresql/data'},
             {'type': 'bind', 'source': str(legacy_init), 'target': '/docker-entrypoint-initdb.d', 'read_only': True},
@@ -340,6 +342,63 @@ class Integration:
         self.provision('merchant-a', self.keys['rotated'])
         self.sql("UPDATE tenants SET enabled=false WHERE tenant_id='merchant-b';")
         self.request('GET', '/v1/quotes/' + quote_b['quoteId'], key=self.keys['b'], expected=401)
+
+    def key_lifecycle(self):
+        """Exercise the operator command against the labelled database and real HTTP API."""
+        self.phase('Checking operator key lifecycle')
+        address = self.compose('port', 'postgres', '5432').stdout.decode().strip()
+        port = int(address.rsplit(':', 1)[1])
+        env = self.env.copy()
+        env['DATABASE_URL'] = 'host=127.0.0.1 port=%d dbname=trade user=trade password=%s' % (port, self.env['POSTGRES_PASSWORD'])
+        def command(*args, expected=0):
+            result = subprocess.run([sys.executable, str(self.repo / 'scripts/tenant_keys.py'), *args],
+                                    env=env, capture_output=True, timeout=30)
+            self.check('Lifecycle command has expected status', result.returncode == expected)
+            if result.returncode:
+                self.check('Lifecycle diagnostics omit connection password', self.env['POSTGRES_PASSWORD'].encode() not in result.stderr)
+                return None
+            obj = json.loads(result.stdout)
+            if isinstance(obj, dict) and obj.get('secret'):
+                self.hidden.extend([obj['secret'], hashlib.sha256(obj['secret'].encode()).hexdigest().upper()])
+            return obj
+        self.sql("INSERT INTO tenants(tenant_id,display_name) VALUES ('lifecycle-a','Lifecycle A'),('lifecycle-b','Lifecycle B');")
+        first = command('issue', 'lifecycle-a', '--days', '1')
+        self.request('GET', '/v1/destinations/GB', key=first['secret'])
+        self.check('List exposes metadata only', 'secret' not in json.dumps(command('list', 'lifecycle-a')) and 'key_hash' not in json.dumps(command('list', 'lifecycle-a')))
+        command('rotate', 'lifecycle-b', first['key_id'], expected=1)
+        self.request('GET', '/v1/destinations/GB', key=first['secret'])
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(lambda _: subprocess.run([sys.executable, str(self.repo / 'scripts/tenant_keys.py'), 'rotate', 'lifecycle-a', first['key_id']], env=env, capture_output=True, timeout=30), range(2)))
+        self.check('Concurrent rotation has one winner', sorted(r.returncode for r in results) == [0, 1])
+        rotated = json.loads(next(r.stdout for r in results if r.returncode == 0))
+        self.hidden.extend([rotated['secret'], hashlib.sha256(rotated['secret'].encode()).hexdigest().upper()])
+        self.request('GET', '/v1/destinations/GB', key=first['secret'], expected=401)
+        self.request('GET', '/v1/destinations/GB', key=rotated['secret'])
+        self.sql("ALTER TABLE audit_events ADD CONSTRAINT reject_test_key_audit CHECK (action <> 'api_key_rotate') NOT VALID;")
+        command('rotate', 'lifecycle-a', rotated['key_id'], expected=1)
+        self.sql('ALTER TABLE audit_events DROP CONSTRAINT reject_test_key_audit;')
+        self.request('GET', '/v1/destinations/GB', key=rotated['secret'])
+        self.check('Failed audit rolled back rotation', self.sql("SELECT count(*) FROM tenant_api_keys WHERE tenant_id='lifecycle-a';") == '2')
+        self.check('Successful lifecycle has tenant-bound audit', self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='lifecycle-a' AND action IN ('api_key_issue','api_key_rotate');") == '2')
+        self.sql("UPDATE tenant_api_keys SET expires_at=clock_timestamp() WHERE key_id=" + self.literal(rotated['key_id']) + ';')
+        self.request('GET', '/v1/destinations/GB', key=rotated['secret'], expected=401)
+        command('revoke', 'lifecycle-a', rotated['key_id'])
+        command('revoke', 'lifecycle-a', rotated['key_id'], expected=1)
+        self.sql("UPDATE tenants SET enabled=false WHERE tenant_id='lifecycle-a';")
+        command('issue', 'lifecycle-a', expected=1)
+        self.sql("INSERT INTO tenants(tenant_id,display_name) VALUES ('lifecycle-budget','Budget');")
+        spec = json.loads(self.compose_file.read_text(encoding='utf-8'))
+        spec['services']['api']['environment']['TenantRateLimit__PermitLimit'] = '2'
+        spec['services']['api']['environment']['TenantRateLimit__WindowSeconds'] = '60'
+        validate_spec(spec, self.project, self.run_id)
+        self.compose_file.write_text(json.dumps(spec), encoding='utf-8')
+        self.start_api()
+        budget_key = command('issue', 'lifecycle-budget')
+        self.request('GET', '/v1/destinations/GB', key=budget_key['secret'])
+        budget_rotated = command('rotate', 'lifecycle-budget', budget_key['key_id'])
+        self.request('GET', '/v1/destinations/GB', key=budget_rotated['secret'])
+        self.request('GET', '/v1/destinations/GB', key=budget_rotated['secret'], expected=429, retry_after=True)
+        self.check('No verifier stored in lifecycle audit', self.sql("SELECT count(*) FROM audit_events a JOIN tenant_api_keys k ON a.details_json::text LIKE '%' || k.key_hash || '%' WHERE a.tenant_id='lifecycle-a';") == '0')
 
     def rate_limits(self):
         """Exercise real tenant and rotated-key limits in a separate API process."""
@@ -702,8 +761,8 @@ class Integration:
         self.sql('INSERT INTO quotes(quote_id,tenant_id,idempotency_key,fingerprint,response_json) VALUES (' +
                  ','.join(self.literal(value) for value in (legacy_id, 'legacy-merchant', 'legacy-key', 'legacy-fingerprint', json.dumps(legacy))) + ');', service=service)
         scripts = sorted((self.repo / 'db').glob('*.sql'))
-        self.check('Exactly the five reviewed migration scripts are used', [path.name for path in scripts] ==
-                   ['001_init.sql', '002_tenants.sql', '003_audit.sql', '004_tariff_staging.sql', '005_tariff_provenance.sql'])
+        self.check('Exactly the six reviewed migration scripts are used', [path.name for path in scripts] ==
+                   ['001_init.sql', '002_tenants.sql', '003_audit.sql', '004_tariff_staging.sql', '005_tariff_provenance.sql', '006_api_key_expiry.sql'])
         self.sql('\n'.join(path.read_text() for path in scripts[1:3]) + '\n' +
                  (self.repo / 'tests/fixtures/postgres/v12-tariff-schema.sql').read_text(), service=service)
         old_batch_id = str(uuid.uuid4())
@@ -713,7 +772,7 @@ class Integration:
                  "INSERT INTO tariff_reference_rows VALUES (" + self.literal(old_batch_id) +
                  ",1,'GB','US','0101210000',9.5,'2026-01-01','2026-12-31','https://example.test/test-only','integration-only'),(" +
                  self.literal(old_batch_id) + ",2,'GB','US','0101299000',12.3,'2026-01-01','2026-12-31','https://example.test/test-only','integration-only');", service=service)
-        self.sql(scripts[4].read_text(), service=service)
+        self.sql('\n'.join(path.read_text() for path in scripts[4:]), service=service)
         self.check('Upgraded schema matches fresh initialization', self.sql(SCHEMA_SQL, service=service) == self.fresh_schema)
         self.sql('\n'.join(path.read_text() for path in scripts), service=service)
         self.check('Reapplying schema scripts preserves legacy data',
@@ -763,11 +822,11 @@ class Integration:
     def migration_ledger(self):
         """Exercise adoption, integrity, serialization, atomic failure and restored history."""
         self.phase('Checking versioned migration ledger')
-        for database in ('migration_fresh', 'migration_v04', 'migration_v12', 'migration_current', 'migration_bad', 'migration_fail', 'migration_unsupported'):
+        for database in ('migration_fresh', 'migration_v04', 'migration_v12', 'migration_current', 'migration_v13', 'migration_bad', 'migration_fail', 'migration_unsupported'):
             self.compose('exec', '-T', 'postgres', 'createdb', '-U', 'trade', database)
         self.migration_command('migration_fresh')
-        self.check('Fresh ledger records five applied migrations',
-                   self.sql("SELECT count(*) FROM gtt_schema_migrations WHERE origin='applied';", database='migration_fresh') == '5')
+        self.check('Fresh ledger records six applied migrations',
+                   self.sql("SELECT count(*) FROM gtt_schema_migrations WHERE origin='applied';", database='migration_fresh') == '6')
         before = self.sql('SELECT json_agg(m ORDER BY version) FROM gtt_schema_migrations m;', database='migration_fresh')
         self.migration_command('migration_fresh')
         self.migration_command('migration_fresh', 'status')
@@ -779,13 +838,14 @@ class Integration:
         self.sql(fixture04 + "\nINSERT INTO quotes(quote_id,tenant_id,idempotency_key,fingerprint,response_json) VALUES ('old-quote','old-tenant','old-key','old-fingerprint','{}');", database='migration_v04')
         self.sql(fixture04 + '\n' + '\n'.join(migrations[1:3]) + '\n' + fixture12, database='migration_v12')
         self.sql('\n'.join(migrations), database='migration_current')
+        self.sql('\n'.join(migrations[:5]), database='migration_v13')
         self.sql("INSERT INTO tariff_import_batches(batch_id,dataset_sha256,source_version,source_url,record_count) VALUES ('00000000-0000-0000-0000-000000000001',repeat('a',64),'old','https://example.test',1);", database='migration_v12')
-        for database, baseline, adopted in [('migration_v04', 'v0.4', 1), ('migration_v12', 'v1.2', 4), ('migration_current', 'current', 5)]:
+        for database, baseline, adopted in [('migration_v04', 'v0.4', 1), ('migration_v12', 'v1.2', 4), ('migration_current', 'current', 6), ('migration_v13', 'v1.3', 5)]:
             self.migration_command(database, baseline=baseline)
             self.check('Adoption records honest baseline ' + baseline,
                        self.sql("SELECT count(*) FROM gtt_schema_migrations WHERE origin='adopted';", database=database) == str(adopted))
             self.check('Upgrade completes ' + baseline,
-                       self.sql('SELECT count(*) FROM gtt_schema_migrations;', database=database) == '5')
+                       self.sql('SELECT count(*) FROM gtt_schema_migrations;', database=database) == '6')
         self.check('Adoption preserves historical quote', self.sql("SELECT count(*) FROM quotes WHERE quote_id='old-quote';", database='migration_v04') == '1')
         self.check('Adoption preserves historical staging', self.sql("SELECT count(*) FROM tariff_import_batches WHERE source_version='old';", database='migration_v12') == '1')
         self.sql('ALTER TABLE quotes ADD COLUMN unexpected text;', database='migration_v04')
@@ -821,13 +881,13 @@ class Integration:
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
             results = list(executor.map(lambda _: self.migration_command('migration_fail', check=False), range(2)))
         self.check('Concurrent migrators both succeed', all(r.returncode == 0 for r in results))
-        self.check('Concurrent migrators record each version once', self.sql('SELECT count(*) FROM gtt_schema_migrations;', database='migration_fail') == '5')
+        self.check('Concurrent migrators record each version once', self.sql('SELECT count(*) FROM gtt_schema_migrations;', database='migration_fail') == '6')
         dump = self.compose('exec', '-T', 'postgres', 'pg_dump', '-U', 'trade', '-d', 'migration_v12', '-Fc', '--no-owner', '--no-acl').stdout
         self.compose('exec', '-T', 'postgres', 'createdb', '-U', 'trade', 'migration_restore')
         self.compose('exec', '-T', 'postgres', 'pg_restore', '-U', 'trade', '-d', 'migration_restore', '--no-owner', '--no-acl', '--exit-on-error', '--single-transaction', data=dump)
         self.check('Backup restores ledger provenance and times', self.sql('SELECT json_agg(m ORDER BY version) FROM gtt_schema_migrations m;', database='migration_v12') == self.sql('SELECT json_agg(m ORDER BY version) FROM gtt_schema_migrations m;', database='migration_restore'))
         self.migration_command('migration_restore')
-        self.check('Restored ledger supports repeat migration', self.sql('SELECT count(*) FROM gtt_schema_migrations;', database='migration_restore') == '5')
+        self.check('Restored ledger supports repeat migration', self.sql('SELECT count(*) FROM gtt_schema_migrations;', database='migration_restore') == '6')
 
     def cleanup(self):
         if not self.claimed:
@@ -852,6 +912,7 @@ class Integration:
         try:
             self.prepare()
             self.fresh_api()
+            self.key_lifecycle()
             self.rate_limits()
             self.staging_and_audit()
             self.vat_review_exceptions()

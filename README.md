@@ -1,3 +1,5 @@
+Merchant API key expiry, rotation and revocation: [operator lifecycle runbook](docs/TENANT_KEY_LIFECYCLE.md). Existing installations require migration 006 before updating the API.
+
 > **Project planning:** [Master task register](TASKS.md) · [Task details](tasks/) · [Task change log](docs/CHANGELOG_TASKS.md)
 
 Latest tariff-data work: [exact upload archives and operator review history](docs/TARIFF_PROVENANCE_REVIEW.md), with duplicate/interval checks, reference-only review expiry and migration 005. Existing databases require a controlled migration before running the updated API; see the [operator migration and recovery procedure](docs/POSTGRES_CONTAINER_VERIFICATION.md#operator-migration-backup-and-recovery).
