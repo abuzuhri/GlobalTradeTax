@@ -37,3 +37,7 @@ Negative cross-tenant tests; rotated keys rejected; admin operations audited; th
 - Who will own and review this task?
 - What official source or provider contract is required?
 - What evidence proves correctness in staging?
+
+- 2026-11-08 / planned API-key lifecycle slice: Add nullable legacy-compatible expiry and server-time authentication; provide an operator-invoked, tenant-bound issue/list/rotate/revoke command with transactional audit, bounded expiry, one-time secret output and concurrency guards. Preserve tenant budgets and existing approval gates. Extend migration and isolated integration coverage; production authority and threat-model approval remain open.
+
+- 2026-11-08 / lifecycle implementation: [operator runbook](../docs/TENANT_KEY_LIFECYCLE.md). Local Release suite passed 525 cases with 16 optional skips; Python passed 39 cases. Local Docker access denied; hosted integration and current-head review are tracked by the PR. Production authorization and threat-model approval remain open.

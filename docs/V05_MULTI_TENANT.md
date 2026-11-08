@@ -12,7 +12,7 @@ Install Python package `psycopg[binary]` in an administrative environment. Set `
 
 Save the printed key securely; only its SHA-256 hash is stored in PostgreSQL. Send the key as `X-API-Key`.
 
-Revoke keys with `UPDATE tenant_api_keys SET enabled=false, revoked_at=now() WHERE key_id=...` using an administrative DB session. Rotate by creating a new key, deploying it, then revoking the old one.
+Use the [key lifecycle runbook](TENANT_KEY_LIFECYCLE.md) for expiry, listing, rotation and revocation.
 
 ## Security notes
 - PostgreSQL tenant lookup enforces active tenant and active key. Quotes remain tenant-filtered.
