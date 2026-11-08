@@ -1,6 +1,6 @@
 Merchant API key expiry, rotation and revocation: [operator lifecycle runbook](docs/TENANT_KEY_LIFECYCLE.md). Existing installations require migration 006 before updating the API.
 
-> **Project planning:** [Master task register](TASKS.md) · [Task details](tasks/) · [Task change log](docs/CHANGELOG_TASKS.md)
+> **Project planning:** [Master task register](TASKS.md) Â· [Task details](tasks/) Â· [Task change log](docs/CHANGELOG_TASKS.md)
 
 Latest tariff-data work: [exact upload archives and operator review history](docs/TARIFF_PROVENANCE_REVIEW.md), with duplicate/interval checks, reference-only review expiry and migration 005. Existing databases require a controlled migration before running the updated API; see the [operator migration and recovery procedure](docs/POSTGRES_CONTAINER_VERIFICATION.md#operator-migration-backup-and-recovery).
 
@@ -12,7 +12,7 @@ Latest VAT work: [declared relief/accounting review and conditional reduced valu
 
 Latest controls work: [declared licence/ITAR holds across quotes and landed-cost estimates](docs/COMPLIANCE_HOLDS.md), with provider calls blocked during a hold, durable compliance evidence and exact bounded request parsing. Financial evidence never approves shipment release.
 
-# GlobalTradeTax — Cross-border Customs & Tax SaaS (C#)
+# GlobalTradeTax â€” Cross-border Customs & Tax SaaS (C#)
 
 Initial working source scaffold for **US -> Worldwide**, designed to expand to **China/Worldwide -> US**.
 
@@ -44,7 +44,7 @@ API key required for quote operations, idempotency key on creation, tenant-scope
 
 Authenticated merchant endpoints have a configurable process-local tenant request budget. See [limits, HTTP 429 behavior and deployment limitations](docs/TENANT_RATE_LIMITS.md).
 
-## v0.3 — US export destination routing
+## v0.3 â€” US export destination routing
 - `GET /v1/destinations/{country}` returns a compliance checklist for EU, GCC, selected Latin American destinations, or other countries (requires `X-API-Key`).
 - US outbound quotes now include destination-specific required actions without fabricating rates.
 - **Not a customs calculator yet**: all destination duty/tax amounts remain null until validated rate data is connected.
@@ -59,7 +59,7 @@ curl http://localhost:5080/v1/destinations/SE -H 'X-API-Key: your-secret-key'
 
 See [docs/V04_POSTGRES.md](docs/V04_POSTGRES.md). Docker Compose provisions PostgreSQL and the API. The old in-memory store is used only when no connection string is supplied. Customs duties and taxes remain unavailable until an authoritative provider is connected.
 
-### PostgreSQL/container verification — 2026-11-04
+### PostgreSQL/container verification â€” 2026-11-04
 
 Run `python3 scripts/check_postgres_integration.py` on a Linux/WSL Docker host to verify fresh databases, a frozen v0.4 upgrade, merchant isolation, concurrent idempotency, container recreation and backup restoration. The first real database run exposed and fixed an audit JSONB parameter error that caused HTTP 500. The corrected suite passed 103 assertions locally; the new CI job uploads redacted JSON evidence. See [commands, upgrade/recovery procedure and scope](docs/POSTGRES_CONTAINER_VERIFICATION.md).
 
@@ -67,7 +67,7 @@ Run `python3 scripts/check_postgres_integration.py` on a Linux/WSL Docker host t
 ## v0.5 Multi-tenant authentication
 PostgreSQL-backed SHA-256 hashed per-merchant API keys are now supported. See `docs/V05_MULTI_TENANT.md` for migrations and merchant provisioning. The API still does not calculate authoritative customs duties or taxes.
 
-## v0.6 — Landed-cost provider boundary
+## v0.6 â€” Landed-cost provider boundary
 Added `POST /v1/landed-cost/estimate` and a replaceable `IImportRateProvider` contract.
 The default adapter is deliberately unconfigured and returns **null** duty/tax/total.
 See `docs/V06_LANDED_COST.md`. No authoritative rates or settlements yet.
@@ -76,7 +76,7 @@ See `docs/V06_LANDED_COST.md`. No authoritative rates or settlements yet.
 ## v0.9 additions
 See `docs/V09_RELEASE.md`. Adds external provider HTTPS adapter, fail-closed evidence verification, compliance check endpoint and PostgreSQL audit events. No live tariff provider is connected.
 
-## v1.1 — curated tariff dataset validation
+## v1.1 â€” curated tariff dataset validation
 `POST /v1/tariff-datasets/validate` validates a tightly defined reference CSV and reports its SHA-256 fingerprint. It does not publish tariffs or generate payable totals. See `docs/V11_DATA_PIPELINE.md`.
 
 ## v1.2: PostgreSQL tariff reference staging
@@ -102,11 +102,11 @@ Independent C# screening inspired by the public UK Trade Tariff Backend design; 
 ## v1.7 UK measure evidence
 Read-only `GET /v1/references/uk/commodities/{code}/evidence?origin=US&importDate=2026-11-02` provides conservative relationship evidence (geography, conditions, quotas, exclusions, raw duty expression) without determining eligibility or computing payable duty. See `docs/V17_UK_MEASURE_EVIDENCE.md`.
 
-## v1.8 — UK geographical evidence
+## v1.8 â€” UK geographical evidence
 
 Added conservative `/v1/references/uk/commodities/{code}/geography` endpoint, `UkGeographyResolver.cs`, tests and `docs/V18_UK_GEOGRAPHY.md`. This is a non-payable reference screen and **not** a tariff calculator.
 
-## v1.9 — UK area reference lookup
+## v1.9 â€” UK area reference lookup
 
 Added authenticated `/v1/references/uk/geographical-areas/{id}` with bounded in-process cache and strict validation. See `docs/V19_UK_AREA_LOOKUP.md`. Reference-only: no payable tariff computation.
 
@@ -117,7 +117,7 @@ Added a conservative, dated UK geographical-area membership reference parser and
 ## v2.1 UK assessment orchestration
 See [docs/V21_UK_ASSESSMENT.md](docs/V21_UK_ASSESSMENT.md). The endpoint `/v1/references/uk/assessments/{code}` combines measures and bounded geographic reference lookups; it returns review evidence only and never invents duty or VAT amounts.
 
-## v2.2 — UK audit evidence
+## v2.2 â€” UK audit evidence
 
 Added a deterministic SHA-256 evidence envelope for UK assessments at
 `GET /v1/references/uk/assessments/{code}/evidence-package?origin=US&importDate=2026-11-02`.
@@ -129,22 +129,22 @@ See [docs/V23_UK_CONTRACT_TESTS.md](docs/V23_UK_CONTRACT_TESTS.md). Offline mock
 ## v2.4 UK API contract guard
 See [UK contract guard](docs/V24_UK_CONTRACT_GUARD.md) and [task 005](tasks/005-uk-live-api-contract-fixtures.md). Initial CI/guard work was followed by the live verification below.
 
-### UK live contract correction — 2026-11-04
+### UK live contract correction â€” 2026-11-04
 
 The live UK commodity API uses an internal resource ID and a separate commodity-code attribute. The reference validator now checks the actual singular resource types and code attribute, with four recorded official responses and opt-in live CI probes. Local verification passed 167 offline xUnit tests, four separate live probes, 25 Python tests and authenticated HTTP checks. See [sources, reproduction and remaining managed-API migration work](docs/UK_LIVE_CONTRACT_VERIFICATION.md). TASK-005 remains in progress; this does not enable payable customs calculations.
 
-### Managed UK API authentication — 2026-11-04
+### Managed UK API authentication â€” 2026-11-04
 
 The UK reference adapter now supports the official managed GB API with operator-provisioned client credentials, shared token renewal and one retry after HTTP 401. Public access remains available. See [configuration, opt-in managed probes and verification](docs/UK_MANAGED_API.md). Local verification passed 219 offline xUnit cases, four public live probes and both running-app configurations; real managed credentials are still required for live managed verification. The two historical Gitleaks findings were confirmed as documentation placeholders and scoped to exact finding fingerprints.
 
-### v2.5 — UK lookup coverage
+### v2.5 â€” UK lookup coverage
 UK assessment exposes omitted area IDs when the 20-lookup safety cap is exceeded. See `docs/V25_UK_LOOKUP_COVERAGE.md` and TASK-006. Not a payable quote.
 
 ## v2.6: UK duty expression prototype
 `UkDutyExpressionEngine` evaluates only explicitly supported GBP percentage, specific and additive compound expressions for illustrative arithmetic. It is NOT connected to payable quotes; `VerifiedForCalculation` always false. Legal applicability, preferences, quotas, taxes, and verified customs valuation remain blocked. See `tasks/007-uk-duty-calculation-engine.md`.
 
 
-### v2.7 — UK duty input requirements
+### v2.7 â€” UK duty input requirements
 Specific GBP-per-unit illustrative calculations require only the relevant quantity. Percentage and compound expressions require customs value. See `docs/V27_UK_DUTY_INPUT_REQUIREMENTS.md`. No payable duty amounts are authorized.
 
 ## v2.8 UK VAT readiness
@@ -164,8 +164,8 @@ The review endpoint now suppresses illustrative GBP amounts when core classifica
 ### v3.2 quality baseline
 See [TASK-010](tasks/010-quality-ci-security.md) and [CI quality notes](docs/V32_CI_QUALITY.md). Run `python3 scripts/check_project_integrity.py` locally. .NET CI must pass before release.
 
-### v3.3 — Dependency vulnerability checks
-GitHub Actions now runs a separate NuGet dependency-audit job. The job restores with NuGet advisory checks and fails on known NU1901–NU1904 warnings, then parses a machine-readable direct/transitive vulnerability report. Run the offline parser tests with `python3 -m unittest discover -s scripts/tests -v`. This does not replace secret scanning, integration tests or production security review.
+### v3.3 â€” Dependency vulnerability checks
+GitHub Actions now runs a separate NuGet dependency-audit job. The job restores with NuGet advisory checks and fails on known NU1901â€“NU1904 warnings, then parses a machine-readable direct/transitive vulnerability report. Run the offline parser tests with `python3 -m unittest discover -s scripts/tests -v`. This does not replace secret scanning, integration tests or production security review.
 
 ### Repository secret guard (v3.4)
 Run `python3 scripts/check_secrets.py` inside a Git checkout, plus `python3 -m unittest discover -s scripts/tests -v`. The guard checks tracked files for high-confidence patterns without logging matched values. It is not a substitute for Gitleaks, Git history scanning or credential rotation. See `tasks/010-quality-ci-security.md`.
@@ -177,23 +177,26 @@ The GitHub Actions workflow now includes a full Git-history Gitleaks scan (in ad
 
 CI now starts the compiled API and checks health, capability safety claims, and rejection of unauthenticated quote/landed-cost requests. See `docs/V36_API_SMOKE_TEST.md`. Local Python tests passed; .NET runtime smoke and GitHub Actions remain unverified.
 
-### v3.7 — API authorization smoke coverage
+### v3.7 â€” API authorization smoke coverage
 
 See `docs/V37_AUTH_SMOKE_COVERAGE.md`. The smoke test now probes seven protected routes, including UK tariff reference and VAT review, without credentials or external tariff calls. This is a development security regression test, **not** a production readiness certification.
 
-### v3.8 — Smoke redirect safety
+### v3.8 â€” Smoke redirect safety
 Local-only smoke tests reject HTTP redirects and require an explicit loopback port. See `docs/V38_SMOKE_REDIRECT_SAFETY.md`. This is not evidence of passing hosted CI or verified tariff calculations.
 
-### Windows local verification — 2026-11-02
+### Windows local verification â€” 2026-11-02
 The .NET 8 Release build, 64 xUnit tests, 25 Python tests, publish and live local API smoke checks passed after fixing the discovered failures. See [commands, results and remaining CI requirements](docs/TASK010_WINDOWS_VERIFICATION.md). `global.json` selects a stable .NET 8 SDK. For a new checkout with untracked source files, run `python scripts/check_secrets.py --include-untracked` without staging files. Hosted CI, container smoke and history scanning remain unverified; TASK-010 is still in progress.
 
-### Saleor review pilot — TASK-012
+### Saleor review pilot â€” TASK-012
 `POST /v1/integrations/saleor/reviews` accepts a signed Saleor payload for diagnostic review using existing merchant authentication and manually pinned store keys. Disabled by default; payable amounts remain null. See [configuration, samples and limits](docs/SALEOR_REVIEW_PILOT.md). The pilot has 44 new tests (108 xUnit total) and independent local signed-HTTP verification; live Saleor installation, Dashboard UI and checkout calculation are not implemented.
 
 ### Local Saleor sandbox
 Run `scripts/start_saleor_sandbox.ps1` on Windows with Docker/Compose inside Ubuntu WSL. Core 3.23.45 is available at http://localhost:18080/graphql/ and Dashboard 3.23.41 at http://localhost:19090/. See [setup, credentials location, stop command and runtime evidence](docs/SALEOR_SANDBOX.md). The corrected GraphQL selection and real Saleor signing function passed local interoperability checks; the suite now has 111 passing xUnit cases. The integration App and real checkout-event flow remain follow-up work.
 
-### Installed review App — 2026-11-03
+### Installed review App â€” 2026-11-03
 
 Latest slice: [signed lifecycle and key rotation](docs/SALEOR_APP_LIFECYCLE.md). Real deactivate/reactivate/delete/reinstall preserved four earlier reviews and produced two new cart-event reviews, with six cards verified inside Dashboard. The local suite now has 143 passing xUnit tests. Collection stays disabled; production monitoring, recovery and distributed persistence remain open.
 The Saleor App now installs in the sandbox, receives real checkout events automatically and displays authenticated reviews inside Dashboard. Start the sandbox, then run `python scripts/check_saleor_app.py --results <local-results>` to install/verify the App and create a test cart. See [configuration, security boundaries and actual evidence](docs/SALEOR_INSTALLED_APP.md). The suite has 124 passing xUnit cases; collection is still disabled and TASK-012 remains in progress.
+
+### GCC destination reference guidance
+Authenticated `GET /v1/references/gcc/{country}` supports BH, KW, OM, QA, SA and AE in either case under the existing tenant rate limit. It returns national source pointers and unresolved checks, with null financial fields and all verification, payment and release gates closed. Source review dates are not effective dates. Country reference coverage does not provide tariff or VAT calculation; see [scope and limitations](tasks/011-eu-taric-destination-expansion.md) and [sources](docs/SOURCES.md).

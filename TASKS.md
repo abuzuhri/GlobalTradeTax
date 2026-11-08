@@ -1,4 +1,4 @@
-# GlobalTradeTax — Master task register
+# GlobalTradeTax â€” Master task register
 
 **Single source of truth for planned work.** Detailed task files live in `tasks/`. This tracker describes implementation status, not regulatory approval or production readiness.
 
@@ -8,7 +8,7 @@
 
 **Latest TASK-006 evidence (2026-11-05):** date-scoped UK requests/cache, typed membership paths, import/export linkage, effective windows and explicit exclusions now have 292 passing offline xUnit cases, six separately enabled public live probes and 35 dated HTTP assertions. [Scope, compatibility and verification](docs/UK_APPLICABILITY_EVIDENCE.md). TASK-006 remains in progress; legal conditions, certificates, quotas and preferences are still unresolved. The dated baseline below records the preceding slice.
 
-**Latest UK completion pass (2026-11-05):** GB/XI shipment review, typed conditional duty evidence, separate invoice/tariff currency feeds, mixed-VAT cost reconciliation and UK manual control gates are implemented. Local checks passed 380 offline xUnit cases, ten public live probes, 32 Python tests and 112 isolated database/container assertions with cleanup. [Current contract and remaining gates](docs/UK_SHIPMENT_REVIEW.md) explicitly retain managed-live access, independently approved calculator cases and legal/valuation/NI approvals as unfinished; TASK-005–009 are not marked done.
+**Latest UK completion pass (2026-11-05):** GB/XI shipment review, typed conditional duty evidence, separate invoice/tariff currency feeds, mixed-VAT cost reconciliation and UK manual control gates are implemented. Local checks passed 380 offline xUnit cases, ten public live probes, 32 Python tests and 112 isolated database/container assertions with cleanup. [Current contract and remaining gates](docs/UK_SHIPMENT_REVIEW.md) explicitly retain managed-live access, independently approved calculator cases and legal/valuation/NI approvals as unfinished; TASK-005â€“009 are not marked done.
 
 **Latest TASK-007 evidence (2026-11-06):** five live official calculator duty rows and four published calculator test examples now match. Four reproduced precision failures are corrected without enabling payment. The local Release suite passes 447 cases with 16 optional API skips. [Case evidence and remaining approval gates](docs/UK_DUTY_REFERENCE_CASES.md). TASK-007 remains in progress.
 
@@ -19,6 +19,8 @@
 **Latest TASK-003 slice (2026-11-08):** an operator-invoked migration ledger now checks immutable files and ordered history, verifies explicit legacy adoption and schema drift, serializes migrations and records changes transactionally. Local checks passed 525 offline xUnit cases (16 optional live skips), 37 Python cases and 334 isolated PostgreSQL/container assertions on implementation commit `eaefcf0` with cleanup. [Runbook and limitations](docs/POSTGRES_CONTAINER_VERIFICATION.md); hosted per-commit results belong to the PR. TASK-003 remains in progress for production privileges, index review and recovery exercises.
 
 **TASK-002 API-key lifecycle slice (2026-11-08):** expiry and operator-managed issue, list, rotation and revocation are implemented with transactional tenant-bound audit. [Runbook and limits](docs/TENANT_KEY_LIFECYCLE.md); production authorization and threat-model approval remain open. PR checks track current verification.
+
+**TASK-011 GCC reference slice (2026-11-08):** six national destination references are available for review only; calculation, legal approval and data rights remain open. See [scope and evidence](tasks/011-eu-taric-destination-expansion.md).
 
 ## Status vocabulary
 - `not-started`: not implemented.
@@ -45,7 +47,7 @@
 | 008 | UK import VAT & landed cost | P0 | in-progress | [Task](tasks/008-uk-import-vat-landed-cost.md) |
 | 009 | Compliance & restricted goods | P1 | in-progress | [Task](tasks/009-compliance-restricted-goods.md) |
 | 010 | Quality CI & security | P0 | in-progress | [Task](tasks/010-quality-ci-security.md) |
-| 011 | EU TARIC & destination expansion | P1 | not-started | [Task](tasks/011-eu-taric-destination-expansion.md) |
+| 011 | EU TARIC & destination expansion | P1 | in-progress | [Task](tasks/011-eu-taric-destination-expansion.md) |
 | 012 | Carrier & commerce integrations | P2 | in-progress | [Task](tasks/012-carrier-commerce-integrations.md) |
 | 013 | Payments, ledger & reconciliation | P2 | not-started | [Task](tasks/013-payments,-ledger-reconciliation.md) |
 | 014 | Operations, monitoring & launch | P1 | not-started | [Task](tasks/014-operations,-monitoring-launch.md) |
