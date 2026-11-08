@@ -3,3 +3,6 @@
 /tests/GlobalTradeTax.Api.Tests/Fixtures/UkDutyReference/observations/* -text -whitespace
 /tests/GlobalTradeTax.Api.Tests/Fixtures/UkDutyReference/api/* -text
 /tests/GlobalTradeTax.Api.Tests/Fixtures/UkDutyReference/upstream/* -text
+
+# Migration checksums cover the exact committed bytes on every platform.
+/db/*.sql -text

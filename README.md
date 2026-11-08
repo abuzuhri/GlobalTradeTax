@@ -1,6 +1,6 @@
 > **Project planning:** [Master task register](TASKS.md) · [Task details](tasks/) · [Task change log](docs/CHANGELOG_TASKS.md)
 
-Latest tariff-data work: [exact upload archives and operator review history](docs/TARIFF_PROVENANCE_REVIEW.md), with duplicate/interval checks, reference-only review expiry and migration 005. Existing databases require the new migration before running the updated API.
+Latest tariff-data work: [exact upload archives and operator review history](docs/TARIFF_PROVENANCE_REVIEW.md), with duplicate/interval checks, reference-only review expiry and migration 005. Existing databases require a controlled migration before running the updated API; see the [operator migration and recovery procedure](docs/POSTGRES_CONTAINER_VERIFICATION.md#operator-migration-backup-and-recovery).
 
 Latest UK work: [GB/XI shipment review and remaining completion gates](docs/UK_SHIPMENT_REVIEW.md) covers separate territory references, typed duty/condition evidence, two currency feeds, per-line VAT cost allocation and UK control checks. Review results never authorize payment. Current assessment evidence uses `uk-reference-evidence/v3`; the [dated applicability slice](docs/UK_APPLICABILITY_EVIDENCE.md) remains historical evidence.
 
@@ -79,7 +79,7 @@ See `docs/V09_RELEASE.md`. Adds external provider HTTPS adapter, fail-closed evi
 
 ## v1.2: PostgreSQL tariff reference staging
 
-See `docs/V12_STAGING.md`. Operator-only `POST /v1/admin/tariff-datasets/stage` and `GET /v1/admin/tariff-datasets/{id}` store validated CSV reference records transactionally, with SHA-256 deduplication. **Staged records are not used for quotes.** Existing databases must apply `db/004_tariff_staging.sql` manually.
+See `docs/V12_STAGING.md`. Operator-only `POST /v1/admin/tariff-datasets/stage` and `GET /v1/admin/tariff-datasets/{id}` store validated CSV reference records transactionally, with SHA-256 deduplication. **Staged records are not used for quotes.** Existing databases must be upgraded using the controlled [operator migration procedure](docs/POSTGRES_CONTAINER_VERIFICATION.md#operator-migration-backup-and-recovery).
 
 ## v1.3 - UK Trade Tariff source registry
 

@@ -18,7 +18,7 @@
 
 ## Setup
 Set TRADE_RATE_PROVIDER_URL to an HTTPS endpoint and TRADE_RATE_PROVIDER_TOKEN to a secret.
-Run db/003_audit.sql against existing PostgreSQL deployments; compose initialization scripts run only on new volumes.
+Use the controlled [migration and recovery procedure](POSTGRES_CONTAINER_VERIFICATION.md#operator-migration-backup-and-recovery) for existing PostgreSQL deployments; Compose initialization scripts run only on new volumes.
 Run docker compose up --build. Use POST /v1/landed-cost/estimate and POST /v1/compliance/check.
 
 ## Next milestones

@@ -16,6 +16,8 @@
 
 **Latest TASK-009/002 evidence (2026-11-07):** declared licence/ITAR holds now block quote completion and landed-cost provider calls and totals. Compliance checks report stable hold reasons and false shipment-release approval. Strict authenticated input parsing rejects duplicate control flags and invalid/overflowing requests. Local checks pass 514 offline xUnit cases/16 optional skips and 33 Python cases. [Behavior, compatibility, sources and remaining approval](docs/COMPLIANCE_HOLDS.md). Both tasks remain in progress.
 
+**Latest TASK-003 slice (2026-11-08):** an operator-invoked migration ledger now checks immutable files and ordered history, verifies explicit legacy adoption and schema drift, serializes migrations and records changes transactionally. Local checks passed 525 offline xUnit cases (16 optional live skips), 37 Python cases and 334 isolated PostgreSQL/container assertions on implementation commit `eaefcf0` with cleanup. [Runbook and limitations](docs/POSTGRES_CONTAINER_VERIFICATION.md); hosted per-commit results belong to the PR. TASK-003 remains in progress for production privileges, index review and recovery exercises.
+
 ## Status vocabulary
 - `not-started`: not implemented.
 - `in-progress`: partial code exists; acceptance criteria unmet.

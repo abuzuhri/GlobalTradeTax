@@ -6,7 +6,7 @@
 Validated CSV rows are written transactionally to PostgreSQL, with SHA-256 deduplication. This is **reference-only staging**. No imported row is activated for IImportRateProvider, no VAT is calculated, and no payable customs amount is derived.
 
 ## Setup
-1. On existing PostgreSQL volumes, apply `db/004_tariff_staging.sql` manually with psql. Docker entrypoint scripts only run on first database initialization.
+1. On existing PostgreSQL volumes, use the controlled [migration and recovery procedure](POSTGRES_CONTAINER_VERIFICATION.md#operator-migration-backup-and-recovery). Docker entrypoint scripts only run on first database initialization.
 2. Set `TRADE_OPERATOR_KEY` to a separately generated random secret of at least 32 characters. Never reuse merchant API keys.
 3. Send CSV with `Content-Type: text/csv` and `X-Operator-Key` to `POST /v1/admin/tariff-datasets/stage`. Max request body is 1 MiB. Returns batch UUID and SHA-256; duplicate byte-identical files reuse batch ID.
 4. Retrieve metadata via `GET /v1/admin/tariff-datasets/{id}` with the same operator header.
