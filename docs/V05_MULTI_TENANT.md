@@ -1,7 +1,7 @@
 # v0.5: Multi-merchant API authentication
 
 ## Database migration
-For an existing v0.4 database, execute `db/002_tenants.sql` manually with psql. Docker's `/docker-entrypoint-initdb.d` runs only when the database volume is initially created. Do not delete existing volumes to apply migrations.
+For an existing v0.4 database, use the controlled [migration and recovery procedure](POSTGRES_CONTAINER_VERIFICATION.md#operator-migration-backup-and-recovery). Docker's `/docker-entrypoint-initdb.d` runs only when the database volume is initially created. Do not delete existing volumes to apply migrations.
 
 For a fresh installation, both SQL scripts run in filename order when mounted as a directory.
 

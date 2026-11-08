@@ -23,6 +23,7 @@ from urllib.request import Request, build_opener
 import uuid
 
 from smoke_api import NoRedirects, assert_smoke, fetch, require_loopback
+import migrate_postgres
 
 
 MARKER = 'com.globaltradetax.integration'
@@ -682,6 +683,11 @@ class Integration:
         self.request('POST', '/v1/landed-cost/estimate', key=self.keys['rotated'], payload=self.payload)
         self.check('Restored database accepts audit writes with its restored identity sequence',
                    self.sql('SELECT count(*) FROM audit_events;', database='trade_restore') == str(self.expected_audit_count + 1))
+        before_adoption = self.sql("SELECT json_build_array((SELECT count(*) FROM quotes),(SELECT count(*) FROM tariff_import_documents),(SELECT count(*) FROM tariff_reference_reviews),(SELECT count(*) FROM audit_events))::text;", database='trade_restore')
+        self.migration_command('trade_restore', baseline='current')
+        self.check('Current adoption preserves quotes, archives, reviews and audits', before_adoption == self.sql("SELECT json_build_array((SELECT count(*) FROM quotes),(SELECT count(*) FROM tariff_import_documents),(SELECT count(*) FROM tariff_reference_reviews),(SELECT count(*) FROM audit_events))::text;", database='trade_restore'))
+        self.request('POST', '/v1/landed-cost/estimate', key=self.keys['rotated'], payload=self.payload)
+        self.check('Audit identity still writes after current adoption', self.sql('SELECT count(*) FROM audit_events;', database='trade_restore') == str(self.expected_audit_count + 2))
         self.report['backup_bytes'] = len(dump)
 
     def upgrade(self):
@@ -738,6 +744,73 @@ class Integration:
         self.incomplete_quote(new_quote)
         self.check('New writes preserve the historical quote', self.sql('SELECT count(*) FROM quotes;', service=service) == '2')
 
+    def migration_command(self, database, mode='apply', baseline=None, *, sql=None, check=True):
+        """Run the same generated operator transaction through psql in our owned container."""
+        if sql is None:
+            args = [sys.executable, str(self.repo / 'scripts/migrate_postgres.py'), mode]
+            if baseline:
+                args += ['--adopt', baseline]
+            result = self.command(args)
+            sql = result.stdout.decode('utf-8')
+        return self.compose('exec', '-T', 'postgres', 'psql', '-X', '-qAt', '-U', 'trade',
+                            '-d', database, '-v', 'ON_ERROR_STOP=1', '-f', '-',
+                            data=sql.encode(), check=check)
+
+    def migration_ledger(self):
+        """Exercise adoption, integrity, serialization, atomic failure and restored history."""
+        self.phase('Checking versioned migration ledger')
+        for database in ('migration_fresh', 'migration_v04', 'migration_v12', 'migration_current', 'migration_bad', 'migration_fail'):
+            self.compose('exec', '-T', 'postgres', 'createdb', '-U', 'trade', database)
+        self.migration_command('migration_fresh')
+        self.check('Fresh ledger records five applied migrations',
+                   self.sql("SELECT count(*) FROM gtt_schema_migrations WHERE origin='applied';", database='migration_fresh') == '5')
+        before = self.sql('SELECT json_agg(m ORDER BY version) FROM gtt_schema_migrations m;', database='migration_fresh')
+        self.migration_command('migration_fresh')
+        self.migration_command('migration_fresh', 'status')
+        self.check('Repeat and status preserve ledger records', before == self.sql(
+            'SELECT json_agg(m ORDER BY version) FROM gtt_schema_migrations m;', database='migration_fresh'))
+        migrations = migrate_postgres.load_migrations(self.repo / 'db')
+        fixture04 = (self.repo / 'tests/fixtures/postgres/v04-schema.sql').read_text()
+        fixture12 = (self.repo / 'tests/fixtures/postgres/v12-tariff-schema.sql').read_text()
+        self.sql(fixture04 + "\nINSERT INTO quotes(quote_id,tenant_id,idempotency_key,fingerprint,response_json) VALUES ('old-quote','old-tenant','old-key','old-fingerprint','{}');", database='migration_v04')
+        self.sql(fixture04 + '\n' + '\n'.join(migrations[1:3]) + '\n' + fixture12, database='migration_v12')
+        self.sql('\n'.join(migrations), database='migration_current')
+        self.sql("INSERT INTO tariff_import_batches(batch_id,dataset_sha256,source_version,source_url,record_count) VALUES ('00000000-0000-0000-0000-000000000001',repeat('a',64),'old','https://example.test',1);", database='migration_v12')
+        for database, baseline, adopted in [('migration_v04', 'v0.4', 1), ('migration_v12', 'v1.2', 4), ('migration_current', 'current', 5)]:
+            self.migration_command(database, baseline=baseline)
+            self.check('Adoption records honest baseline ' + baseline,
+                       self.sql("SELECT count(*) FROM gtt_schema_migrations WHERE origin='adopted';", database=database) == str(adopted))
+            self.check('Upgrade completes ' + baseline,
+                       self.sql('SELECT count(*) FROM gtt_schema_migrations;', database=database) == '5')
+        self.check('Adoption preserves historical quote', self.sql("SELECT count(*) FROM quotes WHERE quote_id='old-quote';", database='migration_v04') == '1')
+        self.check('Adoption preserves historical staging', self.sql("SELECT count(*) FROM tariff_import_batches WHERE source_version='old';", database='migration_v12') == '1')
+        self.sql('ALTER TABLE quotes ADD COLUMN unexpected text;', database='migration_v04')
+        self.check('Tracked schema drift rejected', self.migration_command('migration_v04', check=False).returncode != 0)
+        self.sql('ALTER TABLE quotes DROP COLUMN unexpected;', database='migration_v04')
+        self.sql(fixture04 + '\nALTER TABLE quotes ADD COLUMN unexpected text;', database='migration_bad')
+        self.check('Mismatched adoption rejected', self.migration_command('migration_bad', baseline='v0.4', check=False).returncode != 0)
+        self.check('Rejected adoption leaves no ledger', self.sql("SELECT to_regclass('public.gtt_schema_migrations') IS NULL;", database='migration_bad') == 't')
+        self.check('Untracked schema requires adoption', self.migration_command('migration_bad', check=False).returncode != 0)
+        self.sql("UPDATE gtt_schema_migrations SET checksum=repeat('0',64) WHERE version=2;", database='migration_fresh')
+        self.check('Checksum drift rejected', self.migration_command('migration_fresh', check=False).returncode != 0)
+        self.sql("UPDATE gtt_schema_migrations SET checksum=" + self.literal(migrate_postgres.MANIFEST[1][1]) + ' WHERE version=2;', database='migration_fresh')
+        self.sql('DELETE FROM gtt_schema_migrations WHERE version=2;', database='migration_fresh')
+        self.check('History gap rejected', self.migration_command('migration_fresh', check=False).returncode != 0)
+        self.sql("INSERT INTO gtt_schema_migrations(version,name,checksum,origin) VALUES (2," + self.literal(migrate_postgres.MANIFEST[1][0]) + ',' + self.literal(migrate_postgres.MANIFEST[1][1]) + ",'applied');", database='migration_fresh')
+        failing = migrate_postgres.build_sql(migrations, 'apply').replace(migrations[4], migrations[4] + '\nSELECT 1/0;')
+        self.check('Failed migration returns error', self.migration_command('migration_fail', sql=failing, check=False).returncode != 0)
+        self.check('Failed transaction leaves neither schema nor ledger', self.sql("SELECT to_regclass('public.quotes') IS NULL AND to_regclass('public.gtt_schema_migrations') IS NULL;", database='migration_fail') == 't')
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            results = list(executor.map(lambda _: self.migration_command('migration_fail', check=False), range(2)))
+        self.check('Concurrent migrators both succeed', all(r.returncode == 0 for r in results))
+        self.check('Concurrent migrators record each version once', self.sql('SELECT count(*) FROM gtt_schema_migrations;', database='migration_fail') == '5')
+        dump = self.compose('exec', '-T', 'postgres', 'pg_dump', '-U', 'trade', '-d', 'migration_v12', '-Fc', '--no-owner', '--no-acl').stdout
+        self.compose('exec', '-T', 'postgres', 'createdb', '-U', 'trade', 'migration_restore')
+        self.compose('exec', '-T', 'postgres', 'pg_restore', '-U', 'trade', '-d', 'migration_restore', '--no-owner', '--no-acl', '--exit-on-error', '--single-transaction', data=dump)
+        self.check('Backup restores ledger provenance and times', self.sql('SELECT json_agg(m ORDER BY version) FROM gtt_schema_migrations m;', database='migration_v12') == self.sql('SELECT json_agg(m ORDER BY version) FROM gtt_schema_migrations m;', database='migration_restore'))
+        self.migration_command('migration_restore')
+        self.check('Restored ledger supports repeat migration', self.sql('SELECT count(*) FROM gtt_schema_migrations;', database='migration_restore') == '5')
+
     def cleanup(self):
         if not self.claimed:
             return
@@ -767,6 +840,7 @@ class Integration:
             self.compliance_holds()
             self.persistence_and_restore()
             self.upgrade()
+            self.migration_ledger()
             self.report['status'] = 'passed'
         except (Exception, KeyboardInterrupt) as error:
             self.report['status'] = 'failed'

@@ -4,7 +4,7 @@
 
 Set `POSTGRES_PASSWORD`, `TRADE_API_KEY`, and `TRADE_TENANT_ID` in `.env` (do not commit secrets), then run `docker compose up --build`.
 
-POST `/v1/quotes` with `X-API-Key` and `Idempotency-Key`; GET `/v1/quotes/{id}` using the same API key. The schema is created automatically on **first initialization of a new database volume**. For an existing database, apply `db/001_init.sql` manually.
+POST `/v1/quotes` with `X-API-Key` and `Idempotency-Key`; GET `/v1/quotes/{id}` using the same API key. The schema is created automatically on **first initialization of a new database volume**. For an existing database, use the controlled [migration and recovery procedure](POSTGRES_CONTAINER_VERIFICATION.md#operator-migration-backup-and-recovery).
 
 ## Safety and limitations
 

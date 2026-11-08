@@ -4,6 +4,8 @@ Implemented on 2026-11-04. The integration runner builds the repository Dockerfi
 
 **2026-11-05 extension:** [tariff provenance/review verification](TARIFF_PROVENANCE_REVIEW.md) adds migration 005, exact-byte archives, append-only review revisions/expiry and frozen v1.2 staging upgrade coverage. The current runner checks eight tables and five scripts; the dated 103-assertion baseline below describes the previous slice.
 
+**2026-11-08 ledger slice:** local verification passed 334 assertions with cleanup, including explicit v0.4/v1.2/current adoption, tracked and untracked drift rejection, concurrent runners, atomic failure, preserved data and ledger backup/restore. The first new repeat-preflight run exposed a ledger-index comparison defect; the corrected run passed. The PR tracks hosted results for its latest commit.
+
 ## Discovered runtime defect
 
 The first real database run reached 53 assertions, then `POST /v1/landed-cost/estimate` returned HTTP 500. PostgreSQL reported SQLSTATE 42804: `audit_events.details_json` is JSONB, while `AuditStore` sent its serialized value as a text parameter. Previously, the local HTTP smoke checks did not use PostgreSQL and could not expose this failure.
@@ -68,33 +70,39 @@ The `container-postgres` job runs the same script on every normal workflow run a
 
 Hosted execution and its uploaded evidence are tracked in [draft PR #2](https://github.com/abuzuhri/GlobalTradeTax/pull/2/checks), which builds on PR #1. The PR records the final hosted outcome separately from the local results above.
 
-## Database upgrade and recovery procedure
+## Operator migration, backup and recovery
 
-The official PostgreSQL container executes initialization scripts only for a new data directory; existing volumes need an explicit upgrade. The sorted initialization behavior and persistence path for PostgreSQL 16 are documented by the [official image](https://hub.docker.com/_/postgres). Recreating an existing volume is unnecessary for applying these scripts.
-
-The following commands are for an operator-managed deployment, inside a Linux/WSL shell with the existing Compose configuration and required password environment already supplied. Stop application writers for a controlled upgrade and choose a protected backup location outside the repository.
+The API does not run migrations at startup. The official PostgreSQL image runs initialization files only for a new data directory ([image documentation](https://hub.docker.com/_/postgres)); an initialized volume is untracked until explicitly adopted. Stop all application writers and other schema administrators, identify the target database independently, and take a protected backup. Verify it by restoring into an isolated, unused database before changing the target. Do not delete or recreate the original volume. These Linux/WSL examples assume the operator has configured authentication securely, selected the intended Compose project, and reviewed the target:
 
 ```bash
 set -euo pipefail
 backup_file=/secure-backups/trade-before-upgrade.dump
 docker compose exec -T postgres pg_dump -U trade -d trade -Fc --no-owner --no-acl > "$backup_file"
 docker compose exec -T postgres pg_restore --list < "$backup_file"
-
-cat db/001_init.sql db/002_tenants.sql db/003_audit.sql db/004_tariff_staging.sql db/005_tariff_provenance.sql |
-  docker compose exec -T postgres psql -X -U trade -d trade \
-    -v ON_ERROR_STOP=1 --single-transaction -f -
+python3 scripts/migrate_postgres.py status | docker compose exec -T postgres psql -X -U trade -d trade -v ON_ERROR_STOP=1 -f -
 ```
 
-`ON_ERROR_STOP` and a single transaction make a failed script roll back its transaction; these options and their restrictions are documented in [psql](https://www.postgresql.org/docs/16/app-psql.html). The runner exercises this failure path. These five scripts use idempotent creation statements; there is no version/checksum ledger or automatic downgrade runner.
+The generator validates the exact committed bytes against its release manifest before emitting SQL. `pipefail` is required so a generator failure cannot be mistaken for success. Supply passwords via an approved protected credential mechanism, never in command arguments or logs. On an empty database, run `apply` without an adoption option. For an existing **untracked** schema choose exactly one explicitly reviewed baseline (`v0.4` = 001, `v1.2` = 001–004, or `current` = 001–005):
 
-Before trusting a backup, restore it into a new, unused database and verify it. The test does this using the documented [custom-format dump](https://www.postgresql.org/docs/16/app-pgdump.html) and [pg_restore](https://www.postgresql.org/docs/16/app-pgrestore.html) flow:
+```bash
+python3 scripts/migrate_postgres.py apply --adopt current | docker compose exec -T postgres psql -X -U trade -d trade -v ON_ERROR_STOP=1 -f -
+# For a tracked database or an empty database:
+python3 scripts/migrate_postgres.py apply | docker compose exec -T postgres psql -X -U trade -d trade -v ON_ERROR_STOP=1 -f -
+```
+
+Adoption constructs the selected reference schema in a transaction and compares catalog structure before recording baseline rows as `adopted`. Those timestamps record adoption, **not** historical execution. A mismatched schema is refused and must be investigated; do not manually insert ledger rows or edit a released script to force acceptance. Status checks the manifest and tracked history and lists pending versions without persistent writes; apply also compares the tracked schema against its recorded prefix before making changes. A successful repeat apply is a no-op. All participating runners serialize using a transaction-level advisory lock; schema changes and ledger rows commit together. PostgreSQL documents [advisory locks](https://www.postgresql.org/docs/16/functions-admin.html) and [psql error handling](https://www.postgresql.org/docs/16/app-psql.html). The lock coordinates this tool only; maintenance and other migration tools must be excluded operationally.
+
+The comparison covers relations, columns, defaults, constraints, indexes, sequences, functions, triggers, policies, extensions and supported custom types; it is not proof of data correctness, historical execution, ownership, grants, external dependencies, or absence of all possible catalog alterations. Review these separately. The ledger is an integrity aid, not a tamper-evident audit log: protect the manifest and database ledger from unauthorized modification and keep independent deployment and backup records. The migration role needs schema creation and DDL rights; separate least-privilege design, ownership/grants review and operational approval remain required before production use.
+
+For a restore rehearsal, use a new isolated database with appropriately protected access:
 
 ```bash
 docker compose exec -T postgres createdb -U trade trade_restore_test
 docker compose exec -T postgres pg_restore -U trade -d trade_restore_test \
   --no-owner --no-acl --exit-on-error --single-transaction < "$backup_file"
+python3 scripts/migrate_postgres.py status | docker compose exec -T postgres psql -X -U trade -d trade_restore_test -v ON_ERROR_STOP=1 -f -
 ```
 
-Use the restored database for validation before switching the application connection. The tested backup covers this database's schema/data/sequences; global database roles, separate Saleor state, production TLS, scheduled retention, disaster-recovery timing and database least-privilege policies need their own operational work. Merchant isolation here is verified at the authenticated API boundary.
+Validate restored application data, ledger and sequence writes before switching a connection. This dump does not cover global roles, external Saleor state, TLS or retention. There is no automatic downgrade: on failure, stop writers, investigate the error and restore a verified backup into an isolated database under an approved recovery plan. Recovery can lose writes made since the backup; practice the procedure and establish recovery objectives before production.
 
-TASK-003 and TASK-010 remain in progress. Required-check enforcement, migration release/ledger policy, production recovery exercises and broader security review remain open.
+Release policy: append a uniquely ordered immutable migration and its exact SHA-256 to the manifest; never rewrite, remove or reorder a released migration. Every migration must be reviewed as transaction-safe, schema-relocatable DDL: the preflight executes each recorded script again in a temporary reference schema. Scripts must not change public explicitly, perform data mutations or external side effects, control transactions, or depend on application data. A future migration that needs those capabilities requires a separately designed runner before release. Review compatibility and locking, test fresh, upgrade and restore paths, and publish the release artifact together with its manifest. Transaction-incompatible operations need a separately designed and reviewed procedure; this runner does not support them. Test backups and rollback plans before release, and retain evidence for the exact release commit. TASK-003 remains in progress for production privilege, index and operational review and recovery exercises.
