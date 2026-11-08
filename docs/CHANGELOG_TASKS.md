@@ -2,7 +2,7 @@
 
 ## 2026-11-08 — TASK-003 migration ledger
 - Added an operator-invoked, checksum-verified ordered migration ledger with explicit catalog-checked adoption, tracked schema/history preflight, transaction-scoped locking and atomic migration records. Adoption records its actual time rather than asserting historical execution. [Operator and recovery guidance](POSTGRES_CONTAINER_VERIFICATION.md).
-- Local Release tests passed 525 offline cases with 16 optional live skips, 37 Python tests and 334 PostgreSQL/container assertions with isolated cleanup. A repeat-preflight comparison defect found in an intermediate run was fixed. Hosted evidence for each commit is tracked in the PR. Privilege, index and production recovery review remain open.
+- Local Release tests passed 525 offline cases with 16 optional live skips, 37 Python tests and 334 PostgreSQL/container assertions on implementation commit `eaefcf0` with isolated cleanup. A repeat-preflight comparison defect found in an intermediate run was fixed. Hosted evidence for each commit is tracked in the PR. Privilege, index and production recovery review remain open.
 
 ## 2026-11-07 — TASK-002 tenant request budgets
 - Added bounded process-local tenant request budgets for authenticated merchant routes, shared across keys and checked before body parsing and upstream work. See [configuration and limitations](TENANT_RATE_LIMITS.md). Distributed enforcement and independent approvals remain open.

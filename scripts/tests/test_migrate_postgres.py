@@ -22,6 +22,7 @@ class MigrationGuards(unittest.TestCase):
             (directory / migrations.MANIFEST[0][0]).unlink()
             with self.assertRaisesRegex(ValueError, 'manifest'):
                 migrations.load_migrations(directory)
+            (directory / migrations.MANIFEST[0][0]).write_bytes((migrations.ROOT / 'db' / migrations.MANIFEST[0][0]).read_bytes())
             (directory / '999_unreviewed.sql').write_text('SELECT 1;')
             with self.assertRaisesRegex(ValueError, 'manifest'):
                 migrations.load_migrations(directory)

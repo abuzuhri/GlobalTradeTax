@@ -98,7 +98,7 @@ LANGUAGE sql AS $signature$
  SELECT 'function', p.proname, pg_catalog.pg_get_function_identity_arguments(p.oid)
  FROM pg_catalog.pg_proc p JOIN pg_catalog.pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname=ns
  UNION ALL
- SELECT 'trigger', c.relname||'.'||t.tgname, pg_catalog.pg_get_triggerdef(t.oid)
+ SELECT 'trigger', c.relname||'.'||t.tgname, concat_ws('|',pg_catalog.pg_get_triggerdef(t.oid),t.tgenabled)
  FROM pg_catalog.pg_trigger t JOIN pg_catalog.pg_class c ON c.oid=t.tgrelid
  JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=ns AND NOT t.tgisinternal
  UNION ALL
@@ -110,6 +110,10 @@ $signature$;
 
 
 COMPARE = """DO $compare$ BEGIN
+ IF EXISTS (SELECT 1 FROM pg_temp.schema_signature('public') WHERE kind IN ('type','extension','function','trigger','policy')) OR
+    EXISTS (SELECT 1 FROM pg_temp.schema_signature('gtt_migration_reference') WHERE kind IN ('type','extension','function','trigger','policy')) THEN
+   RAISE EXCEPTION 'Unsupported schema object requires a separately reviewed migration procedure';
+ END IF;
  IF EXISTS ((SELECT kind, identity, replace(definition,'public.','') FROM pg_temp.schema_signature('public')
              EXCEPT SELECT kind, identity, replace(definition,'gtt_migration_reference.','') FROM pg_temp.schema_signature('gtt_migration_reference'))
             UNION ALL

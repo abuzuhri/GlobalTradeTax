@@ -756,6 +756,10 @@ class Integration:
                             '-d', database, '-v', 'ON_ERROR_STOP=1', '-f', '-',
                             data=sql.encode(), check=check)
 
+    def migration_rejected(self, name, result, diagnostic):
+        """Require the intended failure, not merely an unrelated psql error."""
+        self.check(name, result.returncode != 0 and diagnostic in result.stderr.decode('utf-8', errors='replace'))
+
     def migration_ledger(self):
         """Exercise adoption, integrity, serialization, atomic failure and restored history."""
         self.phase('Checking versioned migration ledger')
@@ -785,20 +789,28 @@ class Integration:
         self.check('Adoption preserves historical quote', self.sql("SELECT count(*) FROM quotes WHERE quote_id='old-quote';", database='migration_v04') == '1')
         self.check('Adoption preserves historical staging', self.sql("SELECT count(*) FROM tariff_import_batches WHERE source_version='old';", database='migration_v12') == '1')
         self.sql('ALTER TABLE quotes ADD COLUMN unexpected text;', database='migration_v04')
-        self.check('Tracked schema drift rejected', self.migration_command('migration_v04', check=False).returncode != 0)
+        self.migration_rejected('Tracked schema drift rejected', self.migration_command('migration_v04', check=False), 'Schema does not match')
         self.sql('ALTER TABLE quotes DROP COLUMN unexpected;', database='migration_v04')
+        self.sql("CREATE FUNCTION public.test_trigger() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$; CREATE TRIGGER test_trigger BEFORE INSERT ON quotes FOR EACH ROW EXECUTE FUNCTION public.test_trigger(); ALTER TABLE quotes DISABLE TRIGGER test_trigger;", database='migration_v04')
+        self.migration_rejected('Unsupported trigger and function are rejected', self.migration_command('migration_v04', check=False), 'Unsupported schema object')
+        self.sql('DROP TRIGGER test_trigger ON quotes; DROP FUNCTION public.test_trigger();', database='migration_v04')
+        self.sql("CREATE TYPE public.test_enum AS ENUM ('x');", database='migration_v04')
+        self.migration_rejected('Unsupported custom type is rejected', self.migration_command('migration_v04', check=False), 'Unsupported schema object')
+        self.sql('DROP TYPE public.test_enum; CREATE POLICY test_policy ON quotes USING (true);', database='migration_v04')
+        self.migration_rejected('Unsupported policy is rejected', self.migration_command('migration_v04', check=False), 'Unsupported schema object')
+        self.sql('DROP POLICY test_policy ON quotes;', database='migration_v04')
         self.sql(fixture04 + '\nALTER TABLE quotes ADD COLUMN unexpected text;', database='migration_bad')
-        self.check('Mismatched adoption rejected', self.migration_command('migration_bad', baseline='v0.4', check=False).returncode != 0)
+        self.migration_rejected('Mismatched adoption rejected', self.migration_command('migration_bad', baseline='v0.4', check=False), 'Schema does not match')
         self.check('Rejected adoption leaves no ledger', self.sql("SELECT to_regclass('public.gtt_schema_migrations') IS NULL;", database='migration_bad') == 't')
-        self.check('Untracked schema requires adoption', self.migration_command('migration_bad', check=False).returncode != 0)
+        self.migration_rejected('Untracked schema requires adoption', self.migration_command('migration_bad', check=False), 'Untracked schema')
         self.sql("UPDATE gtt_schema_migrations SET checksum=repeat('0',64) WHERE version=2;", database='migration_fresh')
-        self.check('Checksum drift rejected', self.migration_command('migration_fresh', check=False).returncode != 0)
+        self.migration_rejected('Checksum drift rejected', self.migration_command('migration_fresh', check=False), 'Migration history is inconsistent')
         self.sql("UPDATE gtt_schema_migrations SET checksum=" + self.literal(migrate_postgres.MANIFEST[1][1]) + ' WHERE version=2;', database='migration_fresh')
         self.sql('DELETE FROM gtt_schema_migrations WHERE version=2;', database='migration_fresh')
-        self.check('History gap rejected', self.migration_command('migration_fresh', check=False).returncode != 0)
+        self.migration_rejected('History gap rejected', self.migration_command('migration_fresh', check=False), 'Migration history is inconsistent')
         self.sql("INSERT INTO gtt_schema_migrations(version,name,checksum,origin) VALUES (2," + self.literal(migrate_postgres.MANIFEST[1][0]) + ',' + self.literal(migrate_postgres.MANIFEST[1][1]) + ",'applied');", database='migration_fresh')
         failing = migrate_postgres.build_sql(migrations, 'apply').replace(migrations[4], migrations[4] + '\nSELECT 1/0;')
-        self.check('Failed migration returns error', self.migration_command('migration_fail', sql=failing, check=False).returncode != 0)
+        self.migration_rejected('Failed migration returns error', self.migration_command('migration_fail', sql=failing, check=False), 'division by zero')
         self.check('Failed transaction leaves neither schema nor ledger', self.sql("SELECT to_regclass('public.quotes') IS NULL AND to_regclass('public.gtt_schema_migrations') IS NULL;", database='migration_fail') == 't')
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
             results = list(executor.map(lambda _: self.migration_command('migration_fail', check=False), range(2)))
