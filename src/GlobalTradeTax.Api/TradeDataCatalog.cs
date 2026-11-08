@@ -17,7 +17,7 @@ public static class TradeDataCatalog
             "https://docs.trade-tariff.service.gov.uk/", "MIT",
             "UK Trade Tariff Backend contributors (https://github.com/trade-tariff/trade-tariff-backend)",
             "Architecture and API integration research; review dataset licensing and API terms before any commercial ingestion."),
-        new("eu-taric", "EU TARIC", "https://taxation-customs.ec.europa.eu/customs-4/calculation-customs-duties/customs-tariff/eu-customs-tariff-taric_en",
+        new("eu-taric", "EU TARIC", "https://taxation-customs.ec.europa.eu/online-services/online-services-and-databases-customs/eu-customs-tariff-taric_en",
             "EU", "official tariff reference", "reference-only", "TARIC alone does not cover all national VAT, excise or clearance fees."),
         new("us-hts", "USITC HTS", "https://hts.usitc.gov/", "US", "official import tariff reference",
             "reference-only", "Duty depends on origin, measures and current entry context."),

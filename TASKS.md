@@ -18,6 +18,8 @@
 
 **Latest TASK-003 slice (2026-11-08):** an operator-invoked migration ledger now checks immutable files and ordered history, verifies explicit legacy adoption and schema drift, serializes migrations and records changes transactionally. Local checks passed 525 offline xUnit cases (16 optional live skips), 37 Python cases and 334 isolated PostgreSQL/container assertions on implementation commit `eaefcf0` with cleanup. [Runbook and limitations](docs/POSTGRES_CONTAINER_VERIFICATION.md); hosted per-commit results belong to the PR. TASK-003 remains in progress for production privileges, index review and recovery exercises.
 
+**Latest TASK-011 slice (2026-11-08):** authenticated source guidance covers 27 EU member-state codes, with explicit unresolved territory and separate tariff and national VAT review. Local Release tests passed 563 cases with 16 optional live skips; 37 Python tests passed. [Guidance and limits](docs/EU_DESTINATION_REFERENCE.md). Actual tariff and VAT integration, source rights and independent legal approval remain open.
+
 ## Status vocabulary
 - `not-started`: not implemented.
 - `in-progress`: partial code exists; acceptance criteria unmet.
@@ -43,7 +45,7 @@
 | 008 | UK import VAT & landed cost | P0 | in-progress | [Task](tasks/008-uk-import-vat-landed-cost.md) |
 | 009 | Compliance & restricted goods | P1 | in-progress | [Task](tasks/009-compliance-restricted-goods.md) |
 | 010 | Quality CI & security | P0 | in-progress | [Task](tasks/010-quality-ci-security.md) |
-| 011 | EU TARIC & destination expansion | P1 | not-started | [Task](tasks/011-eu-taric-destination-expansion.md) |
+| 011 | EU TARIC & destination expansion | P1 | in-progress | [Task](tasks/011-eu-taric-destination-expansion.md) |
 | 012 | Carrier & commerce integrations | P2 | in-progress | [Task](tasks/012-carrier-commerce-integrations.md) |
 | 013 | Payments, ledger & reconciliation | P2 | not-started | [Task](tasks/013-payments,-ledger-reconciliation.md) |
 | 014 | Operations, monitoring & launch | P1 | not-started | [Task](tasks/014-operations,-monitoring-launch.md) |

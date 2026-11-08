@@ -28,8 +28,9 @@ public static class ShipmentCompliance
         }
         if (request.ShipTo.Equals("US", StringComparison.OrdinalIgnoreCase))
             checks.Add("Check HTSUS, additional duties, CBP entry, origin and agency admissibility");
-        if (request.ShipTo.ToUpperInvariant() is "DE" or "FR" or "SE" or "NL" or "ES" or "IT")
-            checks.Add("Assess EU VAT/IOSS eligibility separately from customs duties and clearance fees");
+        if (EuDestinationReferences.Find(request.ShipTo) is not null)
+            checks.AddRange(["Assess EU VAT/IOSS eligibility separately from customs duties and clearance fees",
+                "Confirm the exact destination territory and its customs and VAT scope"]);
         if (request.ShipTo.Equals("GB", StringComparison.OrdinalIgnoreCase) || request.ShipTo.Equals("XI", StringComparison.OrdinalIgnoreCase))
         {
             checks.AddRange(["Confirm the GB or Northern Ireland tariff, ten-digit import classification and actual goods origin",
