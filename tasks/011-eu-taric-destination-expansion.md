@@ -45,6 +45,10 @@ Sources are listed in [the registry](../docs/SOURCES.md). The Qatar and Kuwait t
 
 Local Release test run: 537 passed and 16 optional live probes skipped; Python: 39 passed. Hosted database/container results are tied to the PR's tested commit and run, not this preliminary local result.
 
+## AU/NZ reference slice (2026-11-09)
+Scope: authenticated, tenant-limited country reference guidance for AU and NZ only, including official customs, GST, import and biosecurity sources and unresolved territorial and preferential eligibility checks. No rates, clearance, payment, legal decisions, provider or schema changes. Source review is not an effective date; live data, rights and independent legal review remain open.
+
+Local validation before commit: Release .NET suite 587 passed, 16 optional live probes skipped; Python unittest suite 39 passed. Focused AU/NZ tests passed after source registry update. Database and hosted latest-head evidence is tracked in the PR.
 ## India and China reference slice (2026-11-09)
 Scope: authenticated, tenant-budgeted static commercial import source guidance for IN and CN, with unresolved shipment and territorial checks. No rates, provider, migration or approval; source rights and independent legal review remain open.
 

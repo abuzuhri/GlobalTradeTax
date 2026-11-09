@@ -25,6 +25,7 @@ public static class DestinationPolicies
             "Country-specific customs tariff", "provider_required",
             ["Confirm importer of record and broker", "Check local VAT applicability and customs exemptions", "Validate product approvals and restricted goods"],
             GccDestinationReference.Find(country)!.Sources.Select(source => source.Url).ToArray());
+        if (AuNzDestinationReference.Find(country) is { } auNz) return new(country, "AU/NZ", "Country-specific GST", "Country-specific customs tariff", "provider_required", auNz.UnresolvedChecks, auNz.Sources.Select(source => source.Url).ToArray());
         if (JpKrSgDestinationReference.Find(country) is { } jpKrSg) return new(country, "OTHER", "Country-specific consumption tax",
             "Country-specific customs tariff", "provider_required", jpKrSg.UnresolvedChecks, jpKrSg.Sources.Select(source => source.Url).ToArray());
         if (NorthAmericaDestinationReference.Find(country) is { } northAmerica)
