@@ -183,3 +183,4 @@ Added authenticated tenant-limited national references for all six GCC destinati
 ## 2026-11-09 — TASK-011 India and China reference guidance
 
 Added tenant-budgeted, reference-only national sources and unresolved shipment checks for IN and CN. No rates, calculation, payment or clearance approval; rights and independent legal review remain open. See [source scope](IN_CN_DESTINATION_REFERENCE.md) and [task log](../tasks/011-eu-taric-destination-expansion.md). Local Release tests: 587 passed, 16 optional live skips; hosted evidence is tied to the PR head.
+- 2026-11-09: TASK-011 adds review-only JP/KR/SG national reference guidance and tenant-limited endpoint. No rate calculation or clearance approval; source rights, legal review and live data remain open. Validation evidence belongs to the tested commit and CI run.

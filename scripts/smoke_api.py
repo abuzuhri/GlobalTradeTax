@@ -18,6 +18,7 @@ PROTECTED_ENDPOINTS = (
     ('/v1/references/gcc/SA', 'GET', None),
     ('/v1/references/national/IN', 'GET', None),
     ('/v1/references/national/CN', 'GET', None),
+    ('/v1/references/jp-kr-sg/JP', 'GET', None),
     ('/v1/references/north-america/US', 'GET', None),
     ('/v1/references/uk/commodities/0101210000', 'GET', None),
     ('/v1/references/uk/assessments/0101210000?origin=US&importDate=2026-11-02', 'GET', None),
