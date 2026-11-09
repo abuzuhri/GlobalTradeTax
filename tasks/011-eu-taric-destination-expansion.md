@@ -51,6 +51,12 @@ Implement country-specific destination reference guidance for Brazil, Chile, Col
 
 
 Authenticated `/v1/references/latam/{country}` supports only BR, CL, CO and PE, case-insensitively. Country-specific official references and unresolved checks reach destination and compliance responses. Codes and source review dates do not establish legal applicability. Postal, courier, preferential, special-zone, subnational and Brazilian federal/state treatment require shipment-specific review. No rate, preference, calculation, payment or release is approved. MX uses North America guidance; AR behavior remains unchanged. No schema changes. Live data integration, rights, independent eligibility review and TASK-011 approval remain open.
+## Malaysia, Indonesia, Thailand, Vietnam and Philippines reference slice (2026-11-09)
+Scope: authenticated, tenant-budgeted static commercial-import guidance for MY, ID, TH, VN and PH, national official source context and unresolved shipment-specific and territorial checks. No provider, rates, financial approval or migration. Source rights, live effective-dated data and independent legal review remain open; TASK-011 remains in progress.
+
+Implemented the five-country reference endpoint and national destination/compliance reminders. Local Release tests: 587 passed, 16 optional UK live probes skipped; Python tests: 39 passed. Local Docker is unavailable; hosted container evidence must be checked on the PR head. [Sources and limitations](../docs/SOURCES.md). TASK-011 remains in progress.
+
+2026-11-09 review correction: the Malaysia Act PDF returned 404 on direct retrieval. Replaced it with the inspected customs legislation index; see [source limits](../docs/SOURCES.md). This does not establish current legal applicability.
 ## AU/NZ reference slice (2026-11-09)
 Scope: authenticated, tenant-limited country reference guidance for AU and NZ only, including official customs, GST, import and biosecurity sources and unresolved territorial and preferential eligibility checks. No rates, clearance, payment, legal decisions, provider or schema changes. Source review is not an effective date; live data, rights and independent legal review remain open.
 

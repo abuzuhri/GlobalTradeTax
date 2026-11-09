@@ -16,6 +16,7 @@ PROTECTED_ENDPOINTS = (
     ('/v1/compliance/check', 'POST', {}),
     ('/v1/references/eu/destinations/DE', 'GET', None),
     ('/v1/references/gcc/SA', 'GET', None),
+    ('/v1/references/five-imports/MY', 'GET', None),
     ('/v1/references/national/IN', 'GET', None),
     ('/v1/references/national/CN', 'GET', None),
     ('/v1/references/jp-kr-sg/JP', 'GET', None),

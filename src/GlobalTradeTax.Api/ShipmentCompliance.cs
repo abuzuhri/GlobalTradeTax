@@ -31,6 +31,11 @@ public static class ShipmentCompliance
         if (EuDestinationReferences.Find(request.ShipTo) is not null)
             checks.AddRange(["Assess EU VAT/IOSS eligibility separately from customs duties and clearance fees",
                 "Confirm the exact destination territory and its customs and VAT scope"]);
+        if (FiveCountryImportReference.Find(request.ShipTo) is { } guidance)
+        {
+            checks.AddRange(guidance.UnresolvedChecks);
+            warnings.Add(guidance.Name + " guidance is reference only; tax, tariff and clearance require independent review.");
+        }
         if (IndianChineseDestinationReference.Find(request.ShipTo) is { } national)
         {
             checks.AddRange(national.UnresolvedChecks);

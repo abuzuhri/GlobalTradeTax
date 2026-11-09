@@ -21,6 +21,9 @@ public static class DestinationPolicies
             "EU customs tariff and applicable low-value rules", "provider_required",
             ["Validate IOSS eligibility and seller registration", "Verify EU tariff classification and origin", "Check VAT rate, customs value and import fees", "Check precise destination territory, VAT scope and product restrictions"],
             ["https://taxation-customs.ec.europa.eu/ioss_en", "https://taxation-customs.ec.europa.eu/online-services/online-services-and-databases-customs/eu-customs-tariff-taric_en"]);
+        if (FiveCountryImportReference.Find(country) is { } guidance) return new(country, guidance.Name, "Country-specific import tax",
+            "Country-specific customs tariff", "provider_required", guidance.UnresolvedChecks,
+            guidance.Sources.Select(source => source.Url).ToArray());
         if (Gcc.Contains(country)) return new(country, "GCC", "Country-specific VAT where applicable",
             "Country-specific customs tariff", "provider_required",
             ["Confirm importer of record and broker", "Check local VAT applicability and customs exemptions", "Validate product approvals and restricted goods"],
