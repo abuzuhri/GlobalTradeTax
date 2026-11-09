@@ -40,6 +40,7 @@ app.Use(async (context, next) =>
 {
     var route = (context.GetEndpoint() as Microsoft.AspNetCore.Routing.RouteEndpoint)?.RoutePattern.RawText;
     if (route is not null && ((route.StartsWith("/v1/references/uk/", StringComparison.OrdinalIgnoreCase)
+        || route.StartsWith("/v1/references/jp-kr-sg/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/north-america/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/gcc/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/eu/", StringComparison.OrdinalIgnoreCase))
@@ -114,6 +115,11 @@ app.MapGet("/v1/destinations/{country}", async (string country, HttpRequest http
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
     if (country.Length != 2 || !country.All(char.IsLetter)) return Results.BadRequest(new { error = "ISO alpha-2 country required" });
     return Results.Ok(DestinationPolicies.Resolve(country));
+});
+app.MapGet("/v1/references/jp-kr-sg/{country}", (string country) =>
+{
+    var reference = JpKrSgDestinationReference.Find(country);
+    return reference is null ? Results.BadRequest(new { error = "supported JP, KR or SG ISO alpha-2 country required" }) : Results.Ok(reference);
 });
 app.MapGet("/v1/references/north-america/{country}", (string country) =>
 {
