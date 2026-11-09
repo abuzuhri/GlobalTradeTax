@@ -31,6 +31,11 @@ public static class ShipmentCompliance
         if (EuDestinationReferences.Find(request.ShipTo) is not null)
             checks.AddRange(["Assess EU VAT/IOSS eligibility separately from customs duties and clearance fees",
                 "Confirm the exact destination territory and its customs and VAT scope"]);
+        if (IndianChineseDestinationReference.Find(request.ShipTo) is { } national)
+        {
+            checks.AddRange(national.UnresolvedChecks);
+            warnings.Add("National source guidance is reference only; tariff, tax and clearance require independent review.");
+        }
         if (NorthAmericaDestinationReference.Find(request.ShipTo) is { } northAmerica)
         {
             checks.AddRange(northAmerica.UnresolvedChecks);
@@ -41,9 +46,9 @@ public static class ShipmentCompliance
             checks.AddRange(gcc.UnresolvedChecks);
             warnings.Add("GCC country guidance is reference only; national tax, tariff and clearance require independent review.");
         }
-        if (JpKrSgDestinationReference.Find(request.ShipTo) is { } national)
+        if (JpKrSgDestinationReference.Find(request.ShipTo) is { } jpKrSg)
         {
-            checks.AddRange(national.UnresolvedChecks);
+            checks.AddRange(jpKrSg.UnresolvedChecks);
             warnings.Add("National guidance is reference only; tax, tariff and clearance require independent review.");
         }
         if (request.ShipTo.Equals("GB", StringComparison.OrdinalIgnoreCase) || request.ShipTo.Equals("XI", StringComparison.OrdinalIgnoreCase))

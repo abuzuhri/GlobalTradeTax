@@ -310,7 +310,7 @@ class Integration:
         self.start_api()
         self.check('Runtime container runs without root', self.compose('exec', '-T', 'api', 'id', '-u').stdout.strip() != b'0')
         anonymous = assert_smoke(lambda path, method='GET', payload=None: fetch(self.base, path, method, payload))
-        self.check('General container smoke and anonymous routes', anonymous == 15, count=anonymous)
+        self.check('General container smoke and anonymous routes', anonymous == 17, count=anonymous)
         for country in ('DE', 'PL', 'CY'):
             reference = self.request('GET', '/v1/references/eu/destinations/' + country.lower(), key=self.keys['a'])
             self.check('EU country guidance remains reference only: ' + country,
@@ -430,12 +430,14 @@ class Integration:
                    self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='rate-a';") == '0')
         self.request('GET', '/v1/references/uk/commodities/1234567890', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/gcc/AE', key=rotated, expected=429, retry_after=True)
+        self.request('GET', '/v1/references/national/IN', key=rotated, expected=429, retry_after=True)
+        self.request('GET', '/v1/references/national/CN', key=other)
+        self.request('GET', '/v1/references/national/IN', expected=401)
+        self.request('GET', '/v1/references/north-america/US', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/jp-kr-sg/JP', key=rotated, expected=429, retry_after=True)
-        self.request('GET', '/v1/destinations/GB', key=other)
         self.request('GET', '/v1/destinations/GB', expected=401)
         self.request('GET', '/v1/references/gcc/SA', expected=401)
         self.request('GET', '/v1/references/jp-kr-sg/JP', expected=401)
-        self.request('GET', '/v1/references/north-america/US', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/north-america/US', expected=401)
         self.request('GET', '/health')
         environment['TenantRateLimit__PermitLimit'] = '10000'
@@ -466,6 +468,15 @@ class Integration:
             self.request('GET', '/v1/references/north-america/' + country, key=first, expected=400)
         self.request('GET', '/v1/references/gcc/US', key=first, expected=400)
         self.request('GET', '/v1/references/gcc/USA', key=first, expected=400)
+        for country in ('IN', 'CN'):
+            result = self.request('GET', '/v1/references/national/' + country.lower(), key=first)
+            self.check('National reference is unresolved and unapproved ' + country,
+                       result['country'] == country and result['territoryStatus'] == 'unresolved' and
+                       result['status'] == 'reference_only' and result['importDuty'] is None and
+                       result['importTax'] is None and result['landedTotal'] is None and
+                       not result['verifiedForCalculation'] and not result['paymentApproved'] and not result['shipmentReleaseApproved'])
+        self.request('GET', '/v1/references/national/HK', key=first, expected=404)
+        self.request('GET', '/v1/references/national/123', key=first, expected=400)
 
     def staging_and_audit(self):
         self.phase('Checking tariff staging and database audit writes')
@@ -994,4 +1005,3 @@ def main():
 
 if __name__ == '__main__':
     sys.exit(main())
-

@@ -25,6 +25,9 @@ Official source pointers, not rate feeds or proof of legal applicability. Rights
 - Korea Customs Service: [tariff database](https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do), [duty and internal tax declaration](https://www2.customs.go.kr/english/cm/cntnts/cntntsView.do?cntntsId=2736&mi=8060), [import clearance and bonded areas](https://customs.go.kr/english/cm/cntnts/cntntsView.do?cntntsId=2731&mi=8055), [VAT and express goods controls](https://www.customs.go.kr/english/cm/cntnts/cntntsView.do?cntntsId=2733).
 - Singapore Customs: [import operations and classification](https://www.customs.gov.sg/doing-business/import-operations/import-operations-overview/), [import GST](https://www.customs.gov.sg/doing-business/valuation-duties-and-fees/goods-and-services-tax-gst/), [competent authority requirements](https://www.customs.gov.sg/doing-business/quick-links-for-traders/tradenet/competent-authorities-requirements-for-controlled-items/competent-authorities-requirements-for-controlled-items-overview/), [free trade zones](https://www.customs.gov.sg/doing-business/import-operations/import-procedures/depositing-goods-in-free-trade-zones/).
 
+## India and China (reviewed 2026-11-09)
+
+See [national source review](IN_CN_DESTINATION_REFERENCE.md) for official authorities, purposes, links and limitations. Review date is not an effective date; source reuse rights remain unverified.
 ## US, Canada and Mexico references (reviewed 2026-11-09)
 
 - US: [USITC HTS](https://hts.usitc.gov/) publishes the tariff; [CBP](https://www.help.cbp.gov/s/article/Article-1397) describes import classification and controls. [IRS educational material](https://apps.irs.gov/app/understandingTaxes/whys/thm04/les01/media/is1_thm04_les01.pdf) distinguishes federal, state and local tax; consult the actual destination jurisdiction for sales/use tax.

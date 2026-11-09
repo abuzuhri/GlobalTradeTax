@@ -45,6 +45,10 @@ Sources are listed in [the registry](../docs/SOURCES.md). The Qatar and Kuwait t
 
 Local Release test run: 537 passed and 16 optional live probes skipped; Python: 39 passed. Hosted database/container results are tied to the PR's tested commit and run, not this preliminary local result.
 
+## India and China reference slice (2026-11-09)
+Scope: authenticated, tenant-budgeted static commercial import source guidance for IN and CN, with unresolved shipment and territorial checks. No rates, provider, migration or approval; source rights and independent legal review remain open.
+
+Implemented authenticated IN/CN source guidance and compliance reminders; [source context and remaining gates](../docs/IN_CN_DESTINATION_REFERENCE.md). Local Release suite: 587 passed, 16 optional live probes skipped. Hosted per-commit checks supply container evidence. TASK-011 remains in progress.
 ## JP/KR/SG reference slice (2026-11-09)
 Scope: authenticated tenant-limited static national reference guidance for Japan, South Korea and Singapore only. Review official customs, tax, import procedures, controls and destination or zone context. Shipment facts, calculation, payment and release remain unresolved; no schema or authoritative data integration is introduced. Source review dates do not establish legal applicability. Independent rights and legal review remain open.
 
