@@ -17,6 +17,13 @@ The [GCC Secretariat](https://www.gcc-sg.org/en/AboutUs/Pages/default.aspx) and 
 - Qatar: [customs legislation](https://customs.gov.qa/English/Legislations/Laws/Pages/default.aspx), [General Tax Authority](https://gta.gov.qa/en/taxes-info).
 - Saudi Arabia: [integrated tariff](https://zatca.gov.sa/en/RulesRegulations/Taxes/Pages/Integrated-Tarrifs.aspx), [VAT](https://www.zatca.gov.sa/en/RulesRegulations/VAT/Pages/About-Vat.aspx).
 - UAE: [customs union](https://icp.gov.ae/en/customs-union-for-gcc/), [Federal Tax Authority designated-zone guide](https://tax.gov.ae/-/media/Files/FTA/links/vat-designated-zone/Designated-Zones-VAT-Guide.pdf).
+## Japan, South Korea and Singapore (reviewed 2026-11-09)
+
+Official source pointers, not rate feeds or proof of legal applicability. Rights and independent legal review remain open.
+
+- Japan Customs: [tariff schedule](https://www.customs.go.jp/english/tariff/), [import taxes](https://www.customs.go.jp/english/c-answer_e/imtsukan/1701_e.htm), [import permit and bonded area](https://www.customs.go.jp/english/procedures/m49040/fg.htm), [controls](https://www.customs.go.jp/english/summary/prohibit.htm).
+- Korea Customs Service: [tariff database](https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do), [duty and internal tax declaration](https://www2.customs.go.kr/english/cm/cntnts/cntntsView.do?cntntsId=2736&mi=8060), [import clearance and bonded areas](https://customs.go.kr/english/cm/cntnts/cntntsView.do?cntntsId=2731&mi=8055), [VAT and express goods controls](https://www.customs.go.kr/english/cm/cntnts/cntntsView.do?cntntsId=2733).
+- Singapore Customs: [import operations and classification](https://www.customs.gov.sg/doing-business/import-operations/import-operations-overview/), [import GST](https://www.customs.gov.sg/doing-business/valuation-duties-and-fees/goods-and-services-tax-gst/), [competent authority requirements](https://www.customs.gov.sg/doing-business/quick-links-for-traders/tradenet/competent-authorities-requirements-for-controlled-items/competent-authorities-requirements-for-controlled-items-overview/), [free trade zones](https://www.customs.gov.sg/doing-business/import-operations/import-procedures/depositing-goods-in-free-trade-zones/).
 
 ## BR, CL, CO and PE reference review (2026-11-09)
 Source inspection is not proof of legal applicability or reuse rights. Country codes do not determine territorial scope.

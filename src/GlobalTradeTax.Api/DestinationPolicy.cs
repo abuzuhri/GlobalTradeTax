@@ -24,6 +24,8 @@ public static class DestinationPolicies
             GccDestinationReference.Find(country)!.Sources.Select(source => source.Url).ToArray());
         if (LatamDestinationReference.Find(country) is { } reference) return new(country, "LATAM", "Country-specific import tax",
             "Country-specific customs tariff", "provider_required", reference.UnresolvedChecks, reference.Sources.Select(source => source.Url).ToArray());
+        if (JpKrSgDestinationReference.Find(country) is { } national) return new(country, "OTHER", "Country-specific consumption tax",
+            "Country-specific customs tariff", "provider_required", national.UnresolvedChecks, national.Sources.Select(source => source.Url).ToArray());
         if (NorthAmericaDestinationReference.Find(country) is { } northAmerica)
             return new(country, country == "MX" ? "LATAM" : "OTHER", "Destination-specific consumption and local taxes",
                 "Country-specific customs tariff", "provider_required", northAmerica.UnresolvedChecks,
