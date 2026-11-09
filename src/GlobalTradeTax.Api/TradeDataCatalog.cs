@@ -25,6 +25,8 @@ public static class TradeDataCatalog
         new("cl-import-reference", "Chile import reference", "https://www.sii.cl/aprenda_sobre_impuestos/impuestos/impuestos_indirectos.htm", "CL", "national tax guidance", "reference-only", "Customs, territory and applicability require independent review; no live integration."),
         new("co-import-reference", "Colombia import reference", "https://importacionescarga.dian.gov.co/WebArancel/DefMenuConsultas.faces", "CO", "national tariff guidance", "reference-only", "Taxes, territory and applicability require independent review; no live integration."),
         new("pe-import-reference", "Peru import reference", "https://www.sunat.gob.pe/orientacionaduanera/pagosgarantias/", "PE", "national import tax guidance", "reference-only", "Territory and applicability require independent review; no live integration."),
+        new("ca-customs-tariff", "CBSA Customs Tariff", "https://www.cbsa-asfc.gc.ca/trade-commerce/tariff-tarif/2026/menu-eng.html", "CA", "official tariff reference", "reference-only", "Classification, origin, dated measures and provincial tax require separate review."),
+        new("mx-classification", "SAT tariff classification and NICO", "https://wwwmat.sat.gob.mx/tramites/71719/presenta-tu-consulta-de-clasificacion-arancelaria", "MX", "official classification reference", "reference-only", "A classification consultation is not a rate feed or clearance."),
         new("wits", "World Bank WITS", "https://wits.worldbank.org/", "Global", "trade tariff research",
             "reference-only", "Not a real-time checkout duty guarantee; check licensing and update frequency.")
     ];

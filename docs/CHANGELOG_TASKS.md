@@ -1,4 +1,11 @@
+## 2026-11-09 � TASK-011 US, Canada and Mexico reference guidance
+
+Added authenticated, tenant-limited reference-only national source pointers and unresolved shipment checks for US, CA and MX. No calculation, legal approval, payment or release is provided. [Scope and evidence](../tasks/011-eu-taric-destination-expansion.md).
+
 # Task register change log
+
+## 2026-11-09 — TASK-002 operator example clarification
+- Distinguish old and replacement key IDs in rotate/revoke examples and explain that rotation already revokes the old key. Addresses the late documentation review on PR #12; no executable or schema changes.
 
 ## 2026-11-08 — TASK-003 migration ledger
 - Added an operator-invoked, checksum-verified ordered migration ledger with explicit catalog-checked adoption, tracked schema/history preflight, transaction-scoped locking and atomic migration records. Adoption records its actual time rather than asserting historical execution. [Operator and recovery guidance](POSTGRES_CONTAINER_VERIFICATION.md).

@@ -47,7 +47,13 @@ Local Release test run: 537 passed and 16 optional live probes skipped; Python: 
 
 ## Next bounded slice: BR, CL, CO and PE
 
-Implement country-specific destination reference guidance for Brazil, Chile, Colombia and Peru only. Rates, eligibility, calculation and release remain unverified; MX and AR retain existing behavior.
+Implement country-specific destination reference guidance for Brazil, Chile, Colombia and Peru only. Rates, eligibility, calculation and release remain unverified; MX uses North America guidance; AR retains existing behavior.
 
 
-Authenticated `/v1/references/latam/{country}` supports only BR, CL, CO and PE, case-insensitively. Country-specific official references and unresolved checks reach destination and compliance responses. Codes and source review dates do not establish legal applicability. Postal, courier, preferential, special-zone, subnational and Brazilian federal/state treatment require shipment-specific review. No rate, preference, calculation, payment or release is approved. MX and AR behavior remains unchanged. No schema changes. Live data integration, rights, independent eligibility review and TASK-011 approval remain open.
+Authenticated `/v1/references/latam/{country}` supports only BR, CL, CO and PE, case-insensitively. Country-specific official references and unresolved checks reach destination and compliance responses. Codes and source review dates do not establish legal applicability. Postal, courier, preferential, special-zone, subnational and Brazilian federal/state treatment require shipment-specific review. No rate, preference, calculation, payment or release is approved. MX uses North America guidance; AR behavior remains unchanged. No schema changes. Live data integration, rights, independent eligibility review and TASK-011 approval remain open.
+## US, Canada and Mexico reference slice (2026-11-09)
+Scope: authenticated tenant-limited reference guidance for US, CA and MX only, with official national customs and tax pointers and unresolved shipment, preference and exact destination checks. No rate, eligibility, payment, release, provider or schema change. TASK-011 remains in progress; source review is not a legal effective date.
+
+Endpoint `GET /v1/references/north-america/{country}` is authenticated and shares the tenant budget. It supports US, CA and MX in either case; territory codes and other inputs are rejected. References carry null amounts and closed calculation, payment and release gates. Destination and compliance guidance retain unresolved preference, actual origin and territorial tax checks. The source registry describes official pointers, not licensed or effective-dated data integration. No migration is needed. See [sources](../docs/SOURCES.md).
+
+Local implementation verification: Release suite 586 passed, 16 optional live probes skipped; Python suite 39 passed. Hosted checks and container evidence are tied to the PR head and run. These checks do not establish legal eligibility or data rights.
