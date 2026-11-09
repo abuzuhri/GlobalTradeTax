@@ -181,4 +181,7 @@ Added migration 006, server-time expiry enforcement and a tenant-bound operator 
 Added authenticated tenant-limited national references for all six GCC destinations, country-specific source routing and compliance review checks. This is reference coverage only; live data, rights and independent approvals remain open. Local tests: 537 .NET passed, 16 optional live skipped; 39 Python passed. Hosted evidence follows the PR head. See [task](../tasks/011-eu-taric-destination-expansion.md).
 
 - TASK-011: Added reference-only BR, CL, CO and PE destination guidance; no financial or release approval. Live authoritative integration and legal review remain open. Peru product-control guidance links to SUNAT general restricted and prohibited merchandise resources.
+## 2026-11-09 — TASK-011 India and China reference guidance
+
+Added tenant-budgeted, reference-only national sources and unresolved shipment checks for IN and CN. No rates, calculation, payment or clearance approval; rights and independent legal review remain open. See [source scope](IN_CN_DESTINATION_REFERENCE.md) and [task log](../tasks/011-eu-taric-destination-expansion.md). Local Release tests: 587 passed, 16 optional live skips; hosted evidence is tied to the PR head.
 - 2026-11-09: TASK-011 adds review-only JP/KR/SG national reference guidance and tenant-limited endpoint. No rate calculation or clearance approval; source rights, legal review and live data remain open. Validation evidence belongs to the tested commit and CI run.

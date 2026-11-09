@@ -40,6 +40,7 @@ app.Use(async (context, next) =>
 {
     var route = (context.GetEndpoint() as Microsoft.AspNetCore.Routing.RouteEndpoint)?.RoutePattern.RawText;
     if (route is not null && ((route.StartsWith("/v1/references/uk/", StringComparison.OrdinalIgnoreCase)
+        || route.StartsWith("/v1/references/national/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/jp-kr-sg/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/north-america/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/gcc/", StringComparison.OrdinalIgnoreCase)
@@ -137,6 +138,12 @@ app.MapGet("/v1/references/latam/{country}", (string country) =>
 {
     var reference = LatamDestinationReference.Find(country);
     return reference is null ? Results.BadRequest(new { error = "supported LATAM reference ISO alpha-2 country required" }) : Results.Ok(reference);
+});
+app.MapGet("/v1/references/national/{country}", (string country) =>
+{
+    if (country.Length != 2 || !country.All(char.IsAsciiLetter)) return Results.BadRequest(new { error = "Two ASCII country letters required" });
+    var reference = IndianChineseDestinationReference.Find(country);
+    return reference is null ? Results.NotFound() : Results.Ok(reference);
 });
 // Source guidance only: no tariff, VAT or territorial eligibility is inferred.
 app.MapGet("/v1/references/eu/destinations/{country}", async (string country, HttpRequest http, IServiceProvider services, IConfiguration config, CancellationToken ct) =>

@@ -51,6 +51,10 @@ Implement country-specific destination reference guidance for Brazil, Chile, Col
 
 
 Authenticated `/v1/references/latam/{country}` supports only BR, CL, CO and PE, case-insensitively. Country-specific official references and unresolved checks reach destination and compliance responses. Codes and source review dates do not establish legal applicability. Postal, courier, preferential, special-zone, subnational and Brazilian federal/state treatment require shipment-specific review. No rate, preference, calculation, payment or release is approved. MX uses North America guidance; AR behavior remains unchanged. No schema changes. Live data integration, rights, independent eligibility review and TASK-011 approval remain open.
+## India and China reference slice (2026-11-09)
+Scope: authenticated, tenant-budgeted static commercial import source guidance for IN and CN, with unresolved shipment and territorial checks. No rates, provider, migration or approval; source rights and independent legal review remain open.
+
+Implemented authenticated IN/CN source guidance and compliance reminders; [source context and remaining gates](../docs/IN_CN_DESTINATION_REFERENCE.md). Local Release suite: 587 passed, 16 optional live probes skipped. Hosted per-commit checks supply container evidence. TASK-011 remains in progress.
 ## JP/KR/SG reference slice (2026-11-09)
 Scope: authenticated tenant-limited static national reference guidance for Japan, South Korea and Singapore only. Review official customs, tax, import procedures, controls and destination or zone context. Shipment facts, calculation, payment and release remain unresolved; no schema or authoritative data integration is introduced. Source review dates do not establish legal applicability. Independent rights and legal review remain open.
 

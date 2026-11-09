@@ -34,6 +34,9 @@ Source inspection is not proof of legal applicability or reuse rights. Country c
 - Peru: SUNAT [import taxes](https://www.sunat.gob.pe/orientacionaduanera/pagosgarantias/), [import procedure](https://www.sunat.gob.pe/orientacionaduanera/importacion/), and [restricted goods](https://www.sunat.gob.pe/orientacionaduanera/mercanciasrestringidas/).
 
 Classification, actual origin and preferences, valuation, importer, taxes, controls, postal and courier regimes and territorial exceptions remain shipment-specific.
+## India and China (reviewed 2026-11-09)
+
+See [national source review](IN_CN_DESTINATION_REFERENCE.md) for official authorities, purposes, links and limitations. Review date is not an effective date; source reuse rights remain unverified.
 ## US, Canada and Mexico references (reviewed 2026-11-09)
 
 - US: [USITC HTS](https://hts.usitc.gov/) publishes the tariff; [CBP](https://www.help.cbp.gov/s/article/Article-1397) describes import classification and controls. [IRS educational material](https://apps.irs.gov/app/understandingTaxes/whys/thm04/les01/media/is1_thm04_les01.pdf) distinguishes federal, state and local tax; consult the actual destination jurisdiction for sales/use tax.
