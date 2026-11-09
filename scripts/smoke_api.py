@@ -58,6 +58,7 @@ def assert_smoke(fetcher):
     assert status == 200 and isinstance(health, dict) and health.get('status') == 'healthy', 'health check failed'
     status, capabilities = fetcher('/v1/capabilities')
     assert status == 200 and isinstance(capabilities, dict), 'capabilities endpoint failed'
+    assert capabilities.get('destinationPolicies') == 'EU/GCC/LATAM/OTHER', 'destination policy categories changed'
     assert capabilities.get('settlement') == 'not-implemented', 'capabilities must not advertise settlement'
     assert capabilities.get('calculation') == 'provider-required', 'unverified calculation must remain disabled'
     for path, method, payload in PROTECTED_ENDPOINTS:
