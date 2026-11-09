@@ -15,13 +15,13 @@ public static class DestinationPolicies
     {
         country = country.Trim().ToUpperInvariant();
         if (IndianChineseDestinationReference.Find(country) is { } national)
-            return new(country, national.Country, "Destination-specific import tax", "National customs tariff", "provider_required",
+            return new(country, "OTHER", "Destination-specific import tax", "National customs tariff", "provider_required",
                 national.UnresolvedChecks, national.Sources.Select(source => source.Url).ToArray());
         if (EuDestinationReferences.Find(country) is not null) return new(country, "EU", "Destination VAT / IOSS eligibility",
             "EU customs tariff and applicable low-value rules", "provider_required",
             ["Validate IOSS eligibility and seller registration", "Verify EU tariff classification and origin", "Check VAT rate, customs value and import fees", "Check precise destination territory, VAT scope and product restrictions"],
             ["https://taxation-customs.ec.europa.eu/ioss_en", "https://taxation-customs.ec.europa.eu/online-services/online-services-and-databases-customs/eu-customs-tariff-taric_en"]);
-        if (FiveCountryImportReference.Find(country) is { } guidance) return new(country, guidance.Name, "Country-specific import tax",
+        if (FiveCountryImportReference.Find(country) is { } guidance) return new(country, "OTHER", "Country-specific import tax",
             "Country-specific customs tariff", "provider_required", guidance.UnresolvedChecks,
             guidance.Sources.Select(source => source.Url).ToArray());
         if (Gcc.Contains(country)) return new(country, "GCC", "Country-specific VAT where applicable",
@@ -30,7 +30,7 @@ public static class DestinationPolicies
             GccDestinationReference.Find(country)!.Sources.Select(source => source.Url).ToArray());
         if (LatamDestinationReference.Find(country) is { } reference) return new(country, "LATAM", "Country-specific import tax",
             "Country-specific customs tariff", "provider_required", reference.UnresolvedChecks, reference.Sources.Select(source => source.Url).ToArray());
-        if (AuNzDestinationReference.Find(country) is { } auNz) return new(country, "AU/NZ", "Country-specific GST", "Country-specific customs tariff", "provider_required", auNz.UnresolvedChecks, auNz.Sources.Select(source => source.Url).ToArray());
+        if (AuNzDestinationReference.Find(country) is { } auNz) return new(country, "OTHER", "Country-specific GST", "Country-specific customs tariff", "provider_required", auNz.UnresolvedChecks, auNz.Sources.Select(source => source.Url).ToArray());
         if (JpKrSgDestinationReference.Find(country) is { } jpKrSg) return new(country, "OTHER", "Country-specific consumption tax",
             "Country-specific customs tariff", "provider_required", jpKrSg.UnresolvedChecks, jpKrSg.Sources.Select(source => source.Url).ToArray());
         if (NorthAmericaDestinationReference.Find(country) is { } northAmerica)
