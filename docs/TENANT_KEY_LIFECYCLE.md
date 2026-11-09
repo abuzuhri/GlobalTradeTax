@@ -8,9 +8,12 @@ Install `psycopg[binary]` in the operator environment and configure `DATABASE_UR
 python scripts/provision-tenant.py merchant-001 "First Merchant"
 python scripts/tenant_keys.py issue merchant-001 --days 90
 python scripts/tenant_keys.py list merchant-001
-python scripts/tenant_keys.py rotate merchant-001 KEY_UUID --days 90
-python scripts/tenant_keys.py revoke merchant-001 KEY_UUID
+python scripts/tenant_keys.py rotate merchant-001 OLD_KEY_UUID --days 90
+# Only if the replacement must also be revoked:
+python scripts/tenant_keys.py revoke merchant-001 NEW_KEY_UUID
 ```
+
+Rotation revokes `OLD_KEY_UUID` atomically. For the optional revoke command, replace `NEW_KEY_UUID` with the new `key_id` returned by rotation; the old ID no longer identifies an active key.
 
 Issue and rotate print JSON containing the new key exactly once, after commit, on standard output. Transfer it through an approved secret channel and protect the terminal and output. If delivery fails, revoke the new key and issue another; the secret cannot be recovered. List prints only metadata. The old provisioning syntax remains supported, creates a 90-day key and prints JSON; automation that parsed its former two-line output must change. Existing disabled tenants are never enabled, and issue/rotate refuse them. Revoke may operate on a disabled tenant. Rotation rejects inactive, expired, stale or cross-tenant keys; revoke rejects inactive or mismatched keys. Multiple separately issued keys can coexist. Each operation locks the tenant, and mutation plus tenant-bound audit commit together. The audit contains key IDs, lifetime and PostgreSQL role, never a secret or verifier. Database roles are recorded as reported by PostgreSQL, not verified human identities; external access controls and independent audit records remain necessary.
 
