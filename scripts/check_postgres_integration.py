@@ -422,7 +422,7 @@ class Integration:
         validate_spec(spec, self.project, self.run_id)
         self.compose_file.write_text(json.dumps(spec), encoding='utf-8')
         self.start_api()
-        self.request('GET', '/v1/references/gcc/sa', key=first)
+        self.request('GET', '/v1/references/latam/br', key=first)
         self.request('GET', '/v1/destinations/GB', key=rotated)
         self.request('POST', '/v1/landed-cost/estimate', key=first, payload=b'not json', expected=429, retry_after=True)
         self.request('POST', '/v1/landed-cost/estimate', key=first, payload=self.payload, expected=429, retry_after=True)
@@ -430,9 +430,11 @@ class Integration:
                    self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='rate-a';") == '0')
         self.request('GET', '/v1/references/uk/commodities/1234567890', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/gcc/AE', key=rotated, expected=429, retry_after=True)
+        self.request('GET', '/v1/references/latam/CL', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/destinations/GB', key=other)
         self.request('GET', '/v1/destinations/GB', expected=401)
         self.request('GET', '/v1/references/gcc/SA', expected=401)
+        self.request('GET', '/v1/references/latam/BR', expected=401)
         self.request('GET', '/health')
         environment['TenantRateLimit__PermitLimit'] = '10000'
         del environment['TenantRateLimit__WindowSeconds']
@@ -446,6 +448,11 @@ class Integration:
                        result['verifiedForCalculation'] is False and result['paymentApproved'] is False and result['shipmentReleaseApproved'] is False)
         self.request('GET', '/v1/references/gcc/US', key=first, expected=400)
         self.request('GET', '/v1/references/gcc/USA', key=first, expected=400)
+        for country in ('BR', 'CL', 'CO', 'PE'):
+            result = self.request('GET', '/v1/references/latam/' + country.lower(), key=first)
+            self.check('LATAM reference remains unapproved ' + country, result['country'] == country and result['status'] == 'reference_only' and all(result[x] is None for x in ('importDuty', 'importTax', 'landedTotal')) and not any(result[x] for x in ('verifiedForCalculation', 'paymentApproved', 'shipmentReleaseApproved')))
+        for country in ('MX', 'AR', 'GF', 'BRA'):
+            self.request('GET', '/v1/references/latam/' + country, key=first, expected=400)
 
     def staging_and_audit(self):
         self.phase('Checking tariff staging and database audit writes')

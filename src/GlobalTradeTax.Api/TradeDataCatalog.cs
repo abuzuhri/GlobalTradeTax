@@ -21,6 +21,10 @@ public static class TradeDataCatalog
             "EU", "official tariff reference", "reference-only", "TARIC alone does not cover all national VAT, excise or clearance fees."),
         new("us-hts", "USITC HTS", "https://hts.usitc.gov/", "US", "official import tariff reference",
             "reference-only", "Duty depends on origin, measures and current entry context."),
+        new("br-import-reference", "Brazil import reference", "https://www.gov.br/pt-br/servicos/simular-o-tratamento-tributario-e-administrativo-de-importacoes", "BR", "national customs and tax guidance", "reference-only", "Federal and state treatment and applicability require independent review; no live integration."),
+        new("cl-import-reference", "Chile import reference", "https://www.sii.cl/aprenda_sobre_impuestos/impuestos/impuestos_indirectos.htm", "CL", "national tax guidance", "reference-only", "Customs, territory and applicability require independent review; no live integration."),
+        new("co-import-reference", "Colombia import reference", "https://importacionescarga.dian.gov.co/WebArancel/DefMenuConsultas.faces", "CO", "national tariff guidance", "reference-only", "Taxes, territory and applicability require independent review; no live integration."),
+        new("pe-import-reference", "Peru import reference", "https://www.sunat.gob.pe/orientacionaduanera/pagosgarantias/", "PE", "national import tax guidance", "reference-only", "Territory and applicability require independent review; no live integration."),
         new("wits", "World Bank WITS", "https://wits.worldbank.org/", "Global", "trade tariff research",
             "reference-only", "Not a real-time checkout duty guarantee; check licensing and update frequency.")
     ];

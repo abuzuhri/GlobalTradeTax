@@ -172,3 +172,5 @@ Added migration 006, server-time expiry enforcement and a tenant-bound operator 
 
 ## 2026-11-08 — TASK-011 GCC reference guidance
 Added authenticated tenant-limited national references for all six GCC destinations, country-specific source routing and compliance review checks. This is reference coverage only; live data, rights and independent approvals remain open. Local tests: 537 .NET passed, 16 optional live skipped; 39 Python passed. Hosted evidence follows the PR head. See [task](../tasks/011-eu-taric-destination-expansion.md).
+
+- TASK-011: Added reference-only BR, CL, CO and PE destination guidance; no financial or release approval. Live authoritative integration and legal review remain open.

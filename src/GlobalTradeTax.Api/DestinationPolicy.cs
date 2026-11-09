@@ -22,6 +22,8 @@ public static class DestinationPolicies
             "Country-specific customs tariff", "provider_required",
             ["Confirm importer of record and broker", "Check local VAT applicability and customs exemptions", "Validate product approvals and restricted goods"],
             GccDestinationReference.Find(country)!.Sources.Select(source => source.Url).ToArray());
+        if (LatamDestinationReference.Find(country) is { } reference) return new(country, "LATAM", "Country-specific import tax",
+            "Country-specific customs tariff", "provider_required", reference.UnresolvedChecks, reference.Sources.Select(source => source.Url).ToArray());
         if (Latam.Contains(country)) return new(country, "LATAM", country == "BR" ? "Brazil ICMS / applicable remittance rules" : "Country-specific import tax",
             "Country-specific customs tariff", "provider_required",
             ["Confirm local importer and clearance regime", "Validate current import tax and de minimis rules", "Confirm carrier collection/remittance support"],

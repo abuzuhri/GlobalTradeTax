@@ -44,3 +44,10 @@ The endpoint `GET /v1/references/gcc/{country}` accepts the six ISO codes case-i
 Sources are listed in [the registry](../docs/SOURCES.md). The Qatar and Kuwait tax authority links provide general national tax context, not confirmation that VAT applies or does not apply. A live, effective-dated tariff and national tax dataset, terms/data rights review, shipment-specific evidence and independent legal approvals remain open. Linking to official sources does not establish rights to reuse their data.
 
 Local Release test run: 537 passed and 16 optional live probes skipped; Python: 39 passed. Hosted database/container results are tied to the PR's tested commit and run, not this preliminary local result.
+
+## Next bounded slice: BR, CL, CO and PE
+
+Implement country-specific destination reference guidance for Brazil, Chile, Colombia and Peru only. Rates, eligibility, calculation and release remain unverified; MX and AR retain existing behavior.
+
+
+Authenticated `/v1/references/latam/{country}` supports only BR, CL, CO and PE, case-insensitively. Country-specific official references and unresolved checks reach destination and compliance responses. Codes and source review dates do not establish legal applicability. Postal, courier, preferential, special-zone, subnational and Brazilian federal/state treatment require shipment-specific review. No rate, preference, calculation, payment or release is approved. MX and AR behavior remains unchanged. No schema changes. Live data integration, rights, independent eligibility review and TASK-011 approval remain open.

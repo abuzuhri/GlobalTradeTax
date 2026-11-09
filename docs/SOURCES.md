@@ -17,3 +17,13 @@ The [GCC Secretariat](https://www.gcc-sg.org/en/AboutUs/Pages/default.aspx) and 
 - Qatar: [customs legislation](https://customs.gov.qa/English/Legislations/Laws/Pages/default.aspx), [General Tax Authority](https://gta.gov.qa/en/taxes-info).
 - Saudi Arabia: [integrated tariff](https://zatca.gov.sa/en/RulesRegulations/Taxes/Pages/Integrated-Tarrifs.aspx), [VAT](https://www.zatca.gov.sa/en/RulesRegulations/VAT/Pages/About-Vat.aspx).
 - UAE: [customs union](https://icp.gov.ae/en/customs-union-for-gcc/), [Federal Tax Authority designated-zone guide](https://tax.gov.ae/-/media/Files/FTA/links/vat-designated-zone/Designated-Zones-VAT-Guide.pdf).
+
+## BR, CL, CO and PE reference review (2026-11-09)
+Source inspection is not proof of legal applicability or reuse rights. Country codes do not determine territorial scope.
+
+- Brazil: [Receita Federal import simulator](https://www.gov.br/pt-br/servicos/simular-o-tratamento-tributario-e-administrativo-de-importacoes), [Siscomex classification and taxes](https://www.gov.br/siscomex/pt-br/informacoes/perguntas-frequentes/acordos-comerciais/7-aspectos-tarifarios), [administrative controls](https://www.gov.br/siscomex/pt-br/informacoes/tratamento-administrativos/tratamento-administrativo-na-importacao). State ICMS and federal programs need independent review.
+- Chile: [Aduanas tariff rules](https://www.aduana.cl/aduana/site/docs/20070227/20070227234303/02_reglas_generales.pdf), [SII indirect taxes](https://www.sii.cl/aprenda_sobre_impuestos/impuestos/impuestos_indirectos.htm), [Sernapesca product control example](https://www.chileatiende.gob.cl/fichas/4648-autorizacion-de-ingreso-para-productos-pesqueros-y-alimentos-destinados-a-especies-hidrobiologicas).
+- Colombia: [DIAN tariff consultation](https://importacionescarga.dian.gov.co/WebArancel/DefMenuConsultas.faces), [customs procedures, controls and special territories](https://www.dian.gov.co/tramitesservicios/tramites-y-servicios/Paginas/tramites-aduaneros.aspx).
+- Peru: SUNAT [import taxes](https://www.sunat.gob.pe/orientacionaduanera/pagosgarantias/), [import procedure](https://www.sunat.gob.pe/orientacionaduanera/importacion/), and [restricted goods](https://bienvenidoalperu.sunat.gob.pe/es.bienes-o-articulos-restringidos.html).
+
+Classification, actual origin and preferences, valuation, importer, taxes, controls, postal and courier regimes and territorial exceptions remain shipment-specific.
