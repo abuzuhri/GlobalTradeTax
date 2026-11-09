@@ -108,3 +108,5 @@ The open-source backend is an engineering reference; source-code licensing and r
 - TASK-011: BR, CL, CO and PE country reference guidance added; live authoritative integration and overall approval remain open.
 **TASK-011 Malaysia, Indonesia, Thailand, Vietnam and Philippines slice (2026-11-09):** in progress: authenticated, tenant-budgeted commercial-import reference guidance for MY, ID, TH, VN and PH only; no rates, eligibility or approval. See [task scope](tasks/011-eu-taric-destination-expansion.md).
 **TASK-011 AU/NZ slice (2026-11-09):** AU and NZ authenticated country reference guidance adds official source pointers and unresolved import, GST, origin, biosecurity and territorial checks. Calculations, rights and legal approval remain open. [Scope](tasks/011-eu-taric-destination-expansion.md) and [sources](docs/SOURCES.md).
+
+**TASK-011 AR/UY/PY slice (2026-11-09):** in progress: extend authenticated Latin America reference guidance to Argentina, Uruguay and Paraguay; official source review and shipment-specific checks only. Rates, rights, live integration and independent approval remain open.

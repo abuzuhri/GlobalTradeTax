@@ -422,7 +422,7 @@ class Integration:
         validate_spec(spec, self.project, self.run_id)
         self.compose_file.write_text(json.dumps(spec), encoding='utf-8')
         self.start_api()
-        self.request('GET', '/v1/references/latam/br', key=first)
+        self.request('GET', '/v1/references/latam/ar', key=first)
         self.request('GET', '/v1/destinations/GB', key=rotated)
         self.request('POST', '/v1/landed-cost/estimate', key=first, payload=b'not json', expected=429, retry_after=True)
         self.request('POST', '/v1/landed-cost/estimate', key=first, payload=self.payload, expected=429, retry_after=True)
@@ -431,7 +431,7 @@ class Integration:
         self.request('GET', '/v1/references/uk/commodities/1234567890', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/five-imports/ID', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/gcc/AE', key=rotated, expected=429, retry_after=True)
-        self.request('GET', '/v1/references/latam/CL', key=rotated, expected=429, retry_after=True)
+        self.request('GET', '/v1/references/latam/UY', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/au-nz/AU', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/destinations/GB', expected=401)
         self.request('GET', '/v1/references/gcc/SA', expected=401)
@@ -443,7 +443,7 @@ class Integration:
         self.request('GET', '/v1/references/national/CN', key=other)
         self.request('GET', '/v1/references/national/IN', expected=401)
         self.request('GET', '/v1/references/jp-kr-sg/JP', key=rotated, expected=429, retry_after=True)
-        self.request('GET', '/v1/references/latam/BR', expected=401)
+        self.request('GET', '/v1/references/latam/PY', expected=401)
         self.request('GET', '/v1/references/north-america/US', expected=401)
         self.request('GET', '/health')
         environment['TenantRateLimit__PermitLimit'] = '10000'
@@ -482,10 +482,10 @@ class Integration:
             self.request('GET', '/v1/references/north-america/' + country, key=first, expected=400)
         self.request('GET', '/v1/references/gcc/US', key=first, expected=400)
         self.request('GET', '/v1/references/gcc/USA', key=first, expected=400)
-        for country in ('BR', 'CL', 'CO', 'PE'):
+        for country in ('AR', 'BR', 'CL', 'CO', 'PE', 'PY', 'UY'):
             result = self.request('GET', '/v1/references/latam/' + country.lower(), key=first)
             self.check('LATAM reference remains unapproved ' + country, result['country'] == country and result['status'] == 'reference_only' and all(result[x] is None for x in ('importDuty', 'importTax', 'landedTotal')) and not any(result[x] for x in ('verifiedForCalculation', 'paymentApproved', 'shipmentReleaseApproved')))
-        for country in ('MX', 'AR', 'GF', 'BRA'):
+        for country in ('MX', 'ZZ', 'GF', 'BRA'):
             self.request('GET', '/v1/references/latam/' + country, key=first, expected=400)
         for country in ('IN', 'CN'):
             result = self.request('GET', '/v1/references/national/' + country.lower(), key=first)

@@ -77,3 +77,10 @@ Scope: authenticated tenant-limited reference guidance for US, CA and MX only, w
 Endpoint `GET /v1/references/north-america/{country}` is authenticated and shares the tenant budget. It supports US, CA and MX in either case; territory codes and other inputs are rejected. References carry null amounts and closed calculation, payment and release gates. Destination and compliance guidance retain unresolved preference, actual origin and territorial tax checks. The source registry describes official pointers, not licensed or effective-dated data integration. No migration is needed. See [sources](../docs/SOURCES.md).
 
 Local implementation verification: Release suite 586 passed, 16 optional live probes skipped; Python suite 39 passed. Hosted checks and container evidence are tied to the PR head and run. These checks do not establish legal eligibility or data rights.
+
+## Argentina, Uruguay and Paraguay reference slice (2026-11-09)
+Scope: extend the existing authenticated, tenant-budgeted Latin America reference path to AR, UY and PY only, with national official commercial-import sources and unresolved shipment checks. UY/PY move from fallback to LATAM routing; regional grouping establishes no eligibility. No rates, provider, migration, payment or release. Source rights, live effective-dated integration and independent legal approval remain open.
+
+The endpoint now accepts AR, UY and PY alongside the original four. AR moves from generic LATAM guidance to country-specific guidance; UY/PY move from OTHER fallback to LATAM. Mexico retains North America guidance. Historical four-country statements above describe the earlier slice. All monetary amounts remain null and calculation, payment and release remain closed. [Source context](../docs/SOURCES.md).
+
+Local Release tests: 647 passed, 16 optional live probes skipped; Python tests: 39 passed. Project integrity, secret-pattern and CI static guards passed. Local Docker is unavailable; hosted container evidence is tracked on the PR head.

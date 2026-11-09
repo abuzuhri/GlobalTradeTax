@@ -1,4 +1,8 @@
-## 2026-11-09 � TASK-011 US, Canada and Mexico reference guidance
+## 2026-11-09 — TASK-011 Argentina, Uruguay and Paraguay
+
+Added reference-only AR, UY and PY guidance to the existing LATAM endpoint, routing and compliance. AR gains national guidance; UY/PY move from OTHER fallback to LATAM. Mexico retains North America guidance. Local Release: 647 passed and 16 optional live tests skipped; Python: 39 passed. Hosted verification is tied to the PR head. Rights, current data and independent legal approval remain open. [Scope](../tasks/011-eu-taric-destination-expansion.md), [sources](SOURCES.md).
+
+## 2026-11-09 — TASK-011 US, Canada and Mexico reference guidance
 
 Added authenticated, tenant-limited reference-only national source pointers and unresolved shipment checks for US, CA and MX. No calculation, legal approval, payment or release is provided. [Scope and evidence](../tasks/011-eu-taric-destination-expansion.md).
 
