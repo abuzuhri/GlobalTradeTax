@@ -14,6 +14,9 @@ public static class DestinationPolicies
     public static DestinationPolicy Resolve(string country)
     {
         country = country.Trim().ToUpperInvariant();
+        if (IndianChineseDestinationReference.Find(country) is { } national)
+            return new(country, national.Country, "Destination-specific import tax", "National customs tariff", "provider_required",
+                national.UnresolvedChecks, national.Sources.Select(source => source.Url).ToArray());
         if (EuDestinationReferences.Find(country) is not null) return new(country, "EU", "Destination VAT / IOSS eligibility",
             "EU customs tariff and applicable low-value rules", "provider_required",
             ["Validate IOSS eligibility and seller registration", "Verify EU tariff classification and origin", "Check VAT rate, customs value and import fees", "Check precise destination territory, VAT scope and product restrictions"],
@@ -23,6 +26,8 @@ public static class DestinationPolicies
             ["Confirm importer of record and broker", "Check local VAT applicability and customs exemptions", "Validate product approvals and restricted goods"],
             GccDestinationReference.Find(country)!.Sources.Select(source => source.Url).ToArray());
         if (AuNzDestinationReference.Find(country) is { } auNz) return new(country, "AU/NZ", "Country-specific GST", "Country-specific customs tariff", "provider_required", auNz.UnresolvedChecks, auNz.Sources.Select(source => source.Url).ToArray());
+        if (JpKrSgDestinationReference.Find(country) is { } jpKrSg) return new(country, "OTHER", "Country-specific consumption tax",
+            "Country-specific customs tariff", "provider_required", jpKrSg.UnresolvedChecks, jpKrSg.Sources.Select(source => source.Url).ToArray());
         if (NorthAmericaDestinationReference.Find(country) is { } northAmerica)
             return new(country, country == "MX" ? "LATAM" : "OTHER", "Destination-specific consumption and local taxes",
                 "Country-specific customs tariff", "provider_required", northAmerica.UnresolvedChecks,
