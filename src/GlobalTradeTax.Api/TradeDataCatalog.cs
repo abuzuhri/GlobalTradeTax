@@ -21,6 +21,8 @@ public static class TradeDataCatalog
             "EU", "official tariff reference", "reference-only", "TARIC alone does not cover all national VAT, excise or clearance fees."),
         new("us-hts", "USITC HTS", "https://hts.usitc.gov/", "US", "official import tariff reference",
             "reference-only", "Duty depends on origin, measures and current entry context."),
+        new("au-customs-tariff", "Australian Border Force working tariff", "https://www.abf.gov.au/importing-exporting-and-manufacturing/tariff-classification/current-tariff", "Australia; external territories require separate review", "official customs reference", "reference-only", "No rates are imported; origin, territory, tax and data rights require review."),
+        new("nz-customs-tariff", "New Zealand Customs tariff", "https://www.customs.govt.nz/business/tariffs/tariff-classifications-and-rates", "New Zealand; associated jurisdictions require separate review", "official customs reference", "reference-only", "No rates are imported; origin, territory, tax and data rights require review."),
         new("wits", "World Bank WITS", "https://wits.worldbank.org/", "Global", "trade tariff research",
             "reference-only", "Not a real-time checkout duty guarantee; check licensing and update frequency.")
     ];

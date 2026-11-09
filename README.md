@@ -204,3 +204,6 @@ The Saleor App now installs in the sandbox, receives real checkout events automa
 
 ### GCC destination reference guidance
 Authenticated `GET /v1/references/gcc/{country}` supports BH, KW, OM, QA, SA and AE in either case under the existing tenant rate limit. It returns national source pointers and unresolved checks, with null financial fields and all verification, payment and release gates closed. Source review dates are not effective dates. Country reference coverage does not provide tariff or VAT calculation; see [scope and limitations](tasks/011-eu-taric-destination-expansion.md) and [sources](docs/SOURCES.md).
+
+### Australia and New Zealand reference guidance
+`GET /v1/references/au-nz/{country}` accepts AU and NZ case-insensitively, requires a merchant key and uses the shared tenant budget. It returns official source pointers and unresolved checks, not payable tariff or tax calculations. Amounts are null and verification, payment and release approvals remain false. External territories and associated jurisdictions require separate review; country code and dispatch country establish neither scope nor preferential origin. The source review date is not a legal effective date. See [sources](docs/SOURCES.md) and [TASK-011](tasks/011-eu-taric-destination-expansion.md).

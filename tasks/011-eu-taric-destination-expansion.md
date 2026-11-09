@@ -44,3 +44,8 @@ The endpoint `GET /v1/references/gcc/{country}` accepts the six ISO codes case-i
 Sources are listed in [the registry](../docs/SOURCES.md). The Qatar and Kuwait tax authority links provide general national tax context, not confirmation that VAT applies or does not apply. A live, effective-dated tariff and national tax dataset, terms/data rights review, shipment-specific evidence and independent legal approvals remain open. Linking to official sources does not establish rights to reuse their data.
 
 Local Release test run: 537 passed and 16 optional live probes skipped; Python: 39 passed. Hosted database/container results are tied to the PR's tested commit and run, not this preliminary local result.
+
+## AU/NZ reference slice (2026-11-09)
+Scope: authenticated, tenant-limited country reference guidance for AU and NZ only, including official customs, GST, import and biosecurity sources and unresolved territorial and preferential eligibility checks. No rates, clearance, payment, legal decisions, provider or schema changes. Source review is not an effective date; live data, rights and independent legal review remain open.
+
+Local validation before commit: Release .NET suite 587 passed, 16 optional live probes skipped; Python unittest suite 39 passed. Focused AU/NZ tests passed after source registry update. Database and hosted latest-head evidence is tracked in the PR.

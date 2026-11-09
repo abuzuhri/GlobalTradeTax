@@ -40,6 +40,7 @@ app.Use(async (context, next) =>
 {
     var route = (context.GetEndpoint() as Microsoft.AspNetCore.Routing.RouteEndpoint)?.RoutePattern.RawText;
     if (route is not null && ((route.StartsWith("/v1/references/uk/", StringComparison.OrdinalIgnoreCase)
+        || route.StartsWith("/v1/references/au-nz/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/gcc/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/eu/", StringComparison.OrdinalIgnoreCase))
         || route.StartsWith("/v1/quotes", StringComparison.OrdinalIgnoreCase)
@@ -113,6 +114,12 @@ app.MapGet("/v1/destinations/{country}", async (string country, HttpRequest http
     if (await AuthenticateAsync(http, services, config, ct) is null) return Results.Unauthorized();
     if (country.Length != 2 || !country.All(char.IsLetter)) return Results.BadRequest(new { error = "ISO alpha-2 country required" });
     return Results.Ok(DestinationPolicies.Resolve(country));
+});
+// Static source guidance; the shared middleware authenticates and limits the tenant.
+app.MapGet("/v1/references/au-nz/{country}", (string country) =>
+{
+    var reference = AuNzDestinationReference.Find(country);
+    return reference is null ? Results.BadRequest(new { error = "supported AU/NZ ISO alpha-2 country required" }) : Results.Ok(reference);
 });
 app.MapGet("/v1/references/gcc/{country}", (string country) =>
 {
