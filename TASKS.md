@@ -26,6 +26,7 @@
 
 **TASK-011 GCC reference slice (2026-11-08):** six national destination references are available for review only; calculation, legal approval and data rights remain open. See [scope and evidence](tasks/011-eu-taric-destination-expansion.md).
 
+**TASK-011 India and China slice (2026-11-09):** in progress: national reference guidance for IN and CN only; no calculation or legal approval. See [task scope](tasks/011-eu-taric-destination-expansion.md).
 **TASK-011 US, Canada and Mexico reference slice (2026-11-09):** reference-only guidance and compliance reminders for US, CA and MX; calculation, legal eligibility and data rights remain open. See [scope](tasks/011-eu-taric-destination-expansion.md) and [sources](docs/SOURCES.md).
 
 ## Status vocabulary
@@ -105,3 +106,4 @@ The open-source backend is an engineering reference; source-code licensing and r
 **2026-11-04 / Tasks 003 and 010 container/PostgreSQL verification:** added an isolated integration runner covering fresh/legacy/restored databases, merchant isolation and revocation, concurrent idempotency/staging, persistence after container recreation and backup/restore. Found and fixed the real JSONB/text audit parameter mismatch behind HTTP 500. The final frozen-fixture local run passed 103 integration assertions and cleanup; Release build, 219 xUnit cases (eight live skips) and 32 Python cases passed. A frozen original v0.4 schema makes upgrade coverage independent of current migrations. The `container-postgres` CI job uploads hosted evidence; its result is tracked in [draft PR #2](https://github.com/abuzuhri/GlobalTradeTax/pull/2). [Runbook and remaining criteria](docs/POSTGRES_CONTAINER_VERIFICATION.md). Both tasks remain in-progress.
 
 **TASK-011 Malaysia, Indonesia, Thailand, Vietnam and Philippines slice (2026-11-09):** in progress: authenticated, tenant-budgeted commercial-import reference guidance for MY, ID, TH, VN and PH only; no rates, eligibility or approval. See [task scope](tasks/011-eu-taric-destination-expansion.md).
+**TASK-011 AU/NZ slice (2026-11-09):** AU and NZ authenticated country reference guidance adds official source pointers and unresolved import, GST, origin, biosecurity and territorial checks. Calculations, rights and legal approval remain open. [Scope](tasks/011-eu-taric-destination-expansion.md) and [sources](docs/SOURCES.md).

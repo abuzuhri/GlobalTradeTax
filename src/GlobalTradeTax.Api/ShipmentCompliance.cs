@@ -36,6 +36,11 @@ public static class ShipmentCompliance
             checks.AddRange(guidance.UnresolvedChecks);
             warnings.Add(guidance.Name + " guidance is reference only; tax, tariff and clearance require independent review.");
         }
+        if (IndianChineseDestinationReference.Find(request.ShipTo) is { } national)
+        {
+            checks.AddRange(national.UnresolvedChecks);
+            warnings.Add("National source guidance is reference only; tariff, tax and clearance require independent review.");
+        }
         if (NorthAmericaDestinationReference.Find(request.ShipTo) is { } northAmerica)
         {
             checks.AddRange(northAmerica.UnresolvedChecks);
@@ -46,9 +51,14 @@ public static class ShipmentCompliance
             checks.AddRange(gcc.UnresolvedChecks);
             warnings.Add("GCC country guidance is reference only; national tax, tariff and clearance require independent review.");
         }
-        if (JpKrSgDestinationReference.Find(request.ShipTo) is { } national)
+        if (AuNzDestinationReference.Find(request.ShipTo) is { } auNz)
         {
-            checks.AddRange(national.UnresolvedChecks);
+            checks.AddRange(auNz.UnresolvedChecks);
+            warnings.Add("AU/NZ guidance is reference only; tax, tariff, territorial scope and clearance require independent review.");
+        }
+        if (JpKrSgDestinationReference.Find(request.ShipTo) is { } jpKrSg)
+        {
+            checks.AddRange(jpKrSg.UnresolvedChecks);
             warnings.Add("National guidance is reference only; tax, tariff and clearance require independent review.");
         }
         if (request.ShipTo.Equals("GB", StringComparison.OrdinalIgnoreCase) || request.ShipTo.Equals("XI", StringComparison.OrdinalIgnoreCase))

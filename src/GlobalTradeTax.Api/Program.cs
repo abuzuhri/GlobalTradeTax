@@ -41,6 +41,8 @@ app.Use(async (context, next) =>
     var route = (context.GetEndpoint() as Microsoft.AspNetCore.Routing.RouteEndpoint)?.RoutePattern.RawText;
     if (route is not null && ((route.StartsWith("/v1/references/uk/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/five-imports/", StringComparison.OrdinalIgnoreCase)
+        || route.StartsWith("/v1/references/au-nz/", StringComparison.OrdinalIgnoreCase)
+        || route.StartsWith("/v1/references/national/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/jp-kr-sg/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/north-america/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/gcc/", StringComparison.OrdinalIgnoreCase)
@@ -122,6 +124,12 @@ app.MapGet("/v1/references/five-imports/{country}", (string country) =>
     var reference = FiveCountryImportReference.Find(country);
     return reference is null ? Results.BadRequest(new { error = "supported MY, ID, TH, VN or PH ISO alpha-2 country required" }) : Results.Ok(reference);
 });
+// Static source guidance; the shared middleware authenticates and limits the tenant.
+app.MapGet("/v1/references/au-nz/{country}", (string country) =>
+{
+    var reference = AuNzDestinationReference.Find(country);
+    return reference is null ? Results.BadRequest(new { error = "supported AU/NZ ISO alpha-2 country required" }) : Results.Ok(reference);
+});
 app.MapGet("/v1/references/jp-kr-sg/{country}", (string country) =>
 {
     var reference = JpKrSgDestinationReference.Find(country);
@@ -137,6 +145,12 @@ app.MapGet("/v1/references/gcc/{country}", (string country) =>
 {
     var reference = GccDestinationReference.Find(country);
     return reference is null ? Results.BadRequest(new { error = "supported GCC ISO alpha-2 country required" }) : Results.Ok(reference);
+});
+app.MapGet("/v1/references/national/{country}", (string country) =>
+{
+    if (country.Length != 2 || !country.All(char.IsAsciiLetter)) return Results.BadRequest(new { error = "Two ASCII country letters required" });
+    var reference = IndianChineseDestinationReference.Find(country);
+    return reference is null ? Results.NotFound() : Results.Ok(reference);
 });
 // Source guidance only: no tariff, VAT or territorial eligibility is inferred.
 app.MapGet("/v1/references/eu/destinations/{country}", async (string country, HttpRequest http, IServiceProvider services, IConfiguration config, CancellationToken ct) =>
