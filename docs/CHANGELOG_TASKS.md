@@ -1,5 +1,8 @@
 # Task register change log
 
+## 2026-11-09 — TASK-002 operator example clarification
+- Distinguish old and replacement key IDs in rotate/revoke examples and explain that rotation already revokes the old key. Addresses the late documentation review on PR #12; no executable or schema changes.
+
 ## 2026-11-08 — TASK-003 migration ledger
 - Added an operator-invoked, checksum-verified ordered migration ledger with explicit catalog-checked adoption, tracked schema/history preflight, transaction-scoped locking and atomic migration records. Adoption records its actual time rather than asserting historical execution. [Operator and recovery guidance](POSTGRES_CONTAINER_VERIFICATION.md).
 - Local Release tests passed 525 offline cases with 16 optional live skips, 37 Python tests and 334 PostgreSQL/container assertions on implementation commit `eaefcf0` with isolated cleanup. A repeat-preflight comparison defect found in an intermediate run was fixed. Hosted evidence for each commit is tracked in the PR. Privilege, index and production recovery review remain open.
