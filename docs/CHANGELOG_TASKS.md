@@ -1,3 +1,7 @@
+## 2026-11-09 — TASK-011 US, Canada and Mexico reference guidance
+
+Added authenticated, tenant-limited reference-only national source pointers and unresolved shipment checks for US, CA and MX. No calculation, legal approval, payment or release is provided. [Scope and evidence](../tasks/011-eu-taric-destination-expansion.md).
+
 # Task register change log
 
 ## 2026-11-08 â€” TASK-003 migration ledger
