@@ -204,3 +204,6 @@ The Saleor App now installs in the sandbox, receives real checkout events automa
 
 ### GCC destination reference guidance
 Authenticated `GET /v1/references/gcc/{country}` supports BH, KW, OM, QA, SA and AE in either case under the existing tenant rate limit. It returns national source pointers and unresolved checks, with null financial fields and all verification, payment and release gates closed. Source review dates are not effective dates. Country reference coverage does not provide tariff or VAT calculation; see [scope and limitations](tasks/011-eu-taric-destination-expansion.md) and [sources](docs/SOURCES.md).
+
+### US, Canada and Mexico destination references
+Authenticated `GET /v1/references/north-america/{country}` accepts US, CA and MX in either case under the existing tenant budget. Other country and territory codes are rejected. These national references and compliance reminders provide review pointers, not verified calculations or release, payment or eligibility decisions. See [sources and scope](docs/SOURCES.md) and [TASK-011](tasks/011-eu-taric-destination-expansion.md).

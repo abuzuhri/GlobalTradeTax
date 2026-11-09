@@ -44,3 +44,10 @@ The endpoint `GET /v1/references/gcc/{country}` accepts the six ISO codes case-i
 Sources are listed in [the registry](../docs/SOURCES.md). The Qatar and Kuwait tax authority links provide general national tax context, not confirmation that VAT applies or does not apply. A live, effective-dated tariff and national tax dataset, terms/data rights review, shipment-specific evidence and independent legal approvals remain open. Linking to official sources does not establish rights to reuse their data.
 
 Local Release test run: 537 passed and 16 optional live probes skipped; Python: 39 passed. Hosted database/container results are tied to the PR's tested commit and run, not this preliminary local result.
+
+## US, Canada and Mexico reference slice (2026-11-09)
+Scope: authenticated tenant-limited reference guidance for US, CA and MX only, with official national customs and tax pointers and unresolved shipment, preference and exact destination checks. No rate, eligibility, payment, release, provider or schema change. TASK-011 remains in progress; source review is not a legal effective date.
+
+Endpoint `GET /v1/references/north-america/{country}` is authenticated and shares the tenant budget. It supports US, CA and MX in either case; territory codes and other inputs are rejected. References carry null amounts and closed calculation, payment and release gates. Destination and compliance guidance retain unresolved preference, actual origin and territorial tax checks. The source registry describes official pointers, not licensed or effective-dated data integration. No migration is needed. See [sources](../docs/SOURCES.md).
+
+Local implementation verification: Release suite 586 passed, 16 optional live probes skipped; Python suite 39 passed. Hosted checks and container evidence are tied to the PR head and run. These checks do not establish legal eligibility or data rights.

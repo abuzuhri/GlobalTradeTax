@@ -16,6 +16,7 @@ PROTECTED_ENDPOINTS = (
     ('/v1/compliance/check', 'POST', {}),
     ('/v1/references/eu/destinations/DE', 'GET', None),
     ('/v1/references/gcc/SA', 'GET', None),
+    ('/v1/references/north-america/US', 'GET', None),
     ('/v1/references/uk/commodities/0101210000', 'GET', None),
     ('/v1/references/uk/assessments/0101210000?origin=US&importDate=2026-11-02', 'GET', None),
     ('/v1/references/uk/assessments/0101210000/evidence-package?origin=US&importDate=2026-11-02', 'GET', None),
