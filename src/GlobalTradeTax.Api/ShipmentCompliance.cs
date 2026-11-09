@@ -51,6 +51,11 @@ public static class ShipmentCompliance
             checks.AddRange(gcc.UnresolvedChecks);
             warnings.Add("GCC country guidance is reference only; national tax, tariff and clearance require independent review.");
         }
+        if (LatamDestinationReference.Find(request.ShipTo) is { } latam)
+        {
+            checks.AddRange(latam.UnresolvedChecks);
+            warnings.Add("Country guidance is reference only; tax, tariff and clearance require independent review.");
+        }
         if (AuNzDestinationReference.Find(request.ShipTo) is { } auNz)
         {
             checks.AddRange(auNz.UnresolvedChecks);

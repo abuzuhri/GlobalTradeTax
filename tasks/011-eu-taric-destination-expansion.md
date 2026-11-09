@@ -45,6 +45,12 @@ Sources are listed in [the registry](../docs/SOURCES.md). The Qatar and Kuwait t
 
 Local Release test run: 537 passed and 16 optional live probes skipped; Python: 39 passed. Hosted database/container results are tied to the PR's tested commit and run, not this preliminary local result.
 
+## Next bounded slice: BR, CL, CO and PE
+
+Implement country-specific destination reference guidance for Brazil, Chile, Colombia and Peru only. Rates, eligibility, calculation and release remain unverified; MX uses North America guidance; AR retains existing behavior.
+
+
+Authenticated `/v1/references/latam/{country}` supports only BR, CL, CO and PE, case-insensitively. Country-specific official references and unresolved checks reach destination and compliance responses. Codes and source review dates do not establish legal applicability. Postal, courier, preferential, special-zone, subnational and Brazilian federal/state treatment require shipment-specific review. No rate, preference, calculation, payment or release is approved. MX uses North America guidance; AR behavior remains unchanged. No schema changes. Live data integration, rights, independent eligibility review and TASK-011 approval remain open.
 ## Malaysia, Indonesia, Thailand, Vietnam and Philippines reference slice (2026-11-09)
 Scope: authenticated, tenant-budgeted static commercial-import guidance for MY, ID, TH, VN and PH, national official source context and unresolved shipment-specific and territorial checks. No provider, rates, financial approval or migration. Source rights, live effective-dated data and independent legal review remain open; TASK-011 remains in progress.
 

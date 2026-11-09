@@ -46,6 +46,7 @@ app.Use(async (context, next) =>
         || route.StartsWith("/v1/references/jp-kr-sg/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/north-america/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/gcc/", StringComparison.OrdinalIgnoreCase)
+        || route.StartsWith("/v1/references/latam/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/eu/", StringComparison.OrdinalIgnoreCase))
         || route.StartsWith("/v1/quotes", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/destinations/", StringComparison.OrdinalIgnoreCase)
@@ -145,6 +146,11 @@ app.MapGet("/v1/references/gcc/{country}", (string country) =>
 {
     var reference = GccDestinationReference.Find(country);
     return reference is null ? Results.BadRequest(new { error = "supported GCC ISO alpha-2 country required" }) : Results.Ok(reference);
+});
+app.MapGet("/v1/references/latam/{country}", (string country) =>
+{
+    var reference = LatamDestinationReference.Find(country);
+    return reference is null ? Results.BadRequest(new { error = "supported LATAM reference ISO alpha-2 country required" }) : Results.Ok(reference);
 });
 app.MapGet("/v1/references/national/{country}", (string country) =>
 {
