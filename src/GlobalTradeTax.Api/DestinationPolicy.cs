@@ -14,6 +14,9 @@ public static class DestinationPolicies
     public static DestinationPolicy Resolve(string country)
     {
         country = country.Trim().ToUpperInvariant();
+        if (IndianChineseDestinationReference.Find(country) is { } national)
+            return new(country, national.Country, "Destination-specific import tax", "National customs tariff", "provider_required",
+                national.UnresolvedChecks, national.Sources.Select(source => source.Url).ToArray());
         if (EuDestinationReferences.Find(country) is not null) return new(country, "EU", "Destination VAT / IOSS eligibility",
             "EU customs tariff and applicable low-value rules", "provider_required",
             ["Validate IOSS eligibility and seller registration", "Verify EU tariff classification and origin", "Check VAT rate, customs value and import fees", "Check precise destination territory, VAT scope and product restrictions"],

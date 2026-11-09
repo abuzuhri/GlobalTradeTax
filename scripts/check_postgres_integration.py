@@ -430,6 +430,9 @@ class Integration:
                    self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='rate-a';") == '0')
         self.request('GET', '/v1/references/uk/commodities/1234567890', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/gcc/AE', key=rotated, expected=429, retry_after=True)
+        self.request('GET', '/v1/references/national/IN', key=rotated, expected=429, retry_after=True)
+        self.request('GET', '/v1/references/national/CN', key=other)
+        self.request('GET', '/v1/references/national/IN', expected=401)
         self.request('GET', '/v1/destinations/GB', key=other)
         self.request('GET', '/v1/destinations/GB', expected=401)
         self.request('GET', '/v1/references/gcc/SA', expected=401)
@@ -446,6 +449,15 @@ class Integration:
                        result['verifiedForCalculation'] is False and result['paymentApproved'] is False and result['shipmentReleaseApproved'] is False)
         self.request('GET', '/v1/references/gcc/US', key=first, expected=400)
         self.request('GET', '/v1/references/gcc/USA', key=first, expected=400)
+        for country in ('IN', 'CN'):
+            result = self.request('GET', '/v1/references/national/' + country.lower(), key=first)
+            self.check('National reference is unresolved and unapproved ' + country,
+                       result['country'] == country and result['territoryStatus'] == 'unresolved' and
+                       result['status'] == 'reference_only' and result['importDuty'] is None and
+                       result['importTax'] is None and result['landedTotal'] is None and
+                       not result['verifiedForCalculation'] and not result['paymentApproved'] and not result['shipmentReleaseApproved'])
+        self.request('GET', '/v1/references/national/HK', key=first, expected=404)
+        self.request('GET', '/v1/references/national/123', key=first, expected=400)
 
     def staging_and_audit(self):
         self.phase('Checking tariff staging and database audit writes')

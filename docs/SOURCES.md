@@ -17,3 +17,7 @@ The [GCC Secretariat](https://www.gcc-sg.org/en/AboutUs/Pages/default.aspx) and 
 - Qatar: [customs legislation](https://customs.gov.qa/English/Legislations/Laws/Pages/default.aspx), [General Tax Authority](https://gta.gov.qa/en/taxes-info).
 - Saudi Arabia: [integrated tariff](https://zatca.gov.sa/en/RulesRegulations/Taxes/Pages/Integrated-Tarrifs.aspx), [VAT](https://www.zatca.gov.sa/en/RulesRegulations/VAT/Pages/About-Vat.aspx).
 - UAE: [customs union](https://icp.gov.ae/en/customs-union-for-gcc/), [Federal Tax Authority designated-zone guide](https://tax.gov.ae/-/media/Files/FTA/links/vat-designated-zone/Designated-Zones-VAT-Guide.pdf).
+
+## India and China (reviewed 2026-11-09)
+
+See [national source review](IN_CN_DESTINATION_REFERENCE.md) for official authorities, purposes, links and limitations. Review date is not an effective date; source reuse rights remain unverified.

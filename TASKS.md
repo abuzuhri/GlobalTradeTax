@@ -24,6 +24,8 @@
 
 **TASK-011 GCC reference slice (2026-11-08):** six national destination references are available for review only; calculation, legal approval and data rights remain open. See [scope and evidence](tasks/011-eu-taric-destination-expansion.md).
 
+**TASK-011 India and China slice (2026-11-09):** in progress: national reference guidance for IN and CN only; no calculation or legal approval. See [task scope](tasks/011-eu-taric-destination-expansion.md).
+
 ## Status vocabulary
 - `not-started`: not implemented.
 - `in-progress`: partial code exists; acceptance criteria unmet.
