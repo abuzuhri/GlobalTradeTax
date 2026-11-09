@@ -176,3 +176,5 @@ Added authenticated tenant-limited national references for all six GCC destinati
 ## 2026-11-09 — TASK-011 five national import references
 
 Added authenticated, tenant-budgeted MY, ID, TH, VN and PH reference guidance and unresolved shipment checks. No calculation, payment or release approval. Local Release tests passed 587 cases with 16 optional live skips; Python passed 39. Docker is unavailable locally; hosted results are tracked on the PR head. Source review, Vietnam retrieval limit and remaining gates are in [SOURCES.md](SOURCES.md).
+
+**2026-11-09 source correction:** Replaced the Malaysia Act PDF link after direct retrieval returned 404 with the inspected Royal Malaysian Customs legislation index. The index is a source-discovery aid; verify current text through the official Laws of Malaysia portal.

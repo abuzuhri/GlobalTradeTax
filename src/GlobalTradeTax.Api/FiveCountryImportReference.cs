@@ -16,7 +16,7 @@ public static class FiveCountryImportReference
 {
     private static readonly Dictionary<string, (string Name, string Authority, string Purpose, string Url, string Detail)> Countries = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["MY"] = ("Malaysia", "Royal Malaysian Customs Department", "Import declaration and customs duties legislation", "https://www.customs.gov.my/en/pg/Customs%20Act/CUSTOMS%20ACT%201967-1.pdf", "Review Malaysia sales tax and designated or special area treatment for the movement"),
+        ["MY"] = ("Malaysia", "Royal Malaysian Customs Department", "Customs legislation index", "https://www.customs.gov.my/en/procedure/customs/customs", "Review Malaysia sales tax and designated or special area treatment for the movement"),
         ["ID"] = ("Indonesia", "Directorate General of Customs and Excise", "Import for consumption, declaration, duties and restricted goods", "https://www.beacukai.go.id/impor-untuk-dipakai", "Review Indonesia import-for-consumption requirements and relevant agency restrictions"),
         ["TH"] = ("Thailand", "Laem Chabang Port Customs Office", "Commercial import declarations, duties and permits", "https://lcpcb.customs.go.th/th/import-procedures", "Review Thailand import declaration and permits with the responsible agencies"),
         ["VN"] = ("Vietnam", "Vietnam Customs", "Administrative procedure index including commercial imports and customs tax", "https://pus.customs.gov.vn/faces/Procedure", "Review Vietnam commercial import procedure and current goods-management requirements"),

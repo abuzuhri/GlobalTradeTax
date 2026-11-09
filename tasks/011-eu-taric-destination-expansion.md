@@ -49,3 +49,5 @@ Local Release test run: 537 passed and 16 optional live probes skipped; Python: 
 Scope: authenticated, tenant-budgeted static commercial-import guidance for MY, ID, TH, VN and PH, national official source context and unresolved shipment-specific and territorial checks. No provider, rates, financial approval or migration. Source rights, live effective-dated data and independent legal review remain open; TASK-011 remains in progress.
 
 Implemented the five-country reference endpoint and national destination/compliance reminders. Local Release tests: 587 passed, 16 optional UK live probes skipped; Python tests: 39 passed. Local Docker is unavailable; hosted container evidence must be checked on the PR head. [Sources and limitations](../docs/SOURCES.md). TASK-011 remains in progress.
+
+2026-11-09 review correction: the Malaysia Act PDF returned 404 on direct retrieval. Replaced it with the inspected customs legislation index; see [source limits](../docs/SOURCES.md). This does not establish current legal applicability.
