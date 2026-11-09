@@ -36,6 +36,11 @@ public static class ShipmentCompliance
             checks.AddRange(guidance.UnresolvedChecks);
             warnings.Add(guidance.Name + " guidance is reference only; tax, tariff and clearance require independent review.");
         }
+        if (NorthAmericaDestinationReference.Find(request.ShipTo) is { } northAmerica)
+        {
+            checks.AddRange(northAmerica.UnresolvedChecks);
+            warnings.Add("US, Canada and Mexico guidance is reference only; tax, tariff and clearance require independent review.");
+        }
         if (GccDestinationReference.Find(request.ShipTo) is { } gcc)
         {
             checks.AddRange(gcc.UnresolvedChecks);

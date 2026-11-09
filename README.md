@@ -207,3 +207,5 @@ Authenticated `GET /v1/references/gcc/{country}` supports BH, KW, OM, QA, SA and
 
 ### Five national import references
 Authenticated `GET /v1/references/five-imports/{country}` accepts MY, ID, TH, VN and PH, case-insensitively. Malformed or unsupported codes return 400. The existing tenant budget applies. These are separate national commercial-import pointers, not a regional regime or a complete Southeast Asia list. Destination routing and compliance include unresolved shipment checks. All monetary fields remain null and calculation, payment and release approval remain false. See [source review and limits](docs/SOURCES.md).
+### US, Canada and Mexico destination references
+Authenticated `GET /v1/references/north-america/{country}` accepts US, CA and MX in either case under the existing tenant budget. Other country and territory codes are rejected. These national references and compliance reminders provide review pointers, not verified calculations or release, payment or eligibility decisions. See [sources and scope](docs/SOURCES.md) and [TASK-011](tasks/011-eu-taric-destination-expansion.md).

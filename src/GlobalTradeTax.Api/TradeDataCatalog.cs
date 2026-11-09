@@ -21,6 +21,8 @@ public static class TradeDataCatalog
             "EU", "official tariff reference", "reference-only", "TARIC alone does not cover all national VAT, excise or clearance fees."),
         new("us-hts", "USITC HTS", "https://hts.usitc.gov/", "US", "official import tariff reference",
             "reference-only", "Duty depends on origin, measures and current entry context."),
+        new("ca-customs-tariff", "CBSA Customs Tariff", "https://www.cbsa-asfc.gc.ca/trade-commerce/tariff-tarif/2026/menu-eng.html", "CA", "official tariff reference", "reference-only", "Classification, origin, dated measures and provincial tax require separate review."),
+        new("mx-classification", "SAT tariff classification and NICO", "https://wwwmat.sat.gob.mx/tramites/71719/presenta-tu-consulta-de-clasificacion-arancelaria", "MX", "official classification reference", "reference-only", "A classification consultation is not a rate feed or clearance."),
         new("wits", "World Bank WITS", "https://wits.worldbank.org/", "Global", "trade tariff research",
             "reference-only", "Not a real-time checkout duty guarantee; check licensing and update frequency.")
     ];
