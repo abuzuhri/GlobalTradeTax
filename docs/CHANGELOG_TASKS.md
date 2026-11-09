@@ -172,3 +172,7 @@ Added migration 006, server-time expiry enforcement and a tenant-bound operator 
 
 ## 2026-11-08 — TASK-011 GCC reference guidance
 Added authenticated tenant-limited national references for all six GCC destinations, country-specific source routing and compliance review checks. This is reference coverage only; live data, rights and independent approvals remain open. Local tests: 537 .NET passed, 16 optional live skipped; 39 Python passed. Hosted evidence follows the PR head. See [task](../tasks/011-eu-taric-destination-expansion.md).
+
+## 2026-11-09 — TASK-011 five national import references
+
+Added authenticated, tenant-budgeted MY, ID, TH, VN and PH reference guidance and unresolved shipment checks. No calculation, payment or release approval. Local Release tests passed 587 cases with 16 optional live skips; Python passed 39. Docker is unavailable locally; hosted results are tracked on the PR head. Source review, Vietnam retrieval limit and remaining gates are in [SOURCES.md](SOURCES.md).

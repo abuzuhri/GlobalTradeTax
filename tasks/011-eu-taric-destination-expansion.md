@@ -44,3 +44,8 @@ The endpoint `GET /v1/references/gcc/{country}` accepts the six ISO codes case-i
 Sources are listed in [the registry](../docs/SOURCES.md). The Qatar and Kuwait tax authority links provide general national tax context, not confirmation that VAT applies or does not apply. A live, effective-dated tariff and national tax dataset, terms/data rights review, shipment-specific evidence and independent legal approvals remain open. Linking to official sources does not establish rights to reuse their data.
 
 Local Release test run: 537 passed and 16 optional live probes skipped; Python: 39 passed. Hosted database/container results are tied to the PR's tested commit and run, not this preliminary local result.
+
+## Malaysia, Indonesia, Thailand, Vietnam and Philippines reference slice (2026-11-09)
+Scope: authenticated, tenant-budgeted static commercial-import guidance for MY, ID, TH, VN and PH, national official source context and unresolved shipment-specific and territorial checks. No provider, rates, financial approval or migration. Source rights, live effective-dated data and independent legal review remain open; TASK-011 remains in progress.
+
+Implemented the five-country reference endpoint and national destination/compliance reminders. Local Release tests: 587 passed, 16 optional UK live probes skipped; Python tests: 39 passed. Local Docker is unavailable; hosted container evidence must be checked on the PR head. [Sources and limitations](../docs/SOURCES.md). TASK-011 remains in progress.
