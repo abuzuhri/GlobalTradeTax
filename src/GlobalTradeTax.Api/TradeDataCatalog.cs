@@ -23,6 +23,8 @@ public static class TradeDataCatalog
             "reference-only", "Duty depends on origin, measures and current entry context."),
         new("au-customs-tariff", "Australian Border Force working tariff", "https://www.abf.gov.au/importing-exporting-and-manufacturing/tariff-classification/current-tariff", "Australia; external territories require separate review", "official customs reference", "reference-only", "No rates are imported; origin, territory, tax and data rights require review."),
         new("nz-customs-tariff", "New Zealand Customs tariff", "https://www.customs.govt.nz/business/tariffs/tariff-classifications-and-rates", "New Zealand; associated jurisdictions require separate review", "official customs reference", "reference-only", "No rates are imported; origin, territory, tax and data rights require review."),
+        new("ca-customs-tariff", "CBSA Customs Tariff", "https://www.cbsa-asfc.gc.ca/trade-commerce/tariff-tarif/2026/menu-eng.html", "CA", "official tariff reference", "reference-only", "Classification, origin, dated measures and provincial tax require separate review."),
+        new("mx-classification", "SAT tariff classification and NICO", "https://wwwmat.sat.gob.mx/tramites/71719/presenta-tu-consulta-de-clasificacion-arancelaria", "MX", "official classification reference", "reference-only", "A classification consultation is not a rate feed or clearance."),
         new("wits", "World Bank WITS", "https://wits.worldbank.org/", "Global", "trade tariff research",
             "reference-only", "Not a real-time checkout duty guarantee; check licensing and update frequency.")
     ];
