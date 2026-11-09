@@ -207,6 +207,8 @@ Authenticated `GET /v1/references/gcc/{country}` supports BH, KW, OM, QA, SA and
 
 ### Brazil, Chile, Colombia and Peru reference guidance
 Authenticated `GET /v1/references/latam/{country}` provides BR, CL, CO and PE source pointers and unresolved shipment-specific checks under the tenant budget. It supplies no rates or eligibility and does not approve calculation, payment or release. MX uses North America guidance; AR retains existing routing. See [sources](docs/SOURCES.md) and [scope](tasks/011-eu-taric-destination-expansion.md).
+### Australia and New Zealand reference guidance
+`GET /v1/references/au-nz/{country}` accepts AU and NZ case-insensitively, requires a merchant key and uses the shared tenant budget. It returns official source pointers and unresolved checks, not payable tariff or tax calculations. Amounts are null and verification, payment and release approvals remain false. External territories and associated jurisdictions require separate review; country code and dispatch country establish neither scope nor preferential origin. The source review date is not a legal effective date. See [sources](docs/SOURCES.md) and [TASK-011](tasks/011-eu-taric-destination-expansion.md).
 Authenticated `GET /v1/references/national/{country}` provides India and China reference-only guidance under the tenant budget. See [scope and source context](docs/IN_CN_DESTINATION_REFERENCE.md).
 ## Japan, South Korea and Singapore reference guidance
 

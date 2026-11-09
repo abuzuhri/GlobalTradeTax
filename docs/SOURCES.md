@@ -37,6 +37,14 @@ Classification, actual origin and preferences, valuation, importer, taxes, contr
 ## India and China (reviewed 2026-11-09)
 
 See [national source review](IN_CN_DESTINATION_REFERENCE.md) for official authorities, purposes, links and limitations. Review date is not an effective date; source reuse rights remain unverified.
+
+## AU/NZ destination reference review (2026-11-09)
+
+Australia: [ABF working tariff](https://www.abf.gov.au/importing-exporting-and-manufacturing/tariff-classification/current-tariff), [import requirements](https://www.abf.gov.au/imports/Pages/How-to-import/Requirements.aspx), [ATO imported goods GST](https://www.ato.gov.au/api/public/content/0-5cfa3e60-d95b-41aa-9be1-cea62009de33), [DAFF BICON biosecurity](https://www.agriculture.gov.au/biosecurity-trade/import/online-services/bicon), and [ABF external territories notice](https://www.abf.gov.au/help-and-support-subsite/CustomsNotices/2026-11.pdf). DAFF notes BICON may not contain conditions for certain external territories.
+
+New Zealand: [Customs tariff](https://www.customs.govt.nz/business/tariffs/tariff-classifications-and-rates), [Customs import costs](https://www.customs.govt.nz/sending-and-receiving/duty-and-gst/duty-and-allowances), [Inland Revenue GST](https://www.ird.govt.nz/gst/gst-for-overseas-businesses/supplying-goods-or-services-in-new-zealand), [MPI import requirements](https://www.mpi.govt.nz/import/importing-into-nz-how-it-works/general-importing-requirements), and [MFAT treaty guide](https://www.mfat.govt.nz/assets/About-us-Corporate/Treaties-Model-instruments/International-Treaty-Making-Guide-2021.pdf). Cook Islands, Niue and Tokelau require separate jurisdiction and treaty review.
+
+These pointers are not licensed rate feeds or decisions; source review date is not a legal effective date. Actual origin, agreement eligibility, territorial scope, tax and product controls require independent shipment-specific review. Data rights and legal approval remain open.
 ## US, Canada and Mexico references (reviewed 2026-11-09)
 
 - US: [USITC HTS](https://hts.usitc.gov/) publishes the tariff; [CBP](https://www.help.cbp.gov/s/article/Article-1397) describes import classification and controls. [IRS educational material](https://apps.irs.gov/app/understandingTaxes/whys/thm04/les01/media/is1_thm04_les01.pdf) distinguishes federal, state and local tax; consult the actual destination jurisdiction for sales/use tax.
