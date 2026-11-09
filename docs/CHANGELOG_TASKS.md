@@ -1,4 +1,4 @@
-## 2026-11-09 — TASK-011 US, Canada and Mexico reference guidance
+## 2026-11-09 â€” TASK-011 US, Canada and Mexico reference guidance
 
 Added authenticated, tenant-limited reference-only national source pointers and unresolved shipment checks for US, CA and MX. No calculation, legal approval, payment or release is provided. [Scope and evidence](../tasks/011-eu-taric-destination-expansion.md).
 
@@ -191,3 +191,5 @@ Added authenticated, tenant-budgeted MY, ID, TH, VN and PH reference guidance an
 
 Added tenant-budgeted, reference-only national sources and unresolved shipment checks for IN and CN. No rates, calculation, payment or clearance approval; rights and independent legal review remain open. See [source scope](IN_CN_DESTINATION_REFERENCE.md) and [task log](../tasks/011-eu-taric-destination-expansion.md). Local Release tests: 587 passed, 16 optional live skips; hosted evidence is tied to the PR head.
 - 2026-11-09: TASK-011 adds review-only JP/KR/SG national reference guidance and tenant-limited endpoint. No rate calculation or clearance approval; source rights, legal review and live data remain open. Validation evidence belongs to the tested commit and CI run.
+
+2026-11-09: Destination Region compatibility correction: MY/ID/TH/VN/PH, IN/CN and AU/NZ now return OTHER; MX remains LATAM with North America references. Country guidance and unresolved checks remain. Release: 662 passed, 16 optional live skipped; Python: 39 passed; repository, secret and CI guards passed; API smoke: 18 passed. Local Docker unavailable; hosted container verification is required on the PR head. Source review dates unchanged; data rights and independent legal approval remain open. TASK-001 and TASK-011 remain in progress.

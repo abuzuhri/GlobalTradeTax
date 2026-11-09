@@ -12,7 +12,7 @@ class SmokeTests(unittest.TestCase):
         if path == '/health':
             return 200, {'status': 'healthy'}
         if path == '/v1/capabilities':
-            return 200, {'settlement': 'not-implemented', 'calculation': 'provider-required'}
+            return 200, {'settlement': 'not-implemented', 'calculation': 'provider-required', 'destinationPolicies': 'EU/GCC/LATAM/OTHER'}
         return 401, None
 
     def test_expected_contract(self):
@@ -29,7 +29,7 @@ class SmokeTests(unittest.TestCase):
     def test_calculation_cannot_be_claimed_verified(self):
         def mock(path, method='GET', payload=None):
             if path == '/v1/capabilities':
-                return 200, {'settlement': 'not-implemented', 'calculation': 'verified'}
+                return 200, {'settlement': 'not-implemented', 'calculation': 'verified', 'destinationPolicies': 'EU/GCC/LATAM/OTHER'}
             return self.good(path, method, payload)
         with self.assertRaises(AssertionError):
             assert_smoke(mock)

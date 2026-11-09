@@ -32,3 +32,7 @@ Contract tests for errors, null monetary fields, and idempotency; OpenAPI docume
 - Who will own and review this task?
 - What official source or provider contract is required?
 - What evidence proves correctness in staging?
+
+**2026-11-09 destination Region contract correction:** Restore the advertised EU/GCC/LATAM/OTHER grouping for recently added country guidance, retaining country-specific references and unresolved eligibility checks. Verify quote output and capability metadata; no legal/source review, rates, provider or migration is in scope. TASK-001 and TASK-011 remain in progress.
+
+2026-11-09: Region compatibility correction: MY/ID/TH/VN/PH, IN/CN and AU/NZ now use OTHER; EU, GCC and LATAM routing, including MX North America references, remain intact. Country sources and unresolved checks remain. Release tests: 662 passed, 16 optional live skipped; Python: 39 passed; repository, secret and CI guards passed; local API smoke: 18 checks passed. Docker unavailable locally; hosted PostgreSQL/container verification is required on the PR head. Source dates were not re-reviewed; live data rights and independent legal approvals remain open. TASK-001 and TASK-011 remain in progress.
