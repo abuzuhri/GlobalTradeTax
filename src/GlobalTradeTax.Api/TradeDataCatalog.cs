@@ -21,6 +21,9 @@ public static class TradeDataCatalog
             "EU", "official tariff reference", "reference-only", "TARIC alone does not cover all national VAT, excise or clearance fees."),
         new("us-hts", "USITC HTS", "https://hts.usitc.gov/", "US", "official import tariff reference",
             "reference-only", "Duty depends on origin, measures and current entry context."),
+        new("jp-customs", "Japan Customs", "https://www.customs.go.jp/english/tariff/", "JP", "national tariff reference", "reference-only", "Shipment applicability, rights and current rates require independent review."),
+        new("kr-customs", "Korea Customs Service", "https://www.customs.go.kr/english/ad/ct/CustomsTariffList.do", "KR", "national tariff reference", "reference-only", "Shipment applicability, rights and current rates require independent review."),
+        new("sg-customs", "Singapore Customs", "https://www.customs.gov.sg/doing-business/import-operations/import-operations-overview/", "SG", "national import reference", "reference-only", "Shipment applicability, rights and current rates require independent review."),
         new("wits", "World Bank WITS", "https://wits.worldbank.org/", "Global", "trade tariff research",
             "reference-only", "Not a real-time checkout duty guarantee; check licensing and update frequency.")
     ];

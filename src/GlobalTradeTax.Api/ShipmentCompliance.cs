@@ -36,6 +36,11 @@ public static class ShipmentCompliance
             checks.AddRange(gcc.UnresolvedChecks);
             warnings.Add("GCC country guidance is reference only; national tax, tariff and clearance require independent review.");
         }
+        if (JpKrSgDestinationReference.Find(request.ShipTo) is { } national)
+        {
+            checks.AddRange(national.UnresolvedChecks);
+            warnings.Add("National guidance is reference only; tax, tariff and clearance require independent review.");
+        }
         if (request.ShipTo.Equals("GB", StringComparison.OrdinalIgnoreCase) || request.ShipTo.Equals("XI", StringComparison.OrdinalIgnoreCase))
         {
             checks.AddRange(["Confirm the GB or Northern Ireland tariff, ten-digit import classification and actual goods origin",
