@@ -310,7 +310,7 @@ class Integration:
         self.start_api()
         self.check('Runtime container runs without root', self.compose('exec', '-T', 'api', 'id', '-u').stdout.strip() != b'0')
         anonymous = assert_smoke(lambda path, method='GET', payload=None: fetch(self.base, path, method, payload))
-        self.check('General container smoke and anonymous routes', anonymous == 17, count=anonymous)
+        self.check('General container smoke and anonymous routes', anonymous == 18, count=anonymous)
         for country in ('DE', 'PL', 'CY'):
             reference = self.request('GET', '/v1/references/eu/destinations/' + country.lower(), key=self.keys['a'])
             self.check('EU country guidance remains reference only: ' + country,
@@ -422,24 +422,26 @@ class Integration:
         validate_spec(spec, self.project, self.run_id)
         self.compose_file.write_text(json.dumps(spec), encoding='utf-8')
         self.start_api()
-        self.request('GET', '/v1/references/au-nz/au', key=first)
+        self.request('GET', '/v1/references/five-imports/my', key=first)
         self.request('GET', '/v1/destinations/GB', key=rotated)
         self.request('POST', '/v1/landed-cost/estimate', key=first, payload=b'not json', expected=429, retry_after=True)
         self.request('POST', '/v1/landed-cost/estimate', key=first, payload=self.payload, expected=429, retry_after=True)
         self.check('Rejected estimate produced no audit',
                    self.sql("SELECT count(*) FROM audit_events WHERE tenant_id='rate-a';") == '0')
         self.request('GET', '/v1/references/uk/commodities/1234567890', key=rotated, expected=429, retry_after=True)
+        self.request('GET', '/v1/references/five-imports/ID', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/gcc/AE', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/au-nz/AU', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/destinations/GB', expected=401)
         self.request('GET', '/v1/references/gcc/SA', expected=401)
+        self.request('GET', '/v1/references/five-imports/MY', expected=401)
+        self.request('GET', '/v1/references/jp-kr-sg/JP', expected=401)
         self.request('GET', '/v1/references/au-nz/AU', expected=401)
         self.request('GET', '/v1/references/north-america/US', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/national/IN', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/national/CN', key=other)
         self.request('GET', '/v1/references/national/IN', expected=401)
         self.request('GET', '/v1/references/jp-kr-sg/JP', key=rotated, expected=429, retry_after=True)
-        self.request('GET', '/v1/references/jp-kr-sg/JP', expected=401)
         self.request('GET', '/v1/references/north-america/US', expected=401)
         self.request('GET', '/health')
         environment['TenantRateLimit__PermitLimit'] = '10000'
@@ -452,12 +454,20 @@ class Integration:
                        result['country'] == country and result['status'] == 'reference_only' and
                        result['importDuty'] is None and result['importTax'] is None and result['landedTotal'] is None and
                        result['verifiedForCalculation'] is False and result['paymentApproved'] is False and result['shipmentReleaseApproved'] is False)
+        for country in ('MY', 'ID', 'TH', 'VN', 'PH'):
+            result = self.request('GET', '/v1/references/five-imports/' + country.lower(), key=first)
+            self.check('National reference remains unapproved ' + country,
+                       result['country'] == country and result['status'] == 'reference_only' and
+                       result['importDuty'] is None and result['importTax'] is None and result['landedTotal'] is None and
+                       result['verifiedForCalculation'] is False and result['paymentApproved'] is False and result['shipmentReleaseApproved'] is False)
         for country in ('JP', 'KR', 'SG'):
             result = self.request('GET', '/v1/references/jp-kr-sg/' + country.lower(), key=first)
             self.check('National reference remains unapproved ' + country,
                        result['country'] == country and result['status'] == 'reference_only' and
                        result['importDuty'] is None and result['importTax'] is None and result['landedTotal'] is None and
                        result['verifiedForCalculation'] is False and result['paymentApproved'] is False and result['shipmentReleaseApproved'] is False)
+        self.request('GET', '/v1/references/five-imports/SG', key=first, expected=400)
+        self.request('GET', '/v1/references/five-imports/MYS', key=first, expected=400)
         self.request('GET', '/v1/references/jp-kr-sg/HK', key=first, expected=400)
         self.request('GET', '/v1/references/jp-kr-sg/JPN', key=first, expected=400)
         for country in ('US', 'CA', 'MX'):

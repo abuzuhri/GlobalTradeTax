@@ -45,6 +45,12 @@ Sources are listed in [the registry](../docs/SOURCES.md). The Qatar and Kuwait t
 
 Local Release test run: 537 passed and 16 optional live probes skipped; Python: 39 passed. Hosted database/container results are tied to the PR's tested commit and run, not this preliminary local result.
 
+## Malaysia, Indonesia, Thailand, Vietnam and Philippines reference slice (2026-11-09)
+Scope: authenticated, tenant-budgeted static commercial-import guidance for MY, ID, TH, VN and PH, national official source context and unresolved shipment-specific and territorial checks. No provider, rates, financial approval or migration. Source rights, live effective-dated data and independent legal review remain open; TASK-011 remains in progress.
+
+Implemented the five-country reference endpoint and national destination/compliance reminders. Local Release tests: 587 passed, 16 optional UK live probes skipped; Python tests: 39 passed. Local Docker is unavailable; hosted container evidence must be checked on the PR head. [Sources and limitations](../docs/SOURCES.md). TASK-011 remains in progress.
+
+2026-11-09 review correction: the Malaysia Act PDF returned 404 on direct retrieval. Replaced it with the inspected customs legislation index; see [source limits](../docs/SOURCES.md). This does not establish current legal applicability.
 ## AU/NZ reference slice (2026-11-09)
 Scope: authenticated, tenant-limited country reference guidance for AU and NZ only, including official customs, GST, import and biosecurity sources and unresolved territorial and preferential eligibility checks. No rates, clearance, payment, legal decisions, provider or schema changes. Source review is not an effective date; live data, rights and independent legal review remain open.
 
