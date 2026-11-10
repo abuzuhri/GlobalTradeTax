@@ -436,12 +436,14 @@ class Integration:
         self.request('GET', '/v1/destinations/GB', expected=401)
         self.request('GET', '/v1/references/gcc/SA', expected=401)
         self.request('GET', '/v1/references/five-imports/MY', expected=401)
+        self.request('GET', '/v1/references/za-ke-ng-eg/ZA', expected=401)
         self.request('GET', '/v1/references/jp-kr-sg/JP', expected=401)
         self.request('GET', '/v1/references/au-nz/AU', expected=401)
         self.request('GET', '/v1/references/north-america/US', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/national/IN', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/national/CN', key=other)
         self.request('GET', '/v1/references/national/IN', expected=401)
+        self.request('GET', '/v1/references/za-ke-ng-eg/ZA', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/jp-kr-sg/JP', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/latam/BR', expected=401)
         self.request('GET', '/v1/references/north-america/US', expected=401)
@@ -462,6 +464,14 @@ class Integration:
                        result['country'] == country and result['status'] == 'reference_only' and
                        result['importDuty'] is None and result['importTax'] is None and result['landedTotal'] is None and
                        result['verifiedForCalculation'] is False and result['paymentApproved'] is False and result['shipmentReleaseApproved'] is False)
+        for country in ('ZA', 'KE', 'NG', 'EG'):
+            result = self.request('GET', '/v1/references/za-ke-ng-eg/' + country.lower(), key=first)
+            self.check('Four-country reference remains unapproved ' + country,
+                       result['country'] == country and result['status'] == 'reference_only' and
+                       all(result[x] is None for x in ('importDuty', 'importTax', 'landedTotal')) and
+                       not any(result[x] for x in ('verifiedForCalculation', 'paymentApproved', 'shipmentReleaseApproved')))
+        for country in ('GH', 'ZAF'):
+            self.request('GET', '/v1/references/za-ke-ng-eg/' + country, key=first, expected=400)
         for country in ('JP', 'KR', 'SG'):
             result = self.request('GET', '/v1/references/jp-kr-sg/' + country.lower(), key=first)
             self.check('National reference remains unapproved ' + country,
