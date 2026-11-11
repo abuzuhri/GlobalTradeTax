@@ -63,3 +63,14 @@ These pointers are not licensed rate feeds or decisions; source review date is n
 - Mexico: [SAT classification and NICO](https://wwwmat.sat.gob.mx/tramites/71719/presenta-tu-consulta-de-clasificacion-arancelaria), [ANAM customs guidance](https://aduanafacil.anam.gob.mx/) and [SAT import VAT valuation](https://wwwmatnp.sat.gob.mx/articulo/43379/articulo-27). ANAM guidance includes passenger-specific material and does not establish commercial procedure.
 
 Review dates record inspection, not legal effective dates or shipment applicability. Check importer, actual origin, classification, valuation, controls, fees, procedures, postal/courier facts, exact territory and subnational tax. Preferential treatment requires specific origin and proof; membership or shipping country alone is insufficient. No rates or thresholds are supplied, and source links do not establish data rights or legal eligibility.
+
+
+## Argentina, Uruguay and Paraguay commercial-import reference (reviewed 2026-11-09)
+
+These pointers provide context, not comprehensive verified commercial-import guidance or effective-dated data. Review dates are not legal effective dates.
+
+- Argentina: [ARCA customs code](https://biblioteca.arca.gob.ar/dcp/LEY_C_022415_1981_03_02) includes importer and customs provisions; [ARCA international shipments](https://www.arca.gob.ar/envios-internacionales/regimen-general/) explains when shipments fall outside postal/courier regimes. The latter is shipment-specific, not a complete commercial import guide.
+- Uruguay: [customs import tax context](https://www.aduanas.gub.uy/innovaportal/v/2755/8/innova.front/regimen-impositivo-a-la-importacion-.html), [digital declaration procedure](https://www.aduanas.gub.uy/innovaportal/file/10163/1/procedimiento_dua_digital_-_importacion.pdf), and [special border trade restrictions](https://www.aduanas.gub.uy/innovaportal/v/28040/1/innova.front/). The procedural PDF is older and its current applicability must be checked; border rules are limited to that regime.
+- Paraguay: DNIT indexes for [customs actor registration](https://ekuatia.set.gov.py/es/web/portal-institucional/personas-vinculadas-a-la-actividad-aduanera) and [VUI import permits](https://www.dnit.gov.py/en/web/portal-institucional/vui); [MIC selected product procedures](https://www.mic.gov.py/tramites-para-importaciones/) is not exhaustive. Confirm current tariff and tax treatment separately.
+
+For each shipment verify classification, actual origin and preference evidence, value, importer and broker obligations, regime, taxes and fees, permits and prohibitions, postal/courier eligibility, exact territory and special zones. Regional or agreement membership establishes none of these. Rights, live data and independent legal approval remain open.
