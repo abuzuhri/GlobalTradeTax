@@ -310,7 +310,7 @@ class Integration:
         self.start_api()
         self.check('Runtime container runs without root', self.compose('exec', '-T', 'api', 'id', '-u').stdout.strip() != b'0')
         anonymous = assert_smoke(lambda path, method='GET', payload=None: fetch(self.base, path, method, payload))
-        self.check('General container smoke and anonymous routes', anonymous == 18, count=anonymous)
+        self.check('General container smoke and anonymous routes', anonymous == 19, count=anonymous)
         for country in ('DE', 'PL', 'CY'):
             reference = self.request('GET', '/v1/references/eu/destinations/' + country.lower(), key=self.keys['a'])
             self.check('EU country guidance remains reference only: ' + country,
