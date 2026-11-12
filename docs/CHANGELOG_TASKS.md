@@ -199,3 +199,9 @@ Added tenant-budgeted, reference-only national sources and unresolved shipment c
 2026-11-09: Destination Region compatibility correction: MY/ID/TH/VN/PH, IN/CN and AU/NZ now return OTHER; MX remains LATAM with North America references. Country guidance and unresolved checks remain. Release: 662 passed, 16 optional live skipped; Python: 39 passed; repository, secret and CI guards passed; API smoke: 18 passed. Local Docker unavailable; hosted container verification is required on the PR head. Source review dates unchanged; data rights and independent legal approval remain open. TASK-001 and TASK-011 remain in progress.
 
 Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d66c782`: [run 42683768925](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42683768925) passed all six regular jobs, including 467 isolated PostgreSQL/container assertions and cleanup. Optional live jobs were skipped. Subsequent documentation-only changes require their own head checks.
+
+## 2026-11-10 — TASK-011 ZA/KE/NG/EG
+
+Added four-country reference-only import guidance, OTHER routing and compliance reminders; live data, source rights and independent legal approval remain open. See [sources](SOURCES.md) and [task](../tasks/011-eu-taric-destination-expansion.md).
+
+2026-11-12: Reconciled the four-country slice with merged AR/UY/PY guidance. Combined commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed [hosted run 43176500673](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43176500673), including 487 isolated PostgreSQL/container assertions and cleanup; later documentation changes need their own checks.
