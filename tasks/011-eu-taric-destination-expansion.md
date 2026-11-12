@@ -78,6 +78,12 @@ Endpoint `GET /v1/references/north-america/{country}` is authenticated and share
 
 Local implementation verification: Release suite 586 passed, 16 optional live probes skipped; Python suite 39 passed. Hosted checks and container evidence are tied to the PR head and run. These checks do not establish legal eligibility or data rights.
 
+## Argentina, Uruguay and Paraguay reference slice (2026-11-09)
+Scope: extend the existing authenticated, tenant-budgeted Latin America reference path to AR, UY and PY only, with national official commercial-import sources and unresolved shipment checks. UY/PY move from fallback to LATAM routing; regional grouping establishes no eligibility. No rates, provider, migration, payment or release. Source rights, live effective-dated integration and independent legal approval remain open.
+
+The endpoint now accepts AR, UY and PY alongside the original four. AR moves from generic LATAM guidance to country-specific guidance; UY/PY move from OTHER fallback to LATAM. Mexico retains North America guidance. Historical four-country statements above describe the earlier slice. All monetary amounts remain null and calculation, payment and release remain closed. [Source context](../docs/SOURCES.md).
+
+Pre-merge implementation commit `4c46aa896fee3c38b2e6aeba3ec627ada0ba845a` passed 647 Release tests with 16 optional live skips, 39 Python tests, 18 hosted API smoke assertions and 473 isolated PostgreSQL/container assertions with cleanup in [run 42695041563](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42695041563). Combined changes require their own head verification.
 **2026-11-09 destination Region contract correction:** Restore the advertised EU/GCC/LATAM/OTHER grouping for recently added country guidance, retaining country-specific references and unresolved eligibility checks. Verify quote output and capability metadata; no legal/source review, rates, provider or migration is in scope. TASK-001 and TASK-011 remain in progress.
 
 2026-11-09: Region compatibility correction: MY/ID/TH/VN/PH, IN/CN and AU/NZ now use OTHER; EU, GCC and LATAM routing, including MX North America references, remain intact. Country sources and unresolved checks remain. Release tests: 662 passed, 16 optional live skipped; Python: 39 passed; repository, secret and CI guards passed; local API smoke: 18 checks passed. Docker unavailable locally; hosted PostgreSQL/container verification is required on the PR head. Source dates were not re-reviewed; live data rights and independent legal approvals remain open. TASK-001 and TASK-011 remain in progress.
@@ -88,3 +94,5 @@ Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d
 Scope: authenticated, tenant-budgeted static national commercial-import guidance for ZA, KE, NG and EG only, with official source inspection and unresolved shipment-specific and territorial checks. Region remains OTHER. No rates, provider, migration, payment or release approval. TASK-011 remains in progress for live effective-dated data, source rights and independent legal review.
 
 Implemented four national references and destination/compliance reminders; [sources and inspection limits](../docs/SOURCES.md). Local Release tests: 673 passed, 16 optional live skips; Python: 39 passed. Local Docker is unavailable; latest-head hosted container evidence is required. Source inspection is not legal approval or an effective date.
+
+2026-11-12: Reconciled the ZA/KE/NG/EG slice with merged AR/UY/PY guidance from main. Combined local Release tests: 678 passed and 16 optional live probes skipped; Python: 39 passed. Hosted validation is tied to the resulting PR head. TASK-011 remains in progress.

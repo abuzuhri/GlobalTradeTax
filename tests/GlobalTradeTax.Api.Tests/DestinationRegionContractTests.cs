@@ -8,7 +8,7 @@ public sealed class DestinationRegionContractTests
     [InlineData("VN", "OTHER")][InlineData("PH", "OTHER")][InlineData("IN", "OTHER")]
     [InlineData("CN", "OTHER")][InlineData("AU", "OTHER")][InlineData("NZ", "OTHER")]
     [InlineData("de", "EU")][InlineData("AE", "GCC")][InlineData("BR", "LATAM")]
-    [InlineData("mx", "LATAM")][InlineData("AR", "LATAM")][InlineData("JP", "OTHER")]
+    [InlineData("mx", "LATAM")][InlineData("AR", "LATAM")][InlineData("uy", "LATAM")][InlineData("PY", "LATAM")][InlineData("JP", "OTHER")]
     [InlineData("CA", "OTHER")][InlineData("ZZ", "OTHER")]
     public void Policy_and_quote_use_advertised_categories(string country, string expected)
     {
