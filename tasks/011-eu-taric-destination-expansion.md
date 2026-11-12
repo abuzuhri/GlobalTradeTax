@@ -96,3 +96,5 @@ Scope: national commercial-import references for PK, BD and LK only, authenticat
 Implemented `/v1/references/pk-bd-lk/{country}` with OTHER routing, unresolved shipment checks and closed financial and release gates. [Source inspection and limits](../docs/SOURCES.md). Hosted head validation and remaining gates are tracked in the PR.
 
 Local validation: 677 Release tests passed, 16 optional live tests skipped; 39 Python tests and 19 actual anonymous HTTP smoke assertions passed. Repository integrity, secret and CI guards passed. Docker is unavailable locally; isolated hosted container evidence must be checked on the PR head.
+
+Hosted implementation commit `4f33a38250d8c4521b9f47589e57c8264b91b6fb` passed all six regular jobs in [run 43193406799](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43193406799): 677 .NET tests, 16 optional live skips, 19 anonymous HTTP smoke assertions and 485 isolated PostgreSQL/container assertions with cleanup. Local Python suite: 39 passed. Later documentation changes require their own head checks.

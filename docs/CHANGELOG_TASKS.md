@@ -204,3 +204,5 @@ Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d
 Added authenticated, tenant-budgeted Pakistan, Bangladesh and Sri Lanka commercial-import references with OTHER routing and unresolved shipment and territory checks. No rates or approvals; source rights, effective-dated data and independent legal review remain open. See [sources](SOURCES.md). Validation and hosted head evidence are tracked in the PR.
 
 Local verification: 677 Release tests passed, 16 optional live skips, 39 Python tests and 19 anonymous HTTP smoke assertions; repository, secret and CI guards passed. Docker unavailable locally; hosted container validation remains required.
+
+Hosted implementation commit `4f33a38250d8c4521b9f47589e57c8264b91b6fb` passed all six regular jobs in [run 43193406799](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43193406799): 677 .NET tests, 16 optional live skips, 19 anonymous HTTP smoke assertions and 485 isolated PostgreSQL/container assertions with cleanup. Local Python suite: 39 passed. Later documentation changes require their own head checks.
