@@ -221,3 +221,7 @@ Authenticated `GET /v1/references/north-america/{country}` accepts US, CA and MX
 ### Destination policy category compatibility
 
 `GET /v1/capabilities` advertises `EU/GCC/LATAM/OTHER`. Destination policy Region and US-origin quote warnings use those categories: MY, ID, TH, VN, PH, IN, CN, AU and NZ return `OTHER` instead of country names, codes or `AU/NZ`. MX remains `LATAM` while retaining its North America reference guidance. Country names, official source pointers and unresolved checks remain in their reference responses. These groups are routing metadata, not evidence of territorial or legal eligibility; calculations, payment and release remain subject to existing gates. Consumers that grouped on the temporary country labels or `AU/NZ` should migrate to `OTHER`. Source review dates are unchanged. Licensed effective-dated data, rights and independent legal approval remain open.
+
+## Türkiye, Morocco and Tunisia reference guidance
+
+Authenticated `GET /v1/references/tr-ma-tn/{country}` accepts TR, MA and TN case-insensitively and shares the tenant budget; malformed and unsupported codes return 400. These destinations retain the OTHER category. [Official sources and retrieval limits](docs/SOURCES.md) inform reference-only shipment checks; amounts remain null and calculation, payment and release are not approved. Source review does not establish legal applicability or reuse rights.

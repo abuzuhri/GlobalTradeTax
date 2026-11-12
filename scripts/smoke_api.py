@@ -19,6 +19,7 @@ PROTECTED_ENDPOINTS = (
     ('/v1/references/five-imports/MY', 'GET', None),
     ('/v1/references/national/IN', 'GET', None),
     ('/v1/references/national/CN', 'GET', None),
+    ('/v1/references/tr-ma-tn/TR', 'GET', None),
     ('/v1/references/jp-kr-sg/JP', 'GET', None),
     ('/v1/references/north-america/US', 'GET', None),
     ('/v1/references/uk/commodities/0101210000', 'GET', None),
