@@ -96,3 +96,5 @@ Scope: authenticated, tenant-budgeted static national commercial-import guidance
 Implemented four national references and destination/compliance reminders; [sources and inspection limits](../docs/SOURCES.md). Local Release tests: 673 passed, 16 optional live skips; Python: 39 passed. Local Docker is unavailable; latest-head hosted container evidence is required. Source inspection is not legal approval or an effective date.
 
 2026-11-12: Reconciled the ZA/KE/NG/EG slice with merged AR/UY/PY guidance from main. Combined local Release tests: 678 passed and 16 optional live probes skipped; Python: 39 passed. Hosted validation is tied to the resulting PR head. TASK-011 remains in progress.
+
+Combined implementation commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed all six regular jobs in [hosted run 43176500673](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43176500673), including 487 isolated PostgreSQL/container assertions with cleanup and 19 anonymous smoke checks. Optional live jobs were skipped. Later documentation changes require their own head checks.
