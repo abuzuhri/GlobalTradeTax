@@ -203,3 +203,5 @@ Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d
 ## 2026-11-12 — TASK-011 NO/CH/IS reference slice
 
 Added authenticated tenant-budgeted national commercial-import reference guidance for Norway, Switzerland and Iceland, with OTHER routing and compliance reminders. Official source inspection and territorial limitations are recorded in [SOURCES.md](SOURCES.md); reference coverage supplies no rates, legal applicability, payment or release. Live integration, rights and independent tax/legal review remain open. Local Release tests: 678 passed, 16 optional live skipped; Python: 39 passed; local anonymous HTTP smoke: 19 checks passed. Docker unavailable locally; hosted evidence must be checked against the PR head.
+
+Hosted implementation commit `88fa6d74d701a6a4d63ca535326b417884913ae8` passed all six regular jobs in [run 43185383508](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43185383508), including 486 isolated PostgreSQL/container assertions with cleanup and 19 anonymous smoke checks. Optional live jobs were skipped. Later documentation changes require their own head checks.

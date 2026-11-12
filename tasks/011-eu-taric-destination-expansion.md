@@ -95,3 +95,5 @@ Scope: authenticated tenant-budgeted static national commercial-import reference
 
 
 Implemented `/v1/references/no-ch-is/{country}` under existing authentication and shared tenant budget. NO, CH and IS retain OTHER routing; destination and compliance include national review checks. Unsupported and malformed codes return 400; financial fields remain null and calculation, payment and release remain closed. [Sources and inspection limits](../docs/SOURCES.md). Local Release tests: 678 passed and 16 optional live probes skipped; Python: 39 passed; local anonymous HTTP smoke: 19 checks passed. Local Docker command unavailable; hosted current-head container evidence is required. TASK-011 remains in progress for live effective-dated data, source rights and independent legal review.
+
+Hosted implementation commit `88fa6d74d701a6a4d63ca535326b417884913ae8` passed all six regular jobs in [run 43185383508](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43185383508), including 486 isolated PostgreSQL/container assertions with cleanup and 19 anonymous smoke checks. Optional live jobs were skipped. Later documentation changes require their own head checks.
