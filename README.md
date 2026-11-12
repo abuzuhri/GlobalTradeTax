@@ -221,3 +221,7 @@ Authenticated `GET /v1/references/north-america/{country}` accepts US, CA and MX
 ### Destination policy category compatibility
 
 `GET /v1/capabilities` advertises `EU/GCC/LATAM/OTHER`. Destination policy Region and US-origin quote warnings use those categories: MY, ID, TH, VN, PH, IN, CN, AU and NZ return `OTHER` instead of country names, codes or `AU/NZ`. MX remains `LATAM` while retaining its North America reference guidance. Country names, official source pointers and unresolved checks remain in their reference responses. These groups are routing metadata, not evidence of territorial or legal eligibility; calculations, payment and release remain subject to existing gates. Consumers that grouped on the temporary country labels or `AU/NZ` should migrate to `OTHER`. Source review dates are unchanged. Licensed effective-dated data, rights and independent legal approval remain open.
+
+### Norway, Switzerland and Iceland reference API
+
+Authenticated `GET /v1/references/no-ch-is/{country}` accepts NO, CH and IS case-insensitively under the shared tenant budget. Malformed and unsupported codes return 400. It returns static national source pointers and unresolved shipment checks; financial fields remain null and calculation, payment and release approvals are false. Destination routing remains OTHER and compliance requires review. Country codes do not establish territory or preferential eligibility. See [source context](docs/SOURCES.md) and [TASK-011](tasks/011-eu-taric-destination-expansion.md).

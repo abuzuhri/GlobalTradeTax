@@ -179,7 +179,7 @@ Added authenticated, tenant-limited reference-only national source pointers and 
 
 ## 2026-11-08 — TASK-002 key lifecycle
 
-Added migration 006, server-time expiry enforcement and a tenant-bound operator command for issue, metadata listing, rotation and revocation. Legacy keys retain nullable expiry; new keys have bounded lifetimes. Transactional audit and operator limitations are described in [the runbook](TENANT_KEY_LIFECYCLE.md). Local Release tests: 525 passed, 16 optional skipped; Python: 39 passed. Docker verification is tracked on the PR; local Docker access was denied. Production authorization and threat-model approval remain open.
+Added migration 006, server-time expiry enforcement and a tenant-bound operator command for issue, metadata listing, rotation and revocation. Legacy keys retain nullable expiry; new keys have bounded lifetimes. Transactional audit and operator limitations are described in [the runbook](TENANT_KEY_LIFECYCLE.md). Local Release tests: 525 passed, 16 optional skipped; Python: 39 passed; local anonymous HTTP smoke: 19 checks passed. Docker verification is tracked on the PR; local Docker access was denied. Production authorization and threat-model approval remain open.
 
 ## 2026-11-08 — TASK-011 GCC reference guidance
 Added authenticated tenant-limited national references for all six GCC destinations, country-specific source routing and compliance review checks. This is reference coverage only; live data, rights and independent approvals remain open. Local tests: 537 .NET passed, 16 optional live skipped; 39 Python passed. Hosted evidence follows the PR head. See [task](../tasks/011-eu-taric-destination-expansion.md).
@@ -199,3 +199,7 @@ Added tenant-budgeted, reference-only national sources and unresolved shipment c
 2026-11-09: Destination Region compatibility correction: MY/ID/TH/VN/PH, IN/CN and AU/NZ now return OTHER; MX remains LATAM with North America references. Country guidance and unresolved checks remain. Release: 662 passed, 16 optional live skipped; Python: 39 passed; repository, secret and CI guards passed; API smoke: 18 passed. Local Docker unavailable; hosted container verification is required on the PR head. Source review dates unchanged; data rights and independent legal approval remain open. TASK-001 and TASK-011 remain in progress.
 
 Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d66c782`: [run 42683768925](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42683768925) passed all six regular jobs, including 467 isolated PostgreSQL/container assertions and cleanup. Optional live jobs were skipped. Subsequent documentation-only changes require their own head checks.
+
+## 2026-11-12 — TASK-011 NO/CH/IS reference slice
+
+Added authenticated tenant-budgeted national commercial-import reference guidance for Norway, Switzerland and Iceland, with OTHER routing and compliance reminders. Official source inspection and territorial limitations are recorded in [SOURCES.md](SOURCES.md); reference coverage supplies no rates, legal applicability, payment or release. Live integration, rights and independent tax/legal review remain open. Local Release tests: 678 passed, 16 optional live skipped; Python: 39 passed; local anonymous HTTP smoke: 19 checks passed. Docker unavailable locally; hosted evidence must be checked against the PR head.
