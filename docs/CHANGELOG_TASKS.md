@@ -199,3 +199,8 @@ Added tenant-budgeted, reference-only national sources and unresolved shipment c
 2026-11-09: Destination Region compatibility correction: MY/ID/TH/VN/PH, IN/CN and AU/NZ now return OTHER; MX remains LATAM with North America references. Country guidance and unresolved checks remain. Release: 662 passed, 16 optional live skipped; Python: 39 passed; repository, secret and CI guards passed; API smoke: 18 passed. Local Docker unavailable; hosted container verification is required on the PR head. Source review dates unchanged; data rights and independent legal approval remain open. TASK-001 and TASK-011 remain in progress.
 
 Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d66c782`: [run 42683768925](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42683768925) passed all six regular jobs, including 467 isolated PostgreSQL/container assertions and cleanup. Optional live jobs were skipped. Subsequent documentation-only changes require their own head checks.
+
+### 2026-11-12 — TASK-011 PK/BD/LK
+Added authenticated, tenant-budgeted Pakistan, Bangladesh and Sri Lanka commercial-import references with OTHER routing and unresolved shipment and territory checks. No rates or approvals; source rights, effective-dated data and independent legal review remain open. See [sources](SOURCES.md). Validation and hosted head evidence are tracked in the PR.
+
+Local verification: 677 Release tests passed, 16 optional live skips, 39 Python tests and 19 anonymous HTTP smoke assertions; repository, secret and CI guards passed. Docker unavailable locally; hosted container validation remains required.

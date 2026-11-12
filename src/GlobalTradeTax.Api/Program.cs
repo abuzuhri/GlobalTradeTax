@@ -43,6 +43,7 @@ app.Use(async (context, next) =>
         || route.StartsWith("/v1/references/five-imports/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/au-nz/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/national/", StringComparison.OrdinalIgnoreCase)
+        || route.StartsWith("/v1/references/pk-bd-lk/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/jp-kr-sg/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/north-america/", StringComparison.OrdinalIgnoreCase)
         || route.StartsWith("/v1/references/gcc/", StringComparison.OrdinalIgnoreCase)
@@ -130,6 +131,11 @@ app.MapGet("/v1/references/au-nz/{country}", (string country) =>
 {
     var reference = AuNzDestinationReference.Find(country);
     return reference is null ? Results.BadRequest(new { error = "supported AU/NZ ISO alpha-2 country required" }) : Results.Ok(reference);
+});
+app.MapGet("/v1/references/pk-bd-lk/{country}", (string country) =>
+{
+    var reference = PkBdLkDestinationReference.Find(country);
+    return reference is null ? Results.BadRequest(new { error = "supported PK, BD or LK ISO alpha-2 country required" }) : Results.Ok(reference);
 });
 app.MapGet("/v1/references/jp-kr-sg/{country}", (string country) =>
 {

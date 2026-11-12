@@ -89,3 +89,10 @@ Pre-merge implementation commit `4c46aa896fee3c38b2e6aeba3ec627ada0ba845a` passe
 2026-11-09: Region compatibility correction: MY/ID/TH/VN/PH, IN/CN and AU/NZ now use OTHER; EU, GCC and LATAM routing, including MX North America references, remain intact. Country sources and unresolved checks remain. Release tests: 662 passed, 16 optional live skipped; Python: 39 passed; repository, secret and CI guards passed; local API smoke: 18 checks passed. Docker unavailable locally; hosted PostgreSQL/container verification is required on the PR head. Source dates were not re-reviewed; live data rights and independent legal approvals remain open. TASK-001 and TASK-011 remain in progress.
 
 Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d66c782`: [run 42683768925](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42683768925) passed all six regular jobs, including 467 isolated PostgreSQL/container assertions and cleanup. Optional live jobs were skipped. Subsequent documentation-only changes require their own head checks.
+
+## Pakistan, Bangladesh and Sri Lanka reference slice (2026-11-12)
+Scope: national commercial-import references for PK, BD and LK only, authenticated and sharing tenant budgets. Retain OTHER routing and unresolved classification, origin, valuation, importer, regime, taxes, controls and territory checks; no rates, financial approval, provider or migration. Source rights, live effective-dated data and independent legal review remain open.
+
+Implemented `/v1/references/pk-bd-lk/{country}` with OTHER routing, unresolved shipment checks and closed financial and release gates. [Source inspection and limits](../docs/SOURCES.md). Hosted head validation and remaining gates are tracked in the PR.
+
+Local validation: 677 Release tests passed, 16 optional live tests skipped; 39 Python tests and 19 actual anonymous HTTP smoke assertions passed. Repository integrity, secret and CI guards passed. Docker is unavailable locally; isolated hosted container evidence must be checked on the PR head.
