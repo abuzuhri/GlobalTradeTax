@@ -90,6 +90,14 @@ Pre-merge implementation commit `4c46aa896fee3c38b2e6aeba3ec627ada0ba845a` passe
 
 Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d66c782`: [run 42683768925](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42683768925) passed all six regular jobs, including 467 isolated PostgreSQL/container assertions and cleanup. Optional live jobs were skipped. Subsequent documentation-only changes require their own head checks.
 
+## Pakistan, Bangladesh and Sri Lanka reference slice (2026-11-12)
+Scope: national commercial-import references for PK, BD and LK only, authenticated and sharing tenant budgets. Retain OTHER routing and unresolved classification, origin, valuation, importer, regime, taxes, controls and territory checks; no rates, financial approval, provider or migration. Source rights, live effective-dated data and independent legal review remain open.
+
+Implemented `/v1/references/pk-bd-lk/{country}` with OTHER routing, unresolved shipment checks and closed financial and release gates. [Source inspection and limits](../docs/SOURCES.md). Hosted head validation and remaining gates are tracked in the PR.
+
+Local validation: 677 Release tests passed, 16 optional live tests skipped; 39 Python tests and 19 actual anonymous HTTP smoke assertions passed. Repository integrity, secret and CI guards passed. Docker is unavailable locally; isolated hosted container evidence must be checked on the PR head.
+
+Hosted implementation commit `4f33a38250d8c4521b9f47589e57c8264b91b6fb` passed all six regular jobs in [run 43193406799](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43193406799): 677 .NET tests, 16 optional live skips, 19 anonymous HTTP smoke assertions and 485 isolated PostgreSQL/container assertions with cleanup. Local Python suite: 39 passed. Later documentation changes require their own head checks.
 ## Norway, Switzerland and Iceland reference slice (2026-11-12)
 Scope: authenticated tenant-budgeted static national commercial-import references for NO, CH and IS only. Preserve OTHER routing and unresolved shipment, territory, tax and control checks. No rates, provider, migration, payment or release approval. Live effective-dated data, source rights and independent legal review remain open.
 

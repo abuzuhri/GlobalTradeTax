@@ -200,6 +200,12 @@ Added tenant-budgeted, reference-only national sources and unresolved shipment c
 
 Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d66c782`: [run 42683768925](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42683768925) passed all six regular jobs, including 467 isolated PostgreSQL/container assertions and cleanup. Optional live jobs were skipped. Subsequent documentation-only changes require their own head checks.
 
+### 2026-11-12 — TASK-011 PK/BD/LK
+Added authenticated, tenant-budgeted Pakistan, Bangladesh and Sri Lanka commercial-import references with OTHER routing and unresolved shipment and territory checks. No rates or approvals; source rights, effective-dated data and independent legal review remain open. See [sources](SOURCES.md). Validation and hosted head evidence are tracked in the PR.
+
+Local verification: 677 Release tests passed, 16 optional live skips, 39 Python tests and 19 anonymous HTTP smoke assertions; repository, secret and CI guards passed. Docker unavailable locally; hosted container validation remains required.
+
+Hosted implementation commit `4f33a38250d8c4521b9f47589e57c8264b91b6fb` passed all six regular jobs in [run 43193406799](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43193406799): 677 .NET tests, 16 optional live skips, 19 anonymous HTTP smoke assertions and 485 isolated PostgreSQL/container assertions with cleanup. Local Python suite: 39 passed. Later documentation changes require their own head checks.
 ## 2026-11-12 — TASK-011 NO/CH/IS reference slice
 
 Added authenticated tenant-budgeted national commercial-import reference guidance for Norway, Switzerland and Iceland, with OTHER routing and compliance reminders. Official source inspection and territorial limitations are recorded in [SOURCES.md](SOURCES.md); reference coverage supplies no rates, legal applicability, payment or release. Live integration, rights and independent tax/legal review remain open. Local Release tests: 678 passed, 16 optional live skipped; Python: 39 passed; local anonymous HTTP smoke: 19 checks passed. Docker unavailable locally; hosted evidence must be checked against the PR head.
