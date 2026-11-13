@@ -17,6 +17,9 @@ public static class DestinationPolicies
         if (AfricanFourDestinationReference.Find(country) is { } africanFour)
             return new(country, "OTHER", "Country-specific import tax", "Country-specific customs tariff", "provider_required",
                 africanFour.UnresolvedChecks, africanFour.Sources.Select(source => source.Url).ToArray());
+        if (RsAlMkDestinationReference.Find(country) is { } rsAlMk)
+            return new(country, "OTHER", "Country-specific import tax", "Country-specific customs tariff", "provider_required",
+                rsAlMk.UnresolvedChecks, rsAlMk.Sources.Select(source => source.Url).ToArray());
         if (IndianChineseDestinationReference.Find(country) is { } national)
             return new(country, "OTHER", "Destination-specific import tax", "National customs tariff", "provider_required",
                 national.UnresolvedChecks, national.Sources.Select(source => source.Url).ToArray());
@@ -36,6 +39,10 @@ public static class DestinationPolicies
         if (AuNzDestinationReference.Find(country) is { } auNz) return new(country, "OTHER", "Country-specific GST", "Country-specific customs tariff", "provider_required", auNz.UnresolvedChecks, auNz.Sources.Select(source => source.Url).ToArray());
         if (TrMaTnDestinationReference.Find(country) is { } trMaTn) return new(country, "OTHER", "Country-specific import tax",
             "Country-specific customs tariff", "provider_required", trMaTn.UnresolvedChecks, trMaTn.Sources.Select(source => source.Url).ToArray());
+        if (PkBdLkDestinationReference.Find(country) is { } pkBdLk) return new(country, "OTHER", "Country-specific import tax",
+            "Country-specific customs tariff", "provider_required", pkBdLk.UnresolvedChecks, pkBdLk.Sources.Select(source => source.Url).ToArray());
+        if (NoChIsDestinationReference.Find(country) is { } noChIs) return new(country, "OTHER", "Country-specific import tax",
+            "Country-specific customs tariff", "provider_required", noChIs.UnresolvedChecks, noChIs.Sources.Select(source => source.Url).ToArray());
         if (JpKrSgDestinationReference.Find(country) is { } jpKrSg) return new(country, "OTHER", "Country-specific consumption tax",
             "Country-specific customs tariff", "provider_required", jpKrSg.UnresolvedChecks, jpKrSg.Sources.Select(source => source.Url).ToArray());
         if (NorthAmericaDestinationReference.Find(country) is { } northAmerica)

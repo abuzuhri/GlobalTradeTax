@@ -96,6 +96,21 @@ Scope: authenticated, tenant-budgeted static national commercial-import guidance
 Implementation adds `/v1/references/tr-ma-tn/{country}` and national destination/compliance reminders. Sources, historical-document and retrieval limitations are recorded in [the registry](../docs/SOURCES.md). Source inspection is not a legal effective date or data rights approval. Current commodity, origin, valuation, importer, regime, controls, low-value and territorial treatment require shipment-specific review. All financial and release gates remain closed. Preliminary local Release: 677 passed, 16 optional live skipped; Python: 39 passed. Hosted container evidence remains to be verified on the actual PR head. TASK-011 remains in progress.
 
 Implementation commit `54e0fcd9c8db88b42c0d06be39c946885be8db9e` passed [hosted run 43202467047](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43202467047): six regular jobs, 19 anonymous HTTP smoke checks, and 485 isolated PostgreSQL/container assertions with cleanup. Optional live jobs were skipped. Subsequent documentation changes require their own head checks.
+## Pakistan, Bangladesh and Sri Lanka reference slice (2026-11-12)
+Scope: national commercial-import references for PK, BD and LK only, authenticated and sharing tenant budgets. Retain OTHER routing and unresolved classification, origin, valuation, importer, regime, taxes, controls and territory checks; no rates, financial approval, provider or migration. Source rights, live effective-dated data and independent legal review remain open.
+
+Implemented `/v1/references/pk-bd-lk/{country}` with OTHER routing, unresolved shipment checks and closed financial and release gates. [Source inspection and limits](../docs/SOURCES.md). Hosted head validation and remaining gates are tracked in the PR.
+
+Local validation: 677 Release tests passed, 16 optional live tests skipped; 39 Python tests and 19 actual anonymous HTTP smoke assertions passed. Repository integrity, secret and CI guards passed. Docker is unavailable locally; isolated hosted container evidence must be checked on the PR head.
+
+Hosted implementation commit `4f33a38250d8c4521b9f47589e57c8264b91b6fb` passed all six regular jobs in [run 43193406799](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43193406799): 677 .NET tests, 16 optional live skips, 19 anonymous HTTP smoke assertions and 485 isolated PostgreSQL/container assertions with cleanup. Local Python suite: 39 passed. Later documentation changes require their own head checks.
+## Norway, Switzerland and Iceland reference slice (2026-11-12)
+Scope: authenticated tenant-budgeted static national commercial-import references for NO, CH and IS only. Preserve OTHER routing and unresolved shipment, territory, tax and control checks. No rates, provider, migration, payment or release approval. Live effective-dated data, source rights and independent legal review remain open.
+
+
+Implemented `/v1/references/no-ch-is/{country}` under existing authentication and shared tenant budget. NO, CH and IS retain OTHER routing; destination and compliance include national review checks. Unsupported and malformed codes return 400; financial fields remain null and calculation, payment and release remain closed. [Sources and inspection limits](../docs/SOURCES.md). Local Release tests: 678 passed and 16 optional live probes skipped; Python: 39 passed; local anonymous HTTP smoke: 19 checks passed. Local Docker command unavailable; hosted current-head container evidence is required. TASK-011 remains in progress for live effective-dated data, source rights and independent legal review.
+
+Hosted implementation commit `88fa6d74d701a6a4d63ca535326b417884913ae8` passed all six regular jobs in [run 43185383508](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43185383508), including 486 isolated PostgreSQL/container assertions with cleanup and 19 anonymous smoke checks. Optional live jobs were skipped. Later documentation changes require their own head checks.
 ## South Africa, Kenya, Nigeria and Egypt reference slice (2026-11-10)
 Scope: authenticated, tenant-budgeted static national commercial-import guidance for ZA, KE, NG and EG only, with official source inspection and unresolved shipment-specific and territorial checks. Region remains OTHER. No rates, provider, migration, payment or release approval. TASK-011 remains in progress for live effective-dated data, source rights and independent legal review.
 
@@ -104,3 +119,11 @@ Implemented four national references and destination/compliance reminders; [sour
 2026-11-12: Reconciled the ZA/KE/NG/EG slice with merged AR/UY/PY guidance from main. Combined local Release tests: 678 passed and 16 optional live probes skipped; Python: 39 passed. Hosted validation is tied to the resulting PR head. TASK-011 remains in progress.
 
 Combined implementation commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed all six regular jobs in [hosted run 43176500673](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43176500673), including 487 isolated PostgreSQL/container assertions with cleanup and 19 anonymous smoke checks. Optional live jobs were skipped. Later documentation changes require their own head checks.
+## Serbia, Albania and North Macedonia reference slice (2026-11-12)
+Scope: authenticated, tenant-budgeted static commercial-import guidance for RS, AL and MK only, with official national sources and unresolved shipment and territorial checks. Preserve OTHER routing and closed financial gates. No provider, migration or legal approval; source rights and effective-dated integration remain open.
+
+Implemented `/v1/references/rs-al-mk/{country}` for RS, AL and MK under existing authentication and shared tenant budget. OTHER routing and closed financial gates remain; malformed and unsupported codes return 400. [Source inspection and limitations](../docs/SOURCES.md). TASK-011 remains in progress for authoritative effective-dated integration, rights and independent tax/legal approval.
+
+Local verification: 700 Release tests passed, 16 optional live tests skipped; 39 Python tests, repository/security guards and 21 anonymous HTTP smoke assertions passed. Docker is unavailable locally; hosted current-head PostgreSQL/container evidence is required.
+
+Implementation commit `c9203e67a6be6fdcfeeb32bb1107b61b75dcd679` passed six regular jobs in [run 43391014496](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43391014496), including 512 isolated PostgreSQL/container assertions with cleanup. Optional live jobs were skipped. Subsequent changes require their own head checks.
