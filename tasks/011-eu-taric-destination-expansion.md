@@ -98,6 +98,13 @@ Implemented `/v1/references/pk-bd-lk/{country}` with OTHER routing, unresolved s
 Local validation: 677 Release tests passed, 16 optional live tests skipped; 39 Python tests and 19 actual anonymous HTTP smoke assertions passed. Repository integrity, secret and CI guards passed. Docker is unavailable locally; isolated hosted container evidence must be checked on the PR head.
 
 Hosted implementation commit `4f33a38250d8c4521b9f47589e57c8264b91b6fb` passed all six regular jobs in [run 43193406799](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43193406799): 677 .NET tests, 16 optional live skips, 19 anonymous HTTP smoke assertions and 485 isolated PostgreSQL/container assertions with cleanup. Local Python suite: 39 passed. Later documentation changes require their own head checks.
+## Norway, Switzerland and Iceland reference slice (2026-11-12)
+Scope: authenticated tenant-budgeted static national commercial-import references for NO, CH and IS only. Preserve OTHER routing and unresolved shipment, territory, tax and control checks. No rates, provider, migration, payment or release approval. Live effective-dated data, source rights and independent legal review remain open.
+
+
+Implemented `/v1/references/no-ch-is/{country}` under existing authentication and shared tenant budget. NO, CH and IS retain OTHER routing; destination and compliance include national review checks. Unsupported and malformed codes return 400; financial fields remain null and calculation, payment and release remain closed. [Sources and inspection limits](../docs/SOURCES.md). Local Release tests: 678 passed and 16 optional live probes skipped; Python: 39 passed; local anonymous HTTP smoke: 19 checks passed. Local Docker command unavailable; hosted current-head container evidence is required. TASK-011 remains in progress for live effective-dated data, source rights and independent legal review.
+
+Hosted implementation commit `88fa6d74d701a6a4d63ca535326b417884913ae8` passed all six regular jobs in [run 43185383508](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43185383508), including 486 isolated PostgreSQL/container assertions with cleanup and 19 anonymous smoke checks. Optional live jobs were skipped. Later documentation changes require their own head checks.
 ## South Africa, Kenya, Nigeria and Egypt reference slice (2026-11-10)
 Scope: authenticated, tenant-budgeted static national commercial-import guidance for ZA, KE, NG and EG only, with official source inspection and unresolved shipment-specific and territorial checks. Region remains OTHER. No rates, provider, migration, payment or release approval. TASK-011 remains in progress for live effective-dated data, source rights and independent legal review.
 

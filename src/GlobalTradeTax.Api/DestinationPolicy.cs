@@ -36,6 +36,8 @@ public static class DestinationPolicies
         if (AuNzDestinationReference.Find(country) is { } auNz) return new(country, "OTHER", "Country-specific GST", "Country-specific customs tariff", "provider_required", auNz.UnresolvedChecks, auNz.Sources.Select(source => source.Url).ToArray());
         if (PkBdLkDestinationReference.Find(country) is { } pkBdLk) return new(country, "OTHER", "Country-specific import tax",
             "Country-specific customs tariff", "provider_required", pkBdLk.UnresolvedChecks, pkBdLk.Sources.Select(source => source.Url).ToArray());
+        if (NoChIsDestinationReference.Find(country) is { } noChIs) return new(country, "OTHER", "Country-specific import tax",
+            "Country-specific customs tariff", "provider_required", noChIs.UnresolvedChecks, noChIs.Sources.Select(source => source.Url).ToArray());
         if (JpKrSgDestinationReference.Find(country) is { } jpKrSg) return new(country, "OTHER", "Country-specific consumption tax",
             "Country-specific customs tariff", "provider_required", jpKrSg.UnresolvedChecks, jpKrSg.Sources.Select(source => source.Url).ToArray());
         if (NorthAmericaDestinationReference.Find(country) is { } northAmerica)

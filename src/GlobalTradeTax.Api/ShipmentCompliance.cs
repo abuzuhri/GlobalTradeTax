@@ -71,6 +71,11 @@ public static class ShipmentCompliance
             checks.AddRange(pkBdLk.UnresolvedChecks);
             warnings.Add("National guidance is reference only; tax, tariff and clearance require independent review.");
         }
+        if (NoChIsDestinationReference.Find(request.ShipTo) is { } noChIs)
+        {
+            checks.AddRange(noChIs.UnresolvedChecks);
+            warnings.Add("NO, CH and IS guidance is reference only; tax, territorial scope and clearance require independent review.");
+        }
         if (JpKrSgDestinationReference.Find(request.ShipTo) is { } jpKrSg)
         {
             checks.AddRange(jpKrSg.UnresolvedChecks);
