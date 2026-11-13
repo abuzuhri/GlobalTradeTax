@@ -105,3 +105,8 @@ Implemented four national references and destination/compliance reminders; [sour
 2026-11-12: Reconciled the ZA/KE/NG/EG slice with merged AR/UY/PY guidance from main. Combined local Release tests: 678 passed and 16 optional live probes skipped; Python: 39 passed. Hosted validation is tied to the resulting PR head. TASK-011 remains in progress.
 
 Combined implementation commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed all six regular jobs in [hosted run 43176500673](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43176500673), including 487 isolated PostgreSQL/container assertions with cleanup and 19 anonymous smoke checks. Optional live jobs were skipped. Later documentation changes require their own head checks.
+
+## Ghana, Tanzania and Uganda reference slice (2026-11-13)
+Scope: authenticated, tenant-budgeted static national commercial-import guidance for GH, TZ and UG only. Retain OTHER grouping and unresolved shipment-specific origin, preference, taxes, controls and exact territorial treatment. No rates, provider, migration, payment or release approval. Source rights, live effective-dated integration and independent legal review remain open.
+
+Implemented /v1/references/gh-tz-ug/{country} with country-specific destination and compliance checks. Local Release tests: 699 passed, 16 optional live skips; Python: 39 passed; 21 anonymous HTTP smoke checks passed after correcting route authentication. Docker is unavailable locally; hosted isolated PostgreSQL/container and shared budget results remain required on the actual PR head. See source registry for retrieval and territorial limits. TASK-011 remains in progress.
