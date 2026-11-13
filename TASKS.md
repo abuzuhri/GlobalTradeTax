@@ -118,3 +118,5 @@ Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d
 
 **TASK-011 NO/CH/IS slice (2026-11-12):** in progress: authenticated, tenant-budgeted national commercial-import reference guidance for Norway, Switzerland and Iceland only, with OTHER routing and unresolved shipment and territorial checks. No rates, provider, migration or approval; live data, source rights and independent legal review remain open.
 **TASK-011 ZA/KE/NG/EG slice (2026-11-10):** in progress: authenticated tenant-budgeted national commercial-import reference guidance for South Africa, Kenya, Nigeria and Egypt only. Rates, source rights, live data and independent legal approval remain open.
+
+**TASK-011 CR/PA/DO slice (2026-11-13):** In progress: extend authenticated tenant-budgeted Latin America commercial-import references to Costa Rica, Panama and Dominican Republic only. Source rights, effective-dated integration and independent legal/tax approval remain open.

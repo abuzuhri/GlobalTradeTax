@@ -499,7 +499,7 @@ class Integration:
             self.request('GET', '/v1/references/north-america/' + country, key=first, expected=400)
         self.request('GET', '/v1/references/gcc/US', key=first, expected=400)
         self.request('GET', '/v1/references/gcc/USA', key=first, expected=400)
-        for country in ('AR', 'BR', 'CL', 'CO', 'PE', 'PY', 'UY'):
+        for country in ('AR', 'BR', 'CL', 'CO', 'CR', 'DO', 'PA', 'PE', 'PY', 'UY'):
             result = self.request('GET', '/v1/references/latam/' + country.lower(), key=first)
             self.check('LATAM reference remains unapproved ' + country, result['country'] == country and result['status'] == 'reference_only' and all(result[x] is None for x in ('importDuty', 'importTax', 'landedTotal')) and not any(result[x] for x in ('verifiedForCalculation', 'paymentApproved', 'shipmentReleaseApproved')))
         for country in ('MX', 'ZZ', 'GF', 'BRA'):
