@@ -206,3 +206,8 @@ Added authenticated, tenant-budgeted Pakistan, Bangladesh and Sri Lanka commerci
 Local verification: 677 Release tests passed, 16 optional live skips, 39 Python tests and 19 anonymous HTTP smoke assertions; repository, secret and CI guards passed. Docker unavailable locally; hosted container validation remains required.
 
 Hosted implementation commit `4f33a38250d8c4521b9f47589e57c8264b91b6fb` passed all six regular jobs in [run 43193406799](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43193406799): 677 .NET tests, 16 optional live skips, 19 anonymous HTTP smoke assertions and 485 isolated PostgreSQL/container assertions with cleanup. Local Python suite: 39 passed. Later documentation changes require their own head checks.
+## 2026-11-10 — TASK-011 ZA/KE/NG/EG
+
+Added four-country reference-only import guidance, OTHER routing and compliance reminders; live data, source rights and independent legal approval remain open. See [sources](SOURCES.md) and [task](../tasks/011-eu-taric-destination-expansion.md).
+
+2026-11-12: Reconciled the four-country slice with merged AR/UY/PY guidance. Combined commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed [hosted run 43176500673](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43176500673), including 487 isolated PostgreSQL/container assertions and cleanup; later documentation changes need their own checks.

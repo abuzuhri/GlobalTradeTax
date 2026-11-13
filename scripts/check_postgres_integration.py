@@ -310,7 +310,7 @@ class Integration:
         self.start_api()
         self.check('Runtime container runs without root', self.compose('exec', '-T', 'api', 'id', '-u').stdout.strip() != b'0')
         anonymous = assert_smoke(lambda path, method='GET', payload=None: fetch(self.base, path, method, payload))
-        self.check('General container smoke and anonymous routes', anonymous == 19, count=anonymous)
+        self.check('General container smoke and anonymous routes', anonymous == 20, count=anonymous)
         for country in ('DE', 'PL', 'CY'):
             reference = self.request('GET', '/v1/references/eu/destinations/' + country.lower(), key=self.keys['a'])
             self.check('EU country guidance remains reference only: ' + country,
@@ -437,6 +437,7 @@ class Integration:
         self.request('GET', '/v1/references/gcc/SA', expected=401)
         self.request('GET', '/v1/references/five-imports/MY', expected=401)
         self.request('GET', '/v1/references/pk-bd-lk/PK', expected=401)
+        self.request('GET', '/v1/references/za-ke-ng-eg/ZA', expected=401)
         self.request('GET', '/v1/references/jp-kr-sg/JP', expected=401)
         self.request('GET', '/v1/references/au-nz/AU', expected=401)
         self.request('GET', '/v1/references/north-america/US', key=rotated, expected=429, retry_after=True)
@@ -444,6 +445,7 @@ class Integration:
         self.request('GET', '/v1/references/national/CN', key=other)
         self.request('GET', '/v1/references/national/IN', expected=401)
         self.request('GET', '/v1/references/pk-bd-lk/PK', key=rotated, expected=429, retry_after=True)
+        self.request('GET', '/v1/references/za-ke-ng-eg/ZA', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/jp-kr-sg/JP', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/latam/PY', expected=401)
         self.request('GET', '/v1/references/north-america/US', expected=401)
@@ -472,6 +474,14 @@ class Integration:
                        result['verifiedForCalculation'] is False and result['paymentApproved'] is False and result['shipmentReleaseApproved'] is False)
         self.request('GET', '/v1/references/pk-bd-lk/IN', key=first, expected=400)
         self.request('GET', '/v1/references/pk-bd-lk/PAK', key=first, expected=400)
+        for country in ('ZA', 'KE', 'NG', 'EG'):
+            result = self.request('GET', '/v1/references/za-ke-ng-eg/' + country.lower(), key=first)
+            self.check('Four-country reference remains unapproved ' + country,
+                       result['country'] == country and result['status'] == 'reference_only' and
+                       all(result[x] is None for x in ('importDuty', 'importTax', 'landedTotal')) and
+                       not any(result[x] for x in ('verifiedForCalculation', 'paymentApproved', 'shipmentReleaseApproved')))
+        for country in ('GH', 'ZAF'):
+            self.request('GET', '/v1/references/za-ke-ng-eg/' + country, key=first, expected=400)
         for country in ('JP', 'KR', 'SG'):
             result = self.request('GET', '/v1/references/jp-kr-sg/' + country.lower(), key=first)
             self.check('National reference remains unapproved ' + country,

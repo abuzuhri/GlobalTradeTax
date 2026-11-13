@@ -98,3 +98,11 @@ Implemented `/v1/references/pk-bd-lk/{country}` with OTHER routing, unresolved s
 Local validation: 677 Release tests passed, 16 optional live tests skipped; 39 Python tests and 19 actual anonymous HTTP smoke assertions passed. Repository integrity, secret and CI guards passed. Docker is unavailable locally; isolated hosted container evidence must be checked on the PR head.
 
 Hosted implementation commit `4f33a38250d8c4521b9f47589e57c8264b91b6fb` passed all six regular jobs in [run 43193406799](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43193406799): 677 .NET tests, 16 optional live skips, 19 anonymous HTTP smoke assertions and 485 isolated PostgreSQL/container assertions with cleanup. Local Python suite: 39 passed. Later documentation changes require their own head checks.
+## South Africa, Kenya, Nigeria and Egypt reference slice (2026-11-10)
+Scope: authenticated, tenant-budgeted static national commercial-import guidance for ZA, KE, NG and EG only, with official source inspection and unresolved shipment-specific and territorial checks. Region remains OTHER. No rates, provider, migration, payment or release approval. TASK-011 remains in progress for live effective-dated data, source rights and independent legal review.
+
+Implemented four national references and destination/compliance reminders; [sources and inspection limits](../docs/SOURCES.md). Local Release tests: 673 passed, 16 optional live skips; Python: 39 passed. Local Docker is unavailable; latest-head hosted container evidence is required. Source inspection is not legal approval or an effective date.
+
+2026-11-12: Reconciled the ZA/KE/NG/EG slice with merged AR/UY/PY guidance from main. Combined local Release tests: 678 passed and 16 optional live probes skipped; Python: 39 passed. Hosted validation is tied to the resulting PR head. TASK-011 remains in progress.
+
+Combined implementation commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed all six regular jobs in [hosted run 43176500673](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43176500673), including 487 isolated PostgreSQL/container assertions with cleanup and 19 anonymous smoke checks. Optional live jobs were skipped. Later documentation changes require their own head checks.
