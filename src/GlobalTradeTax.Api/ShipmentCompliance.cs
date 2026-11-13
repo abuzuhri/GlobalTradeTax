@@ -36,6 +36,11 @@ public static class ShipmentCompliance
             checks.AddRange(africanFour.UnresolvedChecks);
             warnings.Add(africanFour.Name + " guidance is reference only; tax, tariff and clearance require independent review.");
         }
+        if (RsAlMkDestinationReference.Find(request.ShipTo) is { } rsAlMk)
+        {
+            checks.AddRange(rsAlMk.UnresolvedChecks);
+            warnings.Add("National guidance is reference only; tax, tariff and clearance require independent review.");
+        }
         if (FiveCountryImportReference.Find(request.ShipTo) is { } guidance)
         {
             checks.AddRange(guidance.UnresolvedChecks);
