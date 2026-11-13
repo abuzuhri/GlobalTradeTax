@@ -90,6 +90,13 @@ Pre-merge implementation commit `4c46aa896fee3c38b2e6aeba3ec627ada0ba845a` passe
 
 Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d66c782`: [run 42683768925](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42683768925) passed all six regular jobs, including 467 isolated PostgreSQL/container assertions and cleanup. Optional live jobs were skipped. Subsequent documentation-only changes require their own head checks.
 
+## Norway, Switzerland and Iceland reference slice (2026-11-12)
+Scope: authenticated tenant-budgeted static national commercial-import references for NO, CH and IS only. Preserve OTHER routing and unresolved shipment, territory, tax and control checks. No rates, provider, migration, payment or release approval. Live effective-dated data, source rights and independent legal review remain open.
+
+
+Implemented `/v1/references/no-ch-is/{country}` under existing authentication and shared tenant budget. NO, CH and IS retain OTHER routing; destination and compliance include national review checks. Unsupported and malformed codes return 400; financial fields remain null and calculation, payment and release remain closed. [Sources and inspection limits](../docs/SOURCES.md). Local Release tests: 678 passed and 16 optional live probes skipped; Python: 39 passed; local anonymous HTTP smoke: 19 checks passed. Local Docker command unavailable; hosted current-head container evidence is required. TASK-011 remains in progress for live effective-dated data, source rights and independent legal review.
+
+Hosted implementation commit `88fa6d74d701a6a4d63ca535326b417884913ae8` passed all six regular jobs in [run 43185383508](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43185383508), including 486 isolated PostgreSQL/container assertions with cleanup and 19 anonymous smoke checks. Optional live jobs were skipped. Later documentation changes require their own head checks.
 ## South Africa, Kenya, Nigeria and Egypt reference slice (2026-11-10)
 Scope: authenticated, tenant-budgeted static national commercial-import guidance for ZA, KE, NG and EG only, with official source inspection and unresolved shipment-specific and territorial checks. Region remains OTHER. No rates, provider, migration, payment or release approval. TASK-011 remains in progress for live effective-dated data, source rights and independent legal review.
 

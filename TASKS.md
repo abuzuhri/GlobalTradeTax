@@ -116,4 +116,5 @@ The open-source backend is an engineering reference; source-code licensing and r
 
 Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d66c782`: [run 42683768925](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42683768925) passed all six regular jobs, including 467 isolated PostgreSQL/container assertions and cleanup. Optional live jobs were skipped. Subsequent documentation-only changes require their own head checks.
 
+**TASK-011 NO/CH/IS slice (2026-11-12):** in progress: authenticated, tenant-budgeted national commercial-import reference guidance for Norway, Switzerland and Iceland only, with OTHER routing and unresolved shipment and territorial checks. No rates, provider, migration or approval; live data, source rights and independent legal review remain open.
 **TASK-011 ZA/KE/NG/EG slice (2026-11-10):** in progress: authenticated tenant-budgeted national commercial-import reference guidance for South Africa, Kenya, Nigeria and Egypt only. Rates, source rights, live data and independent legal approval remain open.
