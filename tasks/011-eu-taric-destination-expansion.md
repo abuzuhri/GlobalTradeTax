@@ -110,3 +110,5 @@ Combined implementation commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed
 Scope: extend the existing Latin America reference route to CR, PA and DO only. Preserve closed financial and release gates, unresolved shipment checks and existing countries. Official source inspection, testing and hosted head evidence are pending; source rights, live effective-dated integration and independent legal/tax approval remain open.
 
 Local verification 2026-11-13: Release tests 701 passed, 16 optional live tests skipped; Python tests 39 passed; anonymous API smoke 20 assertions passed. Docker is unavailable locally; hosted current-head authenticated PostgreSQL/container, shared budget and cleanup evidence remains required. The source review date is not an effective date or data licence.
+
+Implementation commit `040ddd465bdc7ae2e3c64631f5aa752ab24ae1ea` passed all six regular hosted jobs in [run 43399561756](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43399561756), including 506 isolated PostgreSQL/container assertions and cleanup. Optional live probes were skipped. Subsequent changes require their own head checks.
