@@ -205,3 +205,8 @@ Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d
 Added authenticated tenant-budgeted national reference guidance for TR, MA and TN, destination and compliance reminders, and closed financial gates. OTHER category is preserved. [Sources and limitations](SOURCES.md); source rights, current effective-dated data and independent legal review remain open. Preliminary local Release: 677 passed, 16 optional live skipped; Python: 39 passed. Hosted results must be tied to the actual PR head.
 
 Implementation commit `54e0fcd9c8db88b42c0d06be39c946885be8db9e` passed [hosted run 43202467047](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43202467047): six regular jobs, 19 anonymous HTTP smoke checks, and 485 isolated PostgreSQL/container assertions with cleanup. Optional live jobs were skipped. Subsequent documentation changes require their own head checks.
+## 2026-11-10 — TASK-011 ZA/KE/NG/EG
+
+Added four-country reference-only import guidance, OTHER routing and compliance reminders; live data, source rights and independent legal approval remain open. See [sources](SOURCES.md) and [task](../tasks/011-eu-taric-destination-expansion.md).
+
+2026-11-12: Reconciled the four-country slice with merged AR/UY/PY guidance. Combined commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed [hosted run 43176500673](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43176500673), including 487 isolated PostgreSQL/container assertions and cleanup; later documentation changes need their own checks.
