@@ -31,6 +31,11 @@ public static class ShipmentCompliance
         if (EuDestinationReferences.Find(request.ShipTo) is not null)
             checks.AddRange(["Assess EU VAT/IOSS eligibility separately from customs duties and clearance fees",
                 "Confirm the exact destination territory and its customs and VAT scope"]);
+        if (GhanaTanzaniaUgandaDestinationReference.Find(request.ShipTo) is { } ghTzUg)
+        {
+            checks.AddRange(ghTzUg.UnresolvedChecks);
+            warnings.Add(ghTzUg.Name + " guidance is reference only; tax, tariff and clearance require independent review.");
+        }
         if (AfricanFourDestinationReference.Find(request.ShipTo) is { } africanFour)
         {
             checks.AddRange(africanFour.UnresolvedChecks);
