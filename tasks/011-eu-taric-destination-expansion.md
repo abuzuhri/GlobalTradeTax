@@ -111,3 +111,5 @@ Scope: authenticated, tenant-budgeted static commercial-import guidance for RS, 
 Implemented `/v1/references/rs-al-mk/{country}` for RS, AL and MK under existing authentication and shared tenant budget. OTHER routing and closed financial gates remain; malformed and unsupported codes return 400. [Source inspection and limitations](../docs/SOURCES.md). TASK-011 remains in progress for authoritative effective-dated integration, rights and independent tax/legal approval.
 
 Local verification: 700 Release tests passed, 16 optional live tests skipped; 39 Python tests, repository/security guards and 21 anonymous HTTP smoke assertions passed. Docker is unavailable locally; hosted current-head PostgreSQL/container evidence is required.
+
+Implementation commit `c9203e67a6be6fdcfeeb32bb1107b61b75dcd679` passed six regular jobs in [run 43391014496](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43391014496), including 512 isolated PostgreSQL/container assertions with cleanup. Optional live jobs were skipped. Subsequent changes require their own head checks.
