@@ -37,6 +37,8 @@ public static class DestinationPolicies
         if (LatamDestinationReference.Find(country) is { } reference) return new(country, "LATAM", "Country-specific import tax",
             "Country-specific customs tariff", "provider_required", reference.UnresolvedChecks, reference.Sources.Select(source => source.Url).ToArray());
         if (AuNzDestinationReference.Find(country) is { } auNz) return new(country, "OTHER", "Country-specific GST", "Country-specific customs tariff", "provider_required", auNz.UnresolvedChecks, auNz.Sources.Select(source => source.Url).ToArray());
+        if (TrMaTnDestinationReference.Find(country) is { } trMaTn) return new(country, "OTHER", "Country-specific import tax",
+            "Country-specific customs tariff", "provider_required", trMaTn.UnresolvedChecks, trMaTn.Sources.Select(source => source.Url).ToArray());
         if (PkBdLkDestinationReference.Find(country) is { } pkBdLk) return new(country, "OTHER", "Country-specific import tax",
             "Country-specific customs tariff", "provider_required", pkBdLk.UnresolvedChecks, pkBdLk.Sources.Select(source => source.Url).ToArray());
         if (NoChIsDestinationReference.Find(country) is { } noChIs) return new(country, "OTHER", "Country-specific import tax",

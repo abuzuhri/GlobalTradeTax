@@ -90,6 +90,12 @@ Pre-merge implementation commit `4c46aa896fee3c38b2e6aeba3ec627ada0ba845a` passe
 
 Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d66c782`: [run 42683768925](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42683768925) passed all six regular jobs, including 467 isolated PostgreSQL/container assertions and cleanup. Optional live jobs were skipped. Subsequent documentation-only changes require their own head checks.
 
+## Türkiye, Morocco and Tunisia reference slice (2026-11-12)
+Scope: authenticated, tenant-budgeted static national commercial-import guidance for TR, MA and TN only, official source context and unresolved shipment-specific checks. Preserve OTHER category, closed financial and release gates, existing country routes and security controls. No rates, eligibility, provider or migration. Source rights, live effective-dated integration and independent legal review remain open.
+
+Implementation adds `/v1/references/tr-ma-tn/{country}` and national destination/compliance reminders. Sources, historical-document and retrieval limitations are recorded in [the registry](../docs/SOURCES.md). Source inspection is not a legal effective date or data rights approval. Current commodity, origin, valuation, importer, regime, controls, low-value and territorial treatment require shipment-specific review. All financial and release gates remain closed. Preliminary local Release: 677 passed, 16 optional live skipped; Python: 39 passed. Hosted container evidence remains to be verified on the actual PR head. TASK-011 remains in progress.
+
+Implementation commit `54e0fcd9c8db88b42c0d06be39c946885be8db9e` passed [hosted run 43202467047](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43202467047): six regular jobs, 19 anonymous HTTP smoke checks, and 485 isolated PostgreSQL/container assertions with cleanup. Optional live jobs were skipped. Subsequent documentation changes require their own head checks.
 ## Pakistan, Bangladesh and Sri Lanka reference slice (2026-11-12)
 Scope: national commercial-import references for PK, BD and LK only, authenticated and sharing tenant budgets. Retain OTHER routing and unresolved classification, origin, valuation, importer, regime, taxes, controls and territory checks; no rates, financial approval, provider or migration. Source rights, live effective-dated data and independent legal review remain open.
 

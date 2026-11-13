@@ -200,6 +200,11 @@ Added tenant-budgeted, reference-only national sources and unresolved shipment c
 
 Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d66c782`: [run 42683768925](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42683768925) passed all six regular jobs, including 467 isolated PostgreSQL/container assertions and cleanup. Optional live jobs were skipped. Subsequent documentation-only changes require their own head checks.
 
+### 2026-11-12 — TASK-011 TR/MA/TN reference slice
+
+Added authenticated tenant-budgeted national reference guidance for TR, MA and TN, destination and compliance reminders, and closed financial gates. OTHER category is preserved. [Sources and limitations](SOURCES.md); source rights, current effective-dated data and independent legal review remain open. Preliminary local Release: 677 passed, 16 optional live skipped; Python: 39 passed. Hosted results must be tied to the actual PR head.
+
+Implementation commit `54e0fcd9c8db88b42c0d06be39c946885be8db9e` passed [hosted run 43202467047](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43202467047): six regular jobs, 19 anonymous HTTP smoke checks, and 485 isolated PostgreSQL/container assertions with cleanup. Optional live jobs were skipped. Subsequent documentation changes require their own head checks.
 ### 2026-11-12 — TASK-011 PK/BD/LK
 Added authenticated, tenant-budgeted Pakistan, Bangladesh and Sri Lanka commercial-import references with OTHER routing and unresolved shipment and territory checks. No rates or approvals; source rights, effective-dated data and independent legal review remain open. See [sources](SOURCES.md). Validation and hosted head evidence are tracked in the PR.
 
