@@ -26,7 +26,8 @@ public sealed class BaMeMdDestinationReferenceTests
         var compliance = ShipmentCompliance.Evaluate(request);
         Assert.Equal("manual_review_required", compliance.Decision); Assert.False(compliance.ShipmentReleaseApproved);
         Assert.All(result.UnresolvedChecks, check => Assert.Contains(check, compliance.RequiredChecks));
-        Assert.Null(new QuoteService().Calculate(request).LandedTotal);
+        var quote = new QuoteService().Calculate(request);
+        Assert.Null(quote.ImportDuty); Assert.Null(quote.ImportTax); Assert.Null(quote.LandedTotal);
         result.Sources[0] = null!;
         Assert.NotNull(BaMeMdDestinationReference.Find(country)!.Sources[0]);
     }
