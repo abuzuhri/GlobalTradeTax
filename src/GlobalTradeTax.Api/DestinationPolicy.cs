@@ -17,6 +17,9 @@ public static class DestinationPolicies
         if (AfricanFourDestinationReference.Find(country) is { } africanFour)
             return new(country, "OTHER", "Country-specific import tax", "Country-specific customs tariff", "provider_required",
                 africanFour.UnresolvedChecks, africanFour.Sources.Select(source => source.Url).ToArray());
+        if (RsAlMkDestinationReference.Find(country) is { } rsAlMk)
+            return new(country, "OTHER", "Country-specific import tax", "Country-specific customs tariff", "provider_required",
+                rsAlMk.UnresolvedChecks, rsAlMk.Sources.Select(source => source.Url).ToArray());
         if (IndianChineseDestinationReference.Find(country) is { } national)
             return new(country, "OTHER", "Destination-specific import tax", "National customs tariff", "provider_required",
                 national.UnresolvedChecks, national.Sources.Select(source => source.Url).ToArray());

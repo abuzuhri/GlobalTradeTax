@@ -113,3 +113,11 @@ Implemented four national references and destination/compliance reminders; [sour
 2026-11-12: Reconciled the ZA/KE/NG/EG slice with merged AR/UY/PY guidance from main. Combined local Release tests: 678 passed and 16 optional live probes skipped; Python: 39 passed. Hosted validation is tied to the resulting PR head. TASK-011 remains in progress.
 
 Combined implementation commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed all six regular jobs in [hosted run 43176500673](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43176500673), including 487 isolated PostgreSQL/container assertions with cleanup and 19 anonymous smoke checks. Optional live jobs were skipped. Later documentation changes require their own head checks.
+## Serbia, Albania and North Macedonia reference slice (2026-11-12)
+Scope: authenticated, tenant-budgeted static commercial-import guidance for RS, AL and MK only, with official national sources and unresolved shipment and territorial checks. Preserve OTHER routing and closed financial gates. No provider, migration or legal approval; source rights and effective-dated integration remain open.
+
+Implemented `/v1/references/rs-al-mk/{country}` for RS, AL and MK under existing authentication and shared tenant budget. OTHER routing and closed financial gates remain; malformed and unsupported codes return 400. [Source inspection and limitations](../docs/SOURCES.md). TASK-011 remains in progress for authoritative effective-dated integration, rights and independent tax/legal approval.
+
+Local verification: 700 Release tests passed, 16 optional live tests skipped; 39 Python tests, repository/security guards and 21 anonymous HTTP smoke assertions passed. Docker is unavailable locally; hosted current-head PostgreSQL/container evidence is required.
+
+Implementation commit `c9203e67a6be6fdcfeeb32bb1107b61b75dcd679` passed six regular jobs in [run 43391014496](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43391014496), including 512 isolated PostgreSQL/container assertions with cleanup. Optional live jobs were skipped. Subsequent changes require their own head checks.

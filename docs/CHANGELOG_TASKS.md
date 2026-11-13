@@ -216,3 +216,5 @@ Hosted implementation commit `88fa6d74d701a6a4d63ca535326b417884913ae8` passed a
 Added four-country reference-only import guidance, OTHER routing and compliance reminders; live data, source rights and independent legal approval remain open. See [sources](SOURCES.md) and [task](../tasks/011-eu-taric-destination-expansion.md).
 
 2026-11-12: Reconciled the four-country slice with merged AR/UY/PY guidance. Combined commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed [hosted run 43176500673](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43176500673), including 487 isolated PostgreSQL/container assertions and cleanup; later documentation changes need their own checks.
+
+- 2026-11-13: TASK-011 adds RS/AL/MK static reference guidance with OTHER routing, tenant protection and unresolved shipment checks. Sources are contextual; no financial calculation or clearance is approved. Current-head verification is tracked in the PR.
