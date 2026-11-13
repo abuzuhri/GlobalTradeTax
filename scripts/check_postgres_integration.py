@@ -310,7 +310,7 @@ class Integration:
         self.start_api()
         self.check('Runtime container runs without root', self.compose('exec', '-T', 'api', 'id', '-u').stdout.strip() != b'0')
         anonymous = assert_smoke(lambda path, method='GET', payload=None: fetch(self.base, path, method, payload))
-        self.check('General container smoke and anonymous routes', anonymous == 20, count=anonymous)
+        self.check('General container smoke and anonymous routes', anonymous == 21, count=anonymous)
         for country in ('DE', 'PL', 'CY'):
             reference = self.request('GET', '/v1/references/eu/destinations/' + country.lower(), key=self.keys['a'])
             self.check('EU country guidance remains reference only: ' + country,
@@ -436,6 +436,8 @@ class Integration:
         self.request('GET', '/v1/destinations/GB', expected=401)
         self.request('GET', '/v1/references/gcc/SA', expected=401)
         self.request('GET', '/v1/references/five-imports/MY', expected=401)
+        self.request('GET', '/v1/references/rs-al-mk/RS', expected=401)
+        self.request('GET', '/v1/references/rs-al-mk/AL', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/no-ch-is/NO', expected=401)
         self.request('GET', '/v1/references/no-ch-is/CH', key=rotated, expected=429, retry_after=True)
         self.request('GET', '/v1/references/za-ke-ng-eg/ZA', expected=401)
@@ -466,6 +468,11 @@ class Integration:
                        result['country'] == country and result['status'] == 'reference_only' and
                        result['importDuty'] is None and result['importTax'] is None and result['landedTotal'] is None and
                        result['verifiedForCalculation'] is False and result['paymentApproved'] is False and result['shipmentReleaseApproved'] is False)
+        for country in ('RS', 'AL', 'MK'):
+            result = self.request('GET', '/v1/references/rs-al-mk/' + country.lower(), key=first)
+            self.check('RS/AL/MK reference remains review only', result['country'] == country and result['status'] == 'reference_only' and all(result[x] is None for x in ('importDuty', 'importTax', 'landedTotal')) and not any(result[x] for x in ('verifiedForCalculation', 'paymentApproved', 'shipmentReleaseApproved')))
+        for country in ('XK', 'SRB'):
+            self.request('GET', '/v1/references/rs-al-mk/' + country, key=first, expected=400)
         for country in ('NO', 'CH', 'IS'):
             result = self.request('GET', '/v1/references/no-ch-is/' + country.lower(), key=first)
             self.check('NO/CH/IS reference remains unapproved ' + country, result['country'] == country and result['status'] == 'reference_only' and all(result[x] is None for x in ('importDuty', 'importTax', 'landedTotal')) and not any(result[x] for x in ('verifiedForCalculation', 'paymentApproved', 'shipmentReleaseApproved')))

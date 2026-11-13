@@ -91,3 +91,13 @@ These are discovery pointers, not licensed, effective-dated tariff data or verif
 - Iceland: Iceland Revenue and Customs' [company import overview](https://www.skatturinn.is/english/companies/customs-matters/importing-to-iceland/) covers procedures and import charges, and its [import documents page](https://www.skatturinn.is/english/companies/customs-matters/importing-to-iceland/import-documents/) discusses origin evidence and licences where required. The English overview itself points to more detailed Icelandic information; it is not a comprehensive catalogue of import controls. Check the relevant competent authority for each product.
 
 For all three, verify classification, actual goods origin and preferential proof, valuation, importer registration and broker, regime, duties, taxes and fees, permits and prohibitions, postal/courier/low-value applicability and exact territory and zone for each shipment. Country code alone establishes none of these. Live authoritative integration, source rights and independent tax/legal review remain open.
+
+## Serbia, Albania and North Macedonia (inspected 2026-11-13)
+
+The source pointers in `RsAlMkDestinationReference` are national commercial-import context, not licensed effective-dated datasets or legal determinations. Inspection date is not a legal effective date. Verify classification, actual origin and preference proof, valuation, importer registration and broker, regime, duties, taxes and fees, competent authorities and permits, postal/courier and low-value treatment, and exact territory and special zones for each shipment. Separately coded destinations are unsupported.
+
+- Serbia: Customs Administration's ITMS page describes tariff classification, import controls and restrictions; its import data are informational during the stated transition. The simplified procedure page links a commercial import explanation. The English customs law PDF is labelled draft and historical; the Serbian Tax Administration VAT PDF consolidates amendments only through 2024, and later changes require review. Neither is proof of current law.
+- Albania: the General Directorate of Customs pages describe tariff classification, import regimes, VAT context and a selected restrictions index. The brief VAT page and restriction index are not exhaustive legal or product-control advice.
+- North Macedonia: the Customs Administration describes tariff, valuation and origin, its tariff system's national VAT context, prohibitions and restrictions, and EXIM licence applications. The system description is contextual; no live tariff or licence determination was performed.
+
+Sources may change, and linking does not grant reuse rights. Independent tax/legal and rights review and live authoritative integration remain open.
