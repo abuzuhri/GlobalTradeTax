@@ -32,3 +32,5 @@ Repeat the same request with the same key to obtain the same quote; changing the
 - Do not use incomplete quotes as customer-facing final prices.
 
 Authenticated `GET /v1/references/za-ke-ng-eg/{country}` provides ZA, KE, NG and EG national reference-only guidance under the shared tenant budget. Unsupported and malformed codes return 400. Routing stays OTHER; amounts and approval gates remain closed. See [source limits](SOURCES.md).
+
+`GET /v1/references/rs-al-mk/{country}` is an authenticated, tenant-budgeted static reference for RS, AL and MK. It rejects unsupported or malformed codes, retains OTHER routing and supplies unresolved shipment checks; it does not calculate or approve any shipment.
