@@ -222,4 +222,7 @@ Added four-country reference-only import guidance, OTHER routing and compliance 
 
 2026-11-12: Reconciled the four-country slice with merged AR/UY/PY guidance. Combined commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed [hosted run 43176500673](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43176500673), including 487 isolated PostgreSQL/container assertions and cleanup; later documentation changes need their own checks.
 
+2026-11-13: TASK-011 extends the existing LATAM reference endpoint to CR, PA and DO, retaining unresolved checks and closed financial and release gates. Source inspection and retrieval limitations are recorded in [SOURCES](SOURCES.md). Hosted current-head verification and independent source rights and legal/tax approval remain open.
 - 2026-11-13: TASK-011 adds RS/AL/MK static reference guidance with OTHER routing, tenant protection and unresolved shipment checks. Sources are contextual; no financial calculation or clearance is approved. Current-head verification is tracked in the PR.
+
+2026-11-14: Reconciled CR/PA/DO guidance with the merged national destination slices; local combined Release tests 732 passed with 16 optional skips, Python 39 passed and anonymous HTTP smoke 23 passed. Hosted current-head container verification remains required.
