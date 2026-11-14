@@ -90,6 +90,20 @@ Pre-merge implementation commit `4c46aa896fee3c38b2e6aeba3ec627ada0ba845a` passe
 
 Hosted verification of implementation commit `d27df46f6e42061fa23c297ce6c9d9f28d66c782`: [run 42683768925](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/42683768925) passed all six regular jobs, including 467 isolated PostgreSQL/container assertions and cleanup. Optional live jobs were skipped. Subsequent documentation-only changes require their own head checks.
 
+## Türkiye, Morocco and Tunisia reference slice (2026-11-12)
+Scope: authenticated, tenant-budgeted static national commercial-import guidance for TR, MA and TN only, official source context and unresolved shipment-specific checks. Preserve OTHER category, closed financial and release gates, existing country routes and security controls. No rates, eligibility, provider or migration. Source rights, live effective-dated integration and independent legal review remain open.
+
+Implementation adds `/v1/references/tr-ma-tn/{country}` and national destination/compliance reminders. Sources, historical-document and retrieval limitations are recorded in [the registry](../docs/SOURCES.md). Source inspection is not a legal effective date or data rights approval. Current commodity, origin, valuation, importer, regime, controls, low-value and territorial treatment require shipment-specific review. All financial and release gates remain closed. Preliminary local Release: 677 passed, 16 optional live skipped; Python: 39 passed. Hosted container evidence remains to be verified on the actual PR head. TASK-011 remains in progress.
+
+Implementation commit `54e0fcd9c8db88b42c0d06be39c946885be8db9e` passed [hosted run 43202467047](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43202467047): six regular jobs, 19 anonymous HTTP smoke checks, and 485 isolated PostgreSQL/container assertions with cleanup. Optional live jobs were skipped. Subsequent documentation changes require their own head checks.
+## Pakistan, Bangladesh and Sri Lanka reference slice (2026-11-12)
+Scope: national commercial-import references for PK, BD and LK only, authenticated and sharing tenant budgets. Retain OTHER routing and unresolved classification, origin, valuation, importer, regime, taxes, controls and territory checks; no rates, financial approval, provider or migration. Source rights, live effective-dated data and independent legal review remain open.
+
+Implemented `/v1/references/pk-bd-lk/{country}` with OTHER routing, unresolved shipment checks and closed financial and release gates. [Source inspection and limits](../docs/SOURCES.md). Hosted head validation and remaining gates are tracked in the PR.
+
+Local validation: 677 Release tests passed, 16 optional live tests skipped; 39 Python tests and 19 actual anonymous HTTP smoke assertions passed. Repository integrity, secret and CI guards passed. Docker is unavailable locally; isolated hosted container evidence must be checked on the PR head.
+
+Hosted implementation commit `4f33a38250d8c4521b9f47589e57c8264b91b6fb` passed all six regular jobs in [run 43193406799](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43193406799): 677 .NET tests, 16 optional live skips, 19 anonymous HTTP smoke assertions and 485 isolated PostgreSQL/container assertions with cleanup. Local Python suite: 39 passed. Later documentation changes require their own head checks.
 ## Norway, Switzerland and Iceland reference slice (2026-11-12)
 Scope: authenticated tenant-budgeted static national commercial-import references for NO, CH and IS only. Preserve OTHER routing and unresolved shipment, territory, tax and control checks. No rates, provider, migration, payment or release approval. Live effective-dated data, source rights and independent legal review remain open.
 
@@ -110,3 +124,21 @@ Combined implementation commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed
 Scope: authenticated, tenant-budgeted static national commercial-import guidance for GH, TZ and UG only. Retain OTHER grouping and unresolved shipment-specific origin, preference, taxes, controls and exact territorial treatment. No rates, provider, migration, payment or release approval. Source rights, live effective-dated integration and independent legal review remain open.
 
 Implemented /v1/references/gh-tz-ug/{country} with country-specific destination and compliance checks. Local Release tests: 699 passed, 16 optional live skips; Python: 39 passed; 21 anonymous HTTP smoke checks passed after correcting route authentication. Docker is unavailable locally; hosted isolated PostgreSQL/container and shared budget results remain required on the actual PR head. See source registry for retrieval and territorial limits. TASK-011 remains in progress.
+## Costa Rica, Panama and Dominican Republic reference slice (2026-11-13)
+Scope: extend the existing Latin America reference route to CR, PA and DO only. Preserve closed financial and release gates, unresolved shipment checks and existing countries. Official source inspection, testing and hosted head evidence are pending; source rights, live effective-dated integration and independent legal/tax approval remain open.
+
+Local verification 2026-11-13: Release tests 701 passed, 16 optional live tests skipped; Python tests 39 passed; anonymous API smoke 20 assertions passed. Docker is unavailable locally; hosted current-head authenticated PostgreSQL/container, shared budget and cleanup evidence remains required. The source review date is not an effective date or data licence.
+
+Implementation commit `040ddd465bdc7ae2e3c64631f5aa752ab24ae1ea` passed all six regular hosted jobs in [run 43399561756](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43399561756), including 506 isolated PostgreSQL/container assertions and cleanup. Optional live probes were skipped. Subsequent changes require their own head checks.
+## Serbia, Albania and North Macedonia reference slice (2026-11-12)
+Scope: authenticated, tenant-budgeted static commercial-import guidance for RS, AL and MK only, with official national sources and unresolved shipment and territorial checks. Preserve OTHER routing and closed financial gates. No provider, migration or legal approval; source rights and effective-dated integration remain open.
+
+Implemented `/v1/references/rs-al-mk/{country}` for RS, AL and MK under existing authentication and shared tenant budget. OTHER routing and closed financial gates remain; malformed and unsupported codes return 400. [Source inspection and limitations](../docs/SOURCES.md). TASK-011 remains in progress for authoritative effective-dated integration, rights and independent tax/legal approval.
+
+Local verification: 700 Release tests passed, 16 optional live tests skipped; 39 Python tests, repository/security guards and 21 anonymous HTTP smoke assertions passed. Docker is unavailable locally; hosted current-head PostgreSQL/container evidence is required.
+
+Implementation commit `c9203e67a6be6fdcfeeb32bb1107b61b75dcd679` passed six regular jobs in [run 43391014496](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43391014496), including 512 isolated PostgreSQL/container assertions with cleanup. Optional live jobs were skipped. Subsequent changes require their own head checks.
+
+2026-11-14: Integrated CR/PA/DO guidance with main including RS/AL/MK, PK/BD/LK and TR/MA/TN. Combined local Release tests: 732 passed and 16 optional live skipped; Python: 39 passed; anonymous HTTP smoke: 23 passed. Repository, secret and CI guards passed; local Docker unavailable. Hosted verification is required on the resulting head. Source review dates and external rights, effective-dated integration and legal/tax gates remain unchanged.
+
+2026-11-14: Reconciled GH/TZ/UG with main including CR/PA/DO, RS/AL/MK, PK/BD/LK and TR/MA/TN. Combined local Release tests: 742 passed and 16 optional live skipped; Python: 39 passed; anonymous HTTP smoke: 24 passed. Repository, secret and CI guards passed; Docker unavailable locally. Hosted latest-head authentication, shared budget, PostgreSQL/container and cleanup evidence remains required. Source inspection dates and external rights, effective-dated integration and legal/tax gates remain unchanged.
