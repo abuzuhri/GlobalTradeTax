@@ -120,6 +120,10 @@ Implemented four national references and destination/compliance reminders; [sour
 
 Combined implementation commit `fb2b77c208fa31b563e7ca50d457fa2ff83058fc` passed all six regular jobs in [hosted run 43176500673](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43176500673), including 487 isolated PostgreSQL/container assertions with cleanup and 19 anonymous smoke checks. Optional live jobs were skipped. Later documentation changes require their own head checks.
 
+## Ghana, Tanzania and Uganda reference slice (2026-11-13)
+Scope: authenticated, tenant-budgeted static national commercial-import guidance for GH, TZ and UG only. Retain OTHER grouping and unresolved shipment-specific origin, preference, taxes, controls and exact territorial treatment. No rates, provider, migration, payment or release approval. Source rights, live effective-dated integration and independent legal review remain open.
+
+Implemented /v1/references/gh-tz-ug/{country} with country-specific destination and compliance checks. Local Release tests: 699 passed, 16 optional live skips; Python: 39 passed; 21 anonymous HTTP smoke checks passed after correcting route authentication. Docker is unavailable locally; hosted isolated PostgreSQL/container and shared budget results remain required on the actual PR head. See source registry for retrieval and territorial limits. TASK-011 remains in progress.
 ## Costa Rica, Panama and Dominican Republic reference slice (2026-11-13)
 Scope: extend the existing Latin America reference route to CR, PA and DO only. Preserve closed financial and release gates, unresolved shipment checks and existing countries. Official source inspection, testing and hosted head evidence are pending; source rights, live effective-dated integration and independent legal/tax approval remain open.
 
@@ -136,3 +140,5 @@ Local verification: 700 Release tests passed, 16 optional live tests skipped; 39
 Implementation commit `c9203e67a6be6fdcfeeb32bb1107b61b75dcd679` passed six regular jobs in [run 43391014496](https://github.com/abuzuhri/GlobalTradeTax/actions/runs/43391014496), including 512 isolated PostgreSQL/container assertions with cleanup. Optional live jobs were skipped. Subsequent changes require their own head checks.
 
 2026-11-14: Integrated CR/PA/DO guidance with main including RS/AL/MK, PK/BD/LK and TR/MA/TN. Combined local Release tests: 732 passed and 16 optional live skipped; Python: 39 passed; anonymous HTTP smoke: 23 passed. Repository, secret and CI guards passed; local Docker unavailable. Hosted verification is required on the resulting head. Source review dates and external rights, effective-dated integration and legal/tax gates remain unchanged.
+
+2026-11-14: Reconciled GH/TZ/UG with main including CR/PA/DO, RS/AL/MK, PK/BD/LK and TR/MA/TN. Combined local Release tests: 742 passed and 16 optional live skipped; Python: 39 passed; anonymous HTTP smoke: 24 passed. Repository, secret and CI guards passed; Docker unavailable locally. Hosted latest-head authentication, shared budget, PostgreSQL/container and cleanup evidence remains required. Source inspection dates and external rights, effective-dated integration and legal/tax gates remain unchanged.
