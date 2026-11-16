@@ -131,8 +131,7 @@ The source pointers in `RsAlMkDestinationReference` are national commercial-impo
 
 Sources may change, and linking does not grant reuse rights. Independent tax/legal and rights review and live authoritative integration remain open.
 
-
-### Armenia, Georgia and Azerbaijan (inspected 2026-11-16)
+## Armenia, Georgia and Azerbaijan (inspected 2026-11-16)
 
 These national pointers are informational; the inspection date is not a legal effective date or evidence of rights. Confirm the actual destination, competent authority and customs territory for each shipment. No country code, agreement or regional membership establishes origin, preferential eligibility, tax treatment or clearance.
 

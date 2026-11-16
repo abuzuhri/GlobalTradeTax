@@ -4,9 +4,9 @@ using Xunit;
 public sealed class ArmeniaGeorgiaAzerbaijanDestinationReferenceTests
 {
     [Theory]
-    [InlineData("AM", "Armenia", "Armenia")]
-    [InlineData("GE", "Georgia", "Georgia")]
-    [InlineData("AZ", "Azerbaijan", "Azerbaijan")]
+    [InlineData("AM", "Armenia", "Review Armenia competent authorities")]
+    [InlineData("GE", "Georgia", "Review Georgia competent authorities")]
+    [InlineData("AZ", "Azerbaijan", "Review Azerbaijan competent product-control authorities")]
     public void Guidance_is_country_specific_and_financially_closed(string country, string name, string detail)
     {
         var result = ArmeniaGeorgiaAzerbaijanDestinationReference.Find(country.ToLowerInvariant())!;
