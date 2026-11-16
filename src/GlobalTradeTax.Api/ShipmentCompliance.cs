@@ -76,6 +76,11 @@ public static class ShipmentCompliance
             checks.AddRange(auNz.UnresolvedChecks);
             warnings.Add("AU/NZ guidance is reference only; tax, tariff, territorial scope and clearance require independent review.");
         }
+        if (BaMeMdDestinationReference.Find(request.ShipTo) is { } baMeMd)
+        {
+            checks.AddRange(baMeMd.UnresolvedChecks);
+            warnings.Add("BA, ME and MD guidance is reference only; tax, territory and clearance require independent review.");
+        }
         if (TrMaTnDestinationReference.Find(request.ShipTo) is { } trMaTn)
         {
             checks.AddRange(trMaTn.UnresolvedChecks);
