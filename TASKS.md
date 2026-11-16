@@ -127,5 +127,7 @@ Hosted implementation commit `4f33a38250d8c4521b9f47589e57c8264b91b6fb` passed a
 
 **TASK-011 BA/ME/MD slice (2026-11-13):** in progress: authenticated, tenant-budgeted national commercial-import references for Bosnia and Herzegovina, Montenegro and Moldova only, grouped OTHER. Shipment-specific territorial, origin, tax and controls review remains required; effective-dated integration, source rights and independent legal approval remain open.
 
+**TASK-011 GH/TZ/UG slice (2026-11-13):** in progress: authenticated, tenant-budgeted static national commercial-import references for Ghana, Tanzania and Uganda only, with OTHER grouping and shipment-specific territorial and control checks. Rates, rights, effective-dated integration and independent legal review remain open.
+
 **TASK-011 CR/PA/DO slice (2026-11-13):** In progress: extend authenticated tenant-budgeted Latin America commercial-import references to Costa Rica, Panama and Dominican Republic only. Source rights, effective-dated integration and independent legal/tax approval remain open.
 **TASK-011 RS/AL/MK slice (2026-11-12):** bounded national commercial-import reference guidance for Serbia, Albania and North Macedonia; OTHER routing, unresolved shipment checks and closed financial gates. Source rights, effective-dated integration and independent legal review remain open.

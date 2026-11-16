@@ -132,6 +132,11 @@ This is research in progress, not implementation or legal/effective-date verific
 
 Implemented `/v1/references/ba-me-md/{country}` with country-specific destination/compliance checks and OTHER routing. Static sources and limitations are documented in [source registry](../docs/SOURCES.md); no rate or clearance is established. Local Release suite initially passed 700 tests with 16 optional skips; Python passed 39. Hosted verification of the final head is required. TASK-011 remains in progress.
 
+## Ghana, Tanzania and Uganda reference slice (2026-11-13)
+Scope: authenticated, tenant-budgeted static national commercial-import guidance for GH, TZ and UG only. Retain OTHER grouping and unresolved shipment-specific origin, preference, taxes, controls and exact territorial treatment. No rates, provider, migration, payment or release approval. Source rights, live effective-dated integration and independent legal review remain open.
+
+Implemented /v1/references/gh-tz-ug/{country} with country-specific destination and compliance checks. Local Release tests: 699 passed, 16 optional live skips; Python: 39 passed; 21 anonymous HTTP smoke checks passed after correcting route authentication. Docker is unavailable locally; hosted isolated PostgreSQL/container and shared budget results remain required on the actual PR head. See source registry for retrieval and territorial limits. TASK-011 remains in progress.
+
 ## Costa Rica, Panama and Dominican Republic reference slice (2026-11-13)
 Scope: extend the existing Latin America reference route to CR, PA and DO only. Preserve closed financial and release gates, unresolved shipment checks and existing countries. Official source inspection, testing and hosted head evidence are pending; source rights, live effective-dated integration and independent legal/tax approval remain open.
 
@@ -152,3 +157,7 @@ Implementation commit `c9203e67a6be6fdcfeeb32bb1107b61b75dcd679` passed six regu
 2026-11-14: Integrated CR/PA/DO guidance with main including RS/AL/MK, PK/BD/LK and TR/MA/TN. Combined local Release tests: 732 passed and 16 optional live skipped; Python: 39 passed; anonymous HTTP smoke: 23 passed. Repository, secret and CI guards passed; local Docker unavailable. Hosted verification is required on the resulting head. Source review dates and external rights, effective-dated integration and legal/tax gates remain unchanged.
 
 2026-11-14: Reconciled BA/ME/MD with main after CR/PA/DO merged; retained both national OTHER and existing LATAM guidance. Local Release: 744 passed, 16 optional live skipped; Python: 39 passed; anonymous HTTP smoke: 24 passed. Docker is unavailable locally; hosted current-head authentication, shared-budget and isolated PostgreSQL/container verification is required. Original source review dates, rights and independent legal/tax gates remain unchanged.
+
+2026-11-14: Reconciled GH/TZ/UG with main including CR/PA/DO, RS/AL/MK, PK/BD/LK and TR/MA/TN. Combined local Release tests: 742 passed and 16 optional live skipped; Python: 39 passed; anonymous HTTP smoke: 24 passed. Repository, secret and CI guards passed; Docker unavailable locally. Hosted latest-head authentication, shared budget, PostgreSQL/container and cleanup evidence remains required. Source inspection dates and external rights, effective-dated integration and legal/tax gates remain unchanged.
+
+2026-11-16: Reconciled BA/ME/MD with merged GH/TZ/UG and retained both national references, earlier country guidance and shipment-specific territorial limits. Local Release tests: 754 passed and 16 optional live skipped; Python: 39 passed; anonymous HTTP smoke: 25 passed. Docker unavailable locally; current-head hosted authentication, shared tenant budget and isolated PostgreSQL/container cleanup evidence are required. Source review dates, rights and independent legal/tax gates remain unchanged.

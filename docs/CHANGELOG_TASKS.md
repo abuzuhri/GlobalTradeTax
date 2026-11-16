@@ -227,9 +227,16 @@ Added authenticated tenant-budgeted national references, OTHER destination routi
 
 2026-11-14: Reconciled BA/ME/MD with the merged country references. Local Release tests passed 732 cases with 16 optional skips; Python passed 39 and local anonymous HTTP smoke passed 24 checks. Docker unavailable locally; hosted current-head container evidence is required. Source rights, effective-dated integration and independent legal/tax review remain open.
 
+## 2026-11-13 — TASK-011 Ghana, Tanzania and Uganda
+Added three authenticated static national references, OTHER destination and compliance guidance. Sources and retrieval limitations are recorded in [the registry](SOURCES.md). Rates, live effective-dated data, reuse rights and independent legal and tax approval remain open.
+
 2026-11-13: TASK-011 extends the existing LATAM reference endpoint to CR, PA and DO, retaining unresolved checks and closed financial and release gates. Source inspection and retrieval limitations are recorded in [SOURCES](SOURCES.md). Hosted current-head verification and independent source rights and legal/tax approval remain open.
 - 2026-11-13: TASK-011 adds RS/AL/MK static reference guidance with OTHER routing, tenant protection and unresolved shipment checks. Sources are contextual; no financial calculation or clearance is approved. Current-head verification is tracked in the PR.
 
 2026-11-14: Reconciled CR/PA/DO guidance with the merged national destination slices; local combined Release tests 732 passed with 16 optional skips, Python 39 passed and anonymous HTTP smoke 23 passed. Hosted current-head container verification remains required.
 
 2026-11-14: Reconciled BA/ME/MD with merged CR/PA/DO guidance. Local Release: 744 passed, 16 optional skips; Python: 39 passed; anonymous HTTP smoke: 24 passed. Local Docker unavailable; hosted current-head container evidence is required. Source review dates and external rights, effective-dated integration and legal/tax gates remain unchanged.
+
+2026-11-14: Reconciled GH/TZ/UG guidance with merged national destination slices; combined local Release tests 742 passed with 16 optional skips, Python 39 passed and anonymous HTTP smoke 24 passed. Hosted current-head container verification remains required.
+
+2026-11-16: Reconciled BA/ME/MD with merged GH/TZ/UG and retained both national references, earlier country guidance and shipment-specific territorial limits. Local Release tests: 754 passed and 16 optional live skipped; Python: 39 passed; anonymous HTTP smoke: 25 passed. Docker unavailable locally; current-head hosted authentication, shared tenant budget and isolated PostgreSQL/container cleanup evidence are required. Source review dates, rights and independent legal/tax gates remain unchanged.
