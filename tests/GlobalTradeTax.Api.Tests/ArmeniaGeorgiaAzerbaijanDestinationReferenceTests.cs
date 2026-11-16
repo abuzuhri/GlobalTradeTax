@@ -30,13 +30,15 @@ public sealed class ArmeniaGeorgiaAzerbaijanDestinationReferenceTests
         Assert.NotEqual(result.Sources[0], ArmeniaGeorgiaAzerbaijanDestinationReference.Find(country)!.Sources[0]);
     }
     [Theory]
-    [InlineData("AM", "exim.src.am")]
-    [InlineData("GE", "www.rs.ge")]
-    [InlineData("AZ", "customs.gov.az")]
-    public void Sources_are_national_and_have_distinct_purposes(string country, string host)
+    [InlineData("AM", new[] { "exim.src.am" })]
+    [InlineData("GE", new[] { "www.rs.ge", "voice.rs.ge" })]
+    [InlineData("AZ", new[] { "customs.gov.az", "afsa.gov.az" })]
+    public void Sources_are_national_and_have_distinct_purposes(string country, string[] allowedHosts)
     {
         var sources = ArmeniaGeorgiaAzerbaijanDestinationReference.Find(country)!.Sources;
-        Assert.Contains(sources, source => new Uri(source.Url).Host == host);
+        Assert.NotEmpty(sources);
+        Assert.All(sources, source => Assert.Contains(new Uri(source.Url).Host, allowedHosts));
+        Assert.All(allowedHosts, host => Assert.Contains(sources, source => new Uri(source.Url).Host == host));
         Assert.True(sources.Select(source => source.Purpose).Distinct().Count() >= 3);
         Assert.All(sources, source => Assert.Equal("2026-11-16", source.ReviewedOn));
     }
