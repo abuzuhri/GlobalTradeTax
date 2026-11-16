@@ -240,3 +240,5 @@ Added three authenticated static national references, OTHER destination and comp
 2026-11-14: Reconciled GH/TZ/UG guidance with merged national destination slices; combined local Release tests 742 passed with 16 optional skips, Python 39 passed and anonymous HTTP smoke 24 passed. Hosted current-head container verification remains required.
 
 2026-11-16: Reconciled BA/ME/MD with merged GH/TZ/UG and retained both national references, earlier country guidance and shipment-specific territorial limits. Local Release tests: 754 passed and 16 optional live skipped; Python: 39 passed; anonymous HTTP smoke: 25 passed. Docker unavailable locally; current-head hosted authentication, shared tenant budget and isolated PostgreSQL/container cleanup evidence are required. Source review dates, rights and independent legal/tax gates remain unchanged.
+
+**2026-11-16 / TASK-011:** Added BW, ZM and RW national import reference guidance, preserving OTHER routing and closed calculation, payment and release gates. Source rights, effective-dated integration and independent legal review remain open. Current-head verification is tracked in the PR.
