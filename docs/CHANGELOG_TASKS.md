@@ -230,3 +230,5 @@ Added three authenticated static national references, OTHER destination and comp
 2026-11-14: Reconciled CR/PA/DO guidance with the merged national destination slices; local combined Release tests 732 passed with 16 optional skips, Python 39 passed and anonymous HTTP smoke 23 passed. Hosted current-head container verification remains required.
 
 2026-11-14: Reconciled GH/TZ/UG guidance with merged national destination slices; combined local Release tests 742 passed with 16 optional skips, Python 39 passed and anonymous HTTP smoke 24 passed. Hosted current-head container verification remains required.
+
+2026-11-16 — TASK-011: AM/GE/AZ national reference-only slice in progress; source rights, live effective-dated integration and independent legal/tax approval remain open. Hosted latest-head verification pending.

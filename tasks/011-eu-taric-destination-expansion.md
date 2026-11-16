@@ -142,3 +142,8 @@ Implementation commit `c9203e67a6be6fdcfeeb32bb1107b61b75dcd679` passed six regu
 2026-11-14: Integrated CR/PA/DO guidance with main including RS/AL/MK, PK/BD/LK and TR/MA/TN. Combined local Release tests: 732 passed and 16 optional live skipped; Python: 39 passed; anonymous HTTP smoke: 23 passed. Repository, secret and CI guards passed; local Docker unavailable. Hosted verification is required on the resulting head. Source review dates and external rights, effective-dated integration and legal/tax gates remain unchanged.
 
 2026-11-14: Reconciled GH/TZ/UG with main including CR/PA/DO, RS/AL/MK, PK/BD/LK and TR/MA/TN. Combined local Release tests: 742 passed and 16 optional live skipped; Python: 39 passed; anonymous HTTP smoke: 24 passed. Repository, secret and CI guards passed; Docker unavailable locally. Hosted latest-head authentication, shared budget, PostgreSQL/container and cleanup evidence remains required. Source inspection dates and external rights, effective-dated integration and legal/tax gates remain unchanged.
+
+## Armenia, Georgia and Azerbaijan reference slice (2026-11-16)
+Scope: AM, GE and AZ national commercial-import reference guidance only, authenticated and tenant-budgeted, with OTHER routing and closed financial and release gates. Official source inspection and shipment-specific classification, origin, valuation, controls and territorial review required. No rates, provider, migration or approval. Source rights and effective-dated live integration remain open.
+
+Implemented `/v1/references/am-ge-az/{country}` with OTHER routing and shipment-specific checks. Local Release test run: 752 passed, 16 optional live skipped. Hosted head verification and source/legal gates remain open. See [source inspection](../docs/SOURCES.md).
