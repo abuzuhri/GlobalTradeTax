@@ -30,6 +30,17 @@ public sealed class ArmeniaGeorgiaAzerbaijanDestinationReferenceTests
         Assert.NotEqual(result.Sources[0], ArmeniaGeorgiaAzerbaijanDestinationReference.Find(country)!.Sources[0]);
     }
     [Theory]
+    [InlineData("AM", "exim.src.am")]
+    [InlineData("GE", "www.rs.ge")]
+    [InlineData("AZ", "customs.gov.az")]
+    public void Sources_are_national_and_have_distinct_purposes(string country, string host)
+    {
+        var sources = ArmeniaGeorgiaAzerbaijanDestinationReference.Find(country)!.Sources;
+        Assert.Contains(sources, source => new Uri(source.Url).Host == host);
+        Assert.True(sources.Select(source => source.Purpose).Distinct().Count() >= 3);
+        Assert.All(sources, source => Assert.Equal("2026-11-16", source.ReviewedOn));
+    }
+    [Theory]
     [InlineData(null)][InlineData("")][InlineData(" A")][InlineData("AM ")][InlineData("ARM")][InlineData("ZA")][InlineData("éG")]
     public void Rejects_invalid_or_unsupported_codes(string? country) => Assert.Null(ArmeniaGeorgiaAzerbaijanDestinationReference.Find(country));
 }
