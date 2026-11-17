@@ -131,3 +131,5 @@ Hosted implementation commit `4f33a38250d8c4521b9f47589e57c8264b91b6fb` passed a
 
 **TASK-011 CR/PA/DO slice (2026-11-13):** In progress: extend authenticated tenant-budgeted Latin America commercial-import references to Costa Rica, Panama and Dominican Republic only. Source rights, effective-dated integration and independent legal/tax approval remain open.
 **TASK-011 RS/AL/MK slice (2026-11-12):** bounded national commercial-import reference guidance for Serbia, Albania and North Macedonia; OTHER routing, unresolved shipment checks and closed financial gates. Source rights, effective-dated integration and independent legal review remain open.
+
+**TASK-011 AM/GE/AZ slice (2026-11-16):** In progress: authenticated tenant-budgeted national commercial-import reference guidance for Armenia, Georgia and Azerbaijan only, with OTHER routing and shipment-specific review. Live integration, data rights and independent legal/tax approval remain open.

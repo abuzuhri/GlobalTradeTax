@@ -14,6 +14,9 @@ public static class DestinationPolicies
     public static DestinationPolicy Resolve(string country)
     {
         country = country.Trim().ToUpperInvariant();
+        if (ArmeniaGeorgiaAzerbaijanDestinationReference.Find(country) is { } amGeAz)
+            return new(country, "OTHER", "Country-specific import tax", "Country-specific customs tariff", "provider_required",
+                amGeAz.UnresolvedChecks, amGeAz.Sources.Select(source => source.Url).ToArray());
         if (GhanaTanzaniaUgandaDestinationReference.Find(country) is { } ghTzUg)
             return new(country, "OTHER", "Country-specific import tax", "Country-specific customs tariff", "provider_required",
                 ghTzUg.UnresolvedChecks, ghTzUg.Sources.Select(source => source.Url).ToArray());
